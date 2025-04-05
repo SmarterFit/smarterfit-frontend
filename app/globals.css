@@ -1,26 +1,95 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+   /* Cores da SmarterFit Power */
+   --color-primary: #6a0dad; /* Roxo */
+   --color-dark: #1e1e1e; /* Preto */
+   --color-light: #d1d1d1; /* Cinza-claro */
+   --color-accent: #ff6b00; /* Laranja */
+   --color-white: #ffffff; /* Branco */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+   /* Background e foreground padrão (modo claro) */
+   --background: var(--color-white);
+   --foreground: var(--color-dark);
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+   :root {
+      --background: var(--color-dark);
+      --foreground: var(--color-white);
+   }
+}
+
+@theme {
+   --color-background: var(--background);
+   --color-foreground: var(--foreground);
+   --color-primary: var(--color-primary);
+   --color-dark: var(--color-dark);
+   --color-light: var(--color-light);
+   --color-accent: var(--color-accent);
+   --color-white: var(--color-white);
+}
+
+@layer components {
+   .primary {
+      @apply bg-primary text-white;
+   }
+
+   .secondary {
+      @apply bg-accent text-white;
+   }
+
+   .tertiary {
+      @apply bg-foreground text-background;
+   }
+
+   .button {
+      @apply px-2 py-1 rounded cursor-pointer;
+   }
+
+   .link {
+      @apply text-foreground no-underline;
+   }
+
+   .desktop-link-menu {
+      @apply font-bold block;
+
+      @variant hover {
+         @apply text-foreground/20;
+      }
+   }
+
+   .mobile-link-menu {
+      @apply px-4 py-1 rounded block;
+
+      @variant hover {
+         @apply bg-white/20;
+      }
+   }
+
+   .card {
+      @apply bg-black/10 rounded-xl py-10 px-2 flex flex-col gap-2 items-center justify-center text-center;
+
+      @variant hover {
+         @apply bg-black/20;
+      }
+
+      @variant dark {
+         @apply bg-white/20;
+
+         @variant hover {
+            @apply bg-white/30;
+         }
+      }
+   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+   background-color: var(--background);
+   color: var(--foreground);
+   font-family: Arial, Helvetica, sans-serif;
+}
+
+.shadow-inset-bottom {
+   box-shadow: inset 0 -4px 4px -4px rgba(0, 0, 0, 0.25);
 }
