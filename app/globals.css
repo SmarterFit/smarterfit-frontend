@@ -82,6 +82,22 @@
          }
       }
    }
+
+   .form {
+      @apply flex flex-col gap-2;
+   }
+
+   .input {
+      @apply flex items-center gap-2 p-2 rounded bg-background outline-accent;
+
+      & input {
+         @apply bg-transparent text-foreground placeholder:text-foreground/40  focus:outline-none flex-1;
+      }
+
+      @variant focus-within {
+         @apply outline;
+      }
+   }
 }
 
 body {

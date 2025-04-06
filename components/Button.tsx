@@ -6,7 +6,7 @@ import clsx from "clsx";
 type ButtonProps = {
    variant?: "primary" | "secondary" | "tertiary";
    className?: string;
-} & React.ButtonHTMLAttributes<HTMLButtonElement>;
+} & React.ComponentProps<"button">;
 
 const baseStyles = "button";
 
