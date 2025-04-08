@@ -1,7 +1,6 @@
 "use client";
 
-import { twMerge } from "tailwind-merge";
-import clsx from "clsx";
+import { cn } from "@/lib/utils";
 
 type ButtonProps = {
    variant?: "primary" | "secondary" | "tertiary";
@@ -22,9 +21,8 @@ export default function Button({
    children,
    ...props
 }: ButtonProps) {
-   const classes = twMerge(
-      clsx(baseStyles, variantsStyles[variant], className)
-   );
+   const classes = cn(baseStyles, variantsStyles[variant], className);
+
    return (
       <button className={classes} {...props}>
          {children}

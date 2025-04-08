@@ -1,5 +1,4 @@
-import clsx from "clsx";
-import { twMerge } from "tailwind-merge";
+import { cn } from "@/lib/utils";
 
 type LinkProps = {
    variant?: "primary" | "secondary" | "tertiary";
@@ -20,8 +19,10 @@ export default function Link({
    children,
    ...props
 }: LinkProps) {
-   const classes = twMerge(
-      clsx(baseStyles, variant ? variantsStyles[variant] : "", className)
+   const classes = cn(
+      baseStyles,
+      variant ? variantsStyles[variant] : "",
+      className
    );
    return (
       <a className={classes} {...props}>

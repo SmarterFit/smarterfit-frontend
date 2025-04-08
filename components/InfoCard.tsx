@@ -1,5 +1,4 @@
-import clsx from "clsx";
-import { twMerge } from "tailwind-merge";
+import { cn } from "@/lib/utils";
 
 type InfoCardProps = {
    icon: React.ReactNode;
@@ -8,13 +7,15 @@ type InfoCardProps = {
    className?: string;
 };
 
+const baseStyles = "card";
+
 export default function InfoCard({
    icon,
    title,
    description,
    className,
 }: InfoCardProps) {
-   const classes = twMerge(clsx("card", className));
+   const classes = cn(baseStyles, className);
 
    return (
       <div className={classes}>

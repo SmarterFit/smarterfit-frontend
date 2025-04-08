@@ -1,5 +1,4 @@
-import clsx from "clsx";
-import { twMerge } from "tailwind-merge";
+import { cn } from "@/lib/utils";
 
 type FormProps = {
    className?: string;
@@ -8,6 +7,6 @@ type FormProps = {
 const baseStyles = "form";
 
 export default function Form({ className, ...props }: FormProps) {
-   const classes = twMerge(clsx(baseStyles, className));
+   const classes = cn(baseStyles, className);
    return <form className={classes} {...props} />;
 }

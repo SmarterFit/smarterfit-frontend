@@ -1,5 +1,4 @@
-import clsx from "clsx";
-import { twMerge } from "tailwind-merge";
+import { cn } from "@/lib/utils";
 
 type InputProps = {
    className?: string;
@@ -8,7 +7,7 @@ type InputProps = {
 const baseStyles = "input";
 
 export default function Input({ className, ...props }: InputProps) {
-   const classes = twMerge(clsx(baseStyles, className));
+   const classes = cn(baseStyles, className);
    return (
       <label className={classes}>
          <input {...props} />

@@ -1,6 +1,5 @@
-import clsx from "clsx";
+import { cn } from "@/lib/utils";
 import React from "react";
-import { twMerge } from "tailwind-merge";
 
 type InputIconProps = {
    icon: React.ReactElement<{ className?: string }>;
@@ -8,20 +7,18 @@ type InputIconProps = {
 } & React.ComponentProps<"input">;
 
 const baseStyles = "group input";
+const iconBaseStyles = "text-foreground/40 group-focus-within:text-foreground";
 
 export default function InputIcon({
    icon,
    className,
    ...props
 }: InputIconProps) {
-   const classes = twMerge(clsx(baseStyles, className));
+   const classes = cn(baseStyles, className);
 
    const enhancedIcon = React.isValidElement(icon)
       ? React.cloneElement(icon, {
-           className: twMerge(
-              "text-foreground/40 group-focus-within:text-foreground",
-              icon.props.className
-           ),
+           className: cn(iconBaseStyles, icon.props.className),
         })
       : icon;
 
