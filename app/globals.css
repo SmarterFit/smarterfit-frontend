@@ -90,8 +90,8 @@
    .input {
       @apply flex items-center gap-2 p-2 rounded bg-background outline-accent;
 
-      & input {
-         @apply bg-transparent text-foreground placeholder:text-foreground/40  focus:outline-none flex-1;
+      input {
+         @apply bg-transparent text-foreground placeholder:text-foreground/40 focus:outline-none w-full;
       }
 
       @variant focus-within {

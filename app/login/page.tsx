@@ -14,8 +14,8 @@ export default function Login() {
    const [isFlipped, setIsFlipped] = useState(false);
 
    return (
-      <main className="relative flex-1 px-8">
-         <div className="panel-size absolute top-1/4 left-1/2 -translate-x-1/2">
+      <main className="flex-1 p-8 relative">
+         <div className="panel-size absolute left-1/2 -translate-x-1/2 sm:top-1/4">
             <FlipContainer isFlipped={isFlipped}>
                <Panel flip={true}>
                   <h2 className="text-3xl font-bold">Login</h2>

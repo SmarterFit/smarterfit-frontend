@@ -7,7 +7,8 @@ type InputIconProps = {
 } & React.ComponentProps<"input">;
 
 const baseStyles = "group input";
-const iconBaseStyles = "text-foreground/40 group-focus-within:text-foreground";
+const iconBaseStyles =
+   "shrink-0 text-foreground/40 group-focus-within:text-foreground";
 
 export default function InputIcon({
    icon,

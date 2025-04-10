@@ -14,7 +14,7 @@ export default function FlipContainer({
    const classes = cn(baseStyles, isFlipped ? "rotate-y-180" : "");
 
    return (
-      <div className="group perspective-normal">
+      <div className="perspective-normal">
          <div className={classes}>{children}</div>
       </div>
    );
