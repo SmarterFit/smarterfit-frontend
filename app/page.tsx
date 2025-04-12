@@ -1,3 +1,4 @@
+import Input from "@/components/form/Input";
 import InfoCard from "@/components/InfoCard";
 import Link from "@/components/Link";
 import { Calendar, ChartNoAxesCombined, Check } from "lucide-react";

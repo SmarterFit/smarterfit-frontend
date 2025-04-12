@@ -39,3 +39,14 @@ export function regexFormatter(mask: string, value: string) {
 
    return masked;
 }
+
+export function textToCurrency(value: string) {
+   const onlyNumbers = value.replace(/\D/g, "");
+   let money = parseInt(onlyNumbers) / 100;
+
+   if (isNaN(money)) {
+      money = 0;
+   }
+
+   return money.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
