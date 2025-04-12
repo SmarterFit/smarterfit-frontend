@@ -4,3 +4,38 @@ import { twMerge } from "tailwind-merge";
 export function cn(...inputs: ClassValue[]) {
    return twMerge(clsx(inputs));
 }
+
+export function regexFormatter(mask: string, value: string) {
+   const isValidChar = (maskChar: string, inputChar: string) => {
+      if (maskChar === "A") return /[A-Za-z]/.test(inputChar);
+      if (maskChar === "9") return /\d/.test(inputChar);
+      if (maskChar === "*") return /./.test(inputChar);
+      return maskChar === inputChar;
+   };
+
+   let masked = "";
+   let inputIndex = 0;
+
+   for (let i = 0; i < mask.length; i++) {
+      const maskChar = mask[i];
+
+      if (inputIndex >= value.length) {
+         break;
+      } else if (maskChar === "A" || maskChar === "9" || maskChar === "*") {
+         while (inputIndex < value.length) {
+            const currentChar = value[inputIndex];
+            if (isValidChar(maskChar, currentChar)) {
+               masked += currentChar;
+               inputIndex++;
+               break;
+            } else {
+               inputIndex++; // pula caractere inválido
+            }
+         }
+      } else {
+         masked += maskChar;
+      }
+   }
+
+   return masked;
+}

@@ -94,9 +94,17 @@
          @apply bg-transparent text-foreground placeholder:text-foreground/40 focus:outline-none w-full;
       }
 
+      .input-icon {
+         @apply shrink-0 text-foreground/40 group-focus-within:text-foreground;
+      }
+
       @variant focus-within {
          @apply outline;
       }
+   }
+
+   .input-error {
+      @apply text-red-500 text-sm mt-1;
    }
 
    .input-group {

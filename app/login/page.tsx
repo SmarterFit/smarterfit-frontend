@@ -4,7 +4,6 @@ import Button from "@/components/Button";
 import Form from "@/components/form/Form";
 import Input from "@/components/form/Input";
 import InputGroup from "@/components/form/InputGroup";
-import InputIcon from "@/components/form/InputIcon";
 import FlipContainer from "@/components/panel/FlipContainer";
 import Panel from "@/components/panel/Panel";
 import { IdCard, Mail, SquareAsterisk } from "lucide-react";
@@ -21,12 +20,8 @@ export default function Login() {
                   <h2 className="text-3xl font-bold">Login</h2>
                   <p className="text-xl">Lorem ipsum dolor sit amet</p>
                   <Form>
-                     <InputIcon
-                        icon={<Mail />}
-                        placeholder="Email"
-                        type="email"
-                     />
-                     <InputIcon
+                     <Input icon={<Mail />} placeholder="Email" type="email" />
+                     <Input
                         icon={<SquareAsterisk />}
                         placeholder="Senha"
                         type="password"
@@ -56,23 +51,20 @@ export default function Login() {
                         <Input type="text" placeholder="Nome" />
                         <Input type="text" placeholder="Sobrenome" />
                      </InputGroup>
-                     <InputIcon
-                        icon={<Mail />}
-                        placeholder="Email"
-                        type="email"
-                     />
-                     <InputIcon
+                     <Input icon={<Mail />} placeholder="Email" type="email" />
+                     <Input
                         icon={<IdCard />}
                         placeholder="CPF"
                         type="text"
+                        mask="999.999.999-99"
                      />
                      <InputGroup>
-                        <InputIcon
+                        <Input
                            icon={<SquareAsterisk />}
                            placeholder="Senha"
                            type="password"
                         />
-                        <InputIcon
+                        <Input
                            icon={<SquareAsterisk />}
                            placeholder="Confirmar senha"
                            type="password"
