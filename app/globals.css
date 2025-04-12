@@ -117,6 +117,7 @@
 
    .panel-flip-container {
       @apply relative transition-all duration-500 transform-3d;
+      -moz-backface-visibility: hidden;
    }
 
    .panel-flip {
