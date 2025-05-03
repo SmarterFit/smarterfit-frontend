@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/header/Header";
+import { NotificationsProvider } from "@/components/NotificationsContext";
 
 export const metadata: Metadata = {
    title: "SmarterFit",
@@ -20,8 +21,10 @@ export default function RootLayout({
    return (
       <html lang="pt-BR">
          <body className="antialiased min-h-screen flex flex-col max-w-[1920px]">
-            <Header />
-            {children}
+            <NotificationsProvider>
+               <Header />
+               {children}
+            </NotificationsProvider>
          </body>
       </html>
    );

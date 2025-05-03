@@ -12,7 +12,7 @@ export default function MobileMenu() {
 
          {isOpen && (
             <div className="absolute top-16 left-0 w-full bg-white dark:bg-dark">
-               <ul className="flex flex-col gap-1 px-4 text-foreground">
+               <ul className="flex flex-col px-4 py-2 text-foreground [&>:not(:last-child)]:border-b *:border-foreground/20 *:py-2">
                   <li>
                      <a href="/" className="mobile-link-menu">
                         Início

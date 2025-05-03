@@ -19,8 +19,6 @@ const baseStyles = "group input";
 const iconBaseStyles = "input-icon";
 const errorStyles = "input-error ";
 
-/// TODO: ADD Currency Type
-
 export default function Input({
    icon,
    validationRules = [],

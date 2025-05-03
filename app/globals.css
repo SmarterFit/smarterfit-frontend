@@ -30,6 +30,36 @@
    --color-white: var(--color-white);
 }
 
+/* Scrollbar fina e estilizada para dark/light */
+@layer utilities {
+   .custom-scroll {
+      scrollbar-width: thin;
+      scrollbar-color: var(--scroll-thumb) transparent;
+   }
+
+   .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+   }
+
+   .custom-scroll::-webkit-scrollbar-track {
+      background: transparent;
+   }
+
+   .custom-scroll::-webkit-scrollbar-thumb {
+      background-color: var(--scroll-thumb);
+      border-radius: 4px;
+   }
+
+   .dark .custom-scroll {
+      --scroll-thumb: #444;
+   }
+
+   .light .custom-scroll,
+   .custom-scroll:not(.dark) {
+      --scroll-thumb: #ccc;
+   }
+}
+
 @layer components {
    .primary {
       @apply bg-primary text-white;
@@ -43,12 +73,36 @@
       @apply bg-foreground text-background;
    }
 
+   .notification {
+      @apply p-4 rounded-lg shadow-md flex items-center space-x-4 w-fit self-end;
+
+      &.success {
+         @apply bg-green-500 text-white;
+      }
+
+      &.error {
+         @apply bg-red-500 text-white;
+      }
+
+      &.warning {
+         @apply bg-yellow-500 text-black;
+      }
+   }
+
    .button {
       @apply px-2 py-1 rounded cursor-pointer;
    }
 
    .link {
       @apply text-foreground no-underline;
+   }
+
+   .section {
+      @apply h-[calc(100dvh-4rem)] snap-start px-8;
+   }
+
+   .sections-container {
+      @apply snap-y snap-mandatory h-[calc(100dvh-4rem)] overflow-y-scroll scroll-smooth mt-16;
    }
 
    .desktop-link-menu {
@@ -64,6 +118,22 @@
 
       @variant hover {
          @apply bg-white/20;
+      }
+   }
+
+   .modal {
+      @apply fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4;
+
+      .modal-content {
+         @apply bg-background text-foreground rounded-xl shadow-lg w-full sm:w-2/3 md:w-1/2 lg:w-1/3 p-6 relative;
+
+         .modal-header {
+            @apply flex items-center justify-between mb-4;
+         }
+
+         .modal-body {
+            @apply flex flex-col gap-4;
+         }
       }
    }
 
@@ -88,7 +158,7 @@
    }
 
    .input {
-      @apply flex items-center gap-2 p-2 rounded bg-background outline-accent;
+      @apply flex items-center gap-2 p-2 rounded bg-background outline-accent border border-foreground/10;
 
       input {
          @apply bg-transparent text-foreground placeholder:text-foreground/40 focus:outline-none w-full;
