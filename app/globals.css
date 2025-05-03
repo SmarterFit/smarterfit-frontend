@@ -74,7 +74,7 @@
    }
 
    .notification {
-      @apply p-4 rounded-lg shadow-md flex items-center space-x-4 w-fit self-end;
+      @apply p-4 rounded-lg shadow-md flex items-center space-x-4 w-fit self-end transition-opacity duration-500 ease-in-out;
 
       &.success {
          @apply bg-green-500 text-white;
@@ -97,12 +97,12 @@
       @apply text-foreground no-underline;
    }
 
-   .section {
-      @apply h-[calc(100dvh-4rem)] snap-start px-8;
+   .sections-container {
+      @apply h-[calc(100dvh-4rem)] mt-16 overflow-y-scroll snap-y snap-mandatory;
    }
 
-   .sections-container {
-      @apply snap-y snap-mandatory h-[calc(100dvh-4rem)] overflow-y-scroll scroll-smooth mt-16;
+   .section {
+      @apply h-full flex items-center justify-center snap-center px-8;
    }
 
    .desktop-link-menu {
@@ -171,6 +171,10 @@
       @variant focus-within {
          @apply outline;
       }
+
+      &.error {
+         @apply outline-red-500;
+      }
    }
 
    .input-error {
@@ -200,6 +204,44 @@
 
    .panel-flip {
       @apply absolute inset-0 backface-hidden;
+   }
+
+   .carousel-container {
+      @apply relative;
+   }
+
+   .carousel-scroll {
+      @apply flex snap-x snap-mandatory overflow-x-auto pb-4;
+      /* Se houver gap entre os itens, garanta que eles sejam considerados */
+      /* Se a classe gap-4 causar erro, é possível substituir por margin entre itens via CSS */
+   }
+
+   .carousel-item {
+      @apply flex-shrink-0 snap-center w-full max-w-sm;
+      /* Se necessário, defina margin direita para espaçamento */
+      margin-right: 1rem;
+   }
+
+   .carousel-pagination {
+      @apply mt-4 flex justify-center space-x-2;
+   }
+
+   .carousel-dot {
+      @apply w-3 h-3 rounded-full transition-colors bg-gray-400;
+   }
+
+   .carousel-dot.active {
+      @apply bg-primary;
+   }
+
+   /* Remove a scrollbar horizontal */
+   .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+   }
+
+   .hide-scrollbar::-webkit-scrollbar {
+      display: none;
    }
 }
 

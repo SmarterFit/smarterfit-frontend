@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Header from "@/components/header/Header";
-import { NotificationsProvider } from "@/components/NotificationsContext";
+import Header from "@/components/base/header/Header";
+import { NotificationsProvider } from "@/components/base/notifications/NotificationsContext";
 
 export const metadata: Metadata = {
    title: "SmarterFit",

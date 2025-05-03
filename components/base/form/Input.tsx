@@ -50,7 +50,7 @@ export default function Input({
       if (onChange) onChange(e);
    };
 
-   const classes = cn(baseStyles, className);
+   const classes = cn(baseStyles, className, errors.length > 0 && "error");
 
    return (
       <div>

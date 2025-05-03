@@ -1,5 +1,5 @@
-// services/apiRequest.ts
 import axios, { AxiosRequestConfig, Method } from "axios";
+import { ApiRequestError } from "./exceptions/ApiRequestError";
 
 const API_BASE_URL = "http://localhost:8081";
 
@@ -28,8 +28,7 @@ export async function apiRequest<T>(
    } catch (error) {
       if (axios.isAxiosError(error)) {
          const errData = error.response?.data as ApiError;
-         const message = errData?.errors?.join(", ") || "Erro desconhecido.";
-         throw new Error(message);
+         throw new ApiRequestError(errData);
       }
 
       throw new Error("Erro inesperado de rede.");

@@ -1,7 +1,7 @@
 "use client";
 
-import Button from "@/components/Button";
-import Section from "@/components/section/Section";
+import Button from "@/components/base/Button";
+import Section from "@/components/base/containers/section/Section";
 import ModalLogin from "./modal/ModalLogin";
 import { useState } from "react";
 import ModalRegister from "./modal/ModalRegister";
@@ -13,13 +13,13 @@ export default function SectionHero() {
    return (
       <Section
          id="section-hero"
-         className="flex items-center justify-center bg-[url(/imgs/hero.png)] bg-cover bg-center bg-no-repeat"
+         className="relative bg-[url(/imgs/hero.png)] bg-cover bg-center bg-no-repeat"
       >
          {/* Sobreposição escura */}
          <div className="absolute top-0 left-0 w-full h-full bg-dark/80"></div>
 
          {/* Conteúdo principal */}
-         <div className="flex flex-col items-center z-10 text-center text-white px-6">
+         <div className="relative flex flex-col items-center z-10 text-center text-white px-6">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6">
                Bem-vindo à SmarterFit
             </h1>

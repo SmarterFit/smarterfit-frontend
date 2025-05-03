@@ -1,14 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { registerUser } from "@/services/userService";
-import Button from "@/components/Button";
-import Form from "@/components/form/Form";
-import Input from "@/components/form/Input";
-import Modal from "@/components/modal/Modal";
+import { registerUser } from "@/lib/services/useraccess/userService";
+import Button from "@/components/base/Button";
+import Form from "@/components/base/form/Form";
+import Input from "@/components/base/form/Input";
+import Modal from "@/components/base/containers/modal/Modal";
 import { IdCard, Mail, SquareAsterisk, User } from "lucide-react";
-import InputGroup from "@/components/form/InputGroup";
-import { useNotifications } from "@/components/NotificationsContext";
+import InputGroup from "@/components/base/form/InputGroup";
+import { useNotifications } from "@/components/base/notifications/NotificationsContext";
+import { ApiRequestError } from "@/lib/exceptions/ApiRequestError";
+import { isCPF, isEmail } from "@/lib/validations/userValidations";
 
 type ModalRegisterProps = {
    isOpen: boolean;
@@ -67,11 +69,23 @@ export default function ModalRegister({
          openLoginModal();
       } catch (error) {
          // Notificação de erro via notificações globais
-         addNotification({
-            type: "error",
-            title: "Erro ao registrar",
-            message: "Houve um problema ao registrar. Tente novamente.",
-         });
+         if (error instanceof ApiRequestError) {
+            if (error.apiError.errors) {
+               error.apiError.errors.forEach((err) => {
+                  addNotification({
+                     type: "error",
+                     title: "Erro ao registrar",
+                     message: err,
+                  });
+               });
+            }
+         } else {
+            addNotification({
+               type: "error",
+               title: "Erro ao registrar",
+               message: "Houve um problema ao registrar. Tente novamente.",
+            });
+         }
       }
    };
 
@@ -94,6 +108,13 @@ export default function ModalRegister({
                      name="firstName"
                      value={nameFields.firstName}
                      onChange={handleNameChange}
+                     validationRules={[
+                        {
+                           validate: (value) => value.length > 3,
+                           message: "Nome inválido",
+                        },
+                     ]}
+                     required
                   />
                   <Input
                      icon={<User />}
@@ -113,6 +134,13 @@ export default function ModalRegister({
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
+                  validationRules={[
+                     {
+                        validate: (value) => isEmail(value),
+                        message: "Email inválido",
+                     },
+                  ]}
+                  required
                />
 
                {/* CPF com máscara */}
@@ -124,6 +152,13 @@ export default function ModalRegister({
                   mask="999.999.999-99"
                   value={formData.cpf}
                   onChange={handleChange}
+                  validationRules={[
+                     {
+                        validate: (value) => isCPF(value),
+                        message: "CPF inválido",
+                     },
+                  ]}
+                  required
                />
 
                {/* Senhas */}
@@ -135,6 +170,13 @@ export default function ModalRegister({
                      name="password"
                      value={formData.password}
                      onChange={handleChange}
+                     validationRules={[
+                        {
+                           validate: (value) => value.length >= 8,
+                           message: "A senha deve ter pelo menos 8 caracteres",
+                        },
+                     ]}
+                     required
                   />
                   <Input
                      icon={<SquareAsterisk />}
@@ -143,6 +185,13 @@ export default function ModalRegister({
                      name="confirmPassword"
                      value={formData.confirmPassword}
                      onChange={handleChange}
+                     validationRules={[
+                        {
+                           validate: (value) => value === formData.password,
+                           message: "As senhas devem ser iguais",
+                        },
+                     ]}
+                     required
                   />
                </InputGroup>
 

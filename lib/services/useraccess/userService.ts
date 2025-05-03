@@ -1,4 +1,3 @@
-// services/userService.ts
 import { apiRequest } from "@/lib/apiRequest";
 
 export type RegisterUserData = {
@@ -24,4 +23,24 @@ export async function registerUser(
       "/usuarios/cadastrar",
       data
    );
+}
+
+export type LoginUserData = {
+   email: string;
+   password: string;
+};
+
+export type JwtToken = {
+   token: string;
+   type: string;
+   expiresIn: Date;
+};
+
+export type AuthResponseDTO = {
+   accessToken: JwtToken;
+   user: UserResponseDTO;
+};
+
+export async function loginUser(data: LoginUserData): Promise<AuthResponseDTO> {
+   return await apiRequest<AuthResponseDTO>("POST", "/auth/login", data);
 }

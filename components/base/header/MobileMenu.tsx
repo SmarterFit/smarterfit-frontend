@@ -14,28 +14,31 @@ export default function MobileMenu() {
             <div className="absolute top-16 left-0 w-full bg-white dark:bg-dark">
                <ul className="flex flex-col px-4 py-2 text-foreground [&>:not(:last-child)]:border-b *:border-foreground/20 *:py-2">
                   <li>
-                     <a href="/" className="mobile-link-menu">
+                     <a href="#section-hero" className="mobile-link-menu">
                         Início
                      </a>
                   </li>
                   <li>
-                     <a href="/planos" className="mobile-link-menu">
+                     <a href="#section-about" className="mobile-link-menu">
+                        Sobre
+                     </a>
+                  </li>
+                  <li>
+                     <a href="#section-plans" className="mobile-link-menu">
                         Planos
                      </a>
                   </li>
                   <li>
-                     <a href="/aulas" className="mobile-link-menu">
+                     <a href="#section-classes" className="mobile-link-menu">
                         Aulas
                      </a>
                   </li>
                   <li>
-                     <a href="/treinos" className="mobile-link-menu">
-                        Treinos
-                     </a>
-                  </li>
-                  <li>
-                     <a href="/login" className="mobile-link-menu">
-                        Log In
+                     <a
+                        href="#section-testimonials"
+                        className="mobile-link-menu"
+                     >
+                        Comentários
                      </a>
                   </li>
                </ul>

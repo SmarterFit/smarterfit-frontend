@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useState, useContext } from "react";
-import Notification from "@/components/Notification";
+import Notification from "@/components/base/notifications/Notification";
 
 export type NotificationType = "success" | "error" | "warning";
 
@@ -40,7 +40,7 @@ export const NotificationsProvider = ({
    const [notifications, setNotifications] = useState<NotificationData[]>([]);
 
    const addNotification = (notification: Omit<NotificationData, "id">) => {
-      const id = Date.now() + Math.random(); // Gera um ID único
+      const id = Date.now() + Math.random() * 1000; // Gera um ID único
       setNotifications((prev) => [...prev, { id, ...notification }]);
    };
 
@@ -51,9 +51,8 @@ export const NotificationsProvider = ({
    return (
       <NotificationsContext.Provider
          value={{ notifications, addNotification, removeNotification }}
-      > 
+      >
          {children}
-         {/* Este container será exibido globalmente, sempre à frente dos demais elementos */}
          <div className="fixed top-4 right-2 z-50 space-y-2 flex flex-col items-end">
             {notifications.map((n) => (
                <Notification
