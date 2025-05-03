@@ -40,7 +40,18 @@ export default function SectionPlans() {
                </p>
             </div>
          ) : plans.length !== 0 ? (
-            <Carousel>
+            <Carousel
+               itemsToShow={{
+                  base: 1,
+                  sm: 2,
+                  md: 3,
+                  lg: 4,
+               }}
+               showDots={true}
+               showArrows={true}
+               gap={16}
+               className="mb-16"
+            >
                {plans.map((plan) => (
                   <PlanCard
                      key={plan.id}
