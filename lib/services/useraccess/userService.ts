@@ -33,7 +33,6 @@ export type LoginUserData = {
 export type JwtToken = {
    token: string;
    type: string;
-   expiresIn: Date;
 };
 
 export type AuthResponseDTO = {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { registerUser } from "@/lib/services/useraccess/userService";
 import Button from "@/components/base/Button";
 import Form from "@/components/base/form/Form";
@@ -11,6 +11,9 @@ import InputGroup from "@/components/base/form/InputGroup";
 import { useNotifications } from "@/components/base/notifications/NotificationsContext";
 import { ApiRequestError } from "@/lib/exceptions/ApiRequestError";
 import { isCPF, isEmail } from "@/lib/validations/userValidations";
+
+const nameIsValid = (name: string) => name.length > 3;
+const passwordIsValid = (password: string) => password.length >= 8;
 
 type ModalRegisterProps = {
    isOpen: boolean;
@@ -37,6 +40,8 @@ export default function ModalRegister({
       lastName: "",
    });
 
+   const [isFormValid, setIsFormValid] = useState(false);
+
    const { addNotification } = useNotifications();
 
    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,6 +56,17 @@ export default function ModalRegister({
          [name]: value,
       }));
    };
+
+   useEffect(() => {
+      const allValid =
+         nameIsValid(nameFields.firstName) &&
+         isEmail(formData.email) &&
+         isCPF(formData.cpf) &&
+         passwordIsValid(formData.password) &&
+         formData.password === formData.confirmPassword;
+
+      setIsFormValid(allValid);
+   }, [nameFields, formData]);
 
    const handleRegister = async () => {
       const fullName = `${nameFields.firstName.trim()} ${nameFields.lastName.trim()}`;
@@ -110,7 +126,7 @@ export default function ModalRegister({
                      onChange={handleNameChange}
                      validationRules={[
                         {
-                           validate: (value) => value.length > 3,
+                           validate: (value) => nameIsValid(value),
                            message: "Nome inválido",
                         },
                      ]}
@@ -172,7 +188,7 @@ export default function ModalRegister({
                      onChange={handleChange}
                      validationRules={[
                         {
-                           validate: (value) => value.length >= 8,
+                           validate: (value) => passwordIsValid(value),
                            message: "A senha deve ter pelo menos 8 caracteres",
                         },
                      ]}
@@ -195,10 +211,12 @@ export default function ModalRegister({
                   />
                </InputGroup>
 
+               {/* Botão de cadastro */}
                <Button
                   variant="secondary"
-                  className="p-2 hover:bg-accent/80"
+                  className="p-2 hover:bg-accent/80 disabled:bg-accent/60 disabled:cursor-default"
                   type="submit"
+                  disabled={!isFormValid}
                >
                   Cadastrar
                </Button>

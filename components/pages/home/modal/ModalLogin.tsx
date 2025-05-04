@@ -43,10 +43,6 @@ export default function ModalLogin({
          // Salvar token e dados do usuário
          localStorage.setItem("token", response.accessToken.token);
          localStorage.setItem("tokenType", response.accessToken.type);
-         localStorage.setItem(
-            "tokenExpiresIn",
-            response.accessToken.expiresIn.toString()
-         );
          localStorage.setItem("user", JSON.stringify(response.user));
 
          // Notificação de sucesso

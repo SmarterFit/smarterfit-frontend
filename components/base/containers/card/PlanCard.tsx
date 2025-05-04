@@ -20,7 +20,7 @@ export default function PlanCard({ plan, icon, className }: PlanCardProps) {
          <p className="text-lg font-bold text-accent mt-4">
             R$ {plan.price.toFixed(2)}
          </p>
-         <p className="text-sm">Duração: {plan.duration} meses</p>
+         <p className="text-sm">Duração: {plan.duration} dias</p>
          <p className="text-sm">Máx. Usuários: {plan.maxUsers}</p>
          <p className="text-sm">Máx. Aulas: {plan.maxClasses}</p>
       </div>
