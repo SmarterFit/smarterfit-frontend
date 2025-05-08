@@ -98,11 +98,11 @@
    }
 
    .sections-container {
-      @apply h-[calc(100dvh-4rem)] mt-16 overflow-y-scroll snap-y snap-mandatory;
+      @apply snap-y snap-mandatory;
    }
 
    .section {
-      @apply h-full flex items-center justify-center snap-center px-8;
+      @apply h-screen flex items-center justify-center snap-center px-8 pt-16;
    }
 
    .desktop-link-menu {

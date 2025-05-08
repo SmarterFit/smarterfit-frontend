@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig, Method } from "axios";
 import { ApiRequestError } from "./exceptions/ApiRequestError";
 
-const API_BASE_URL = "http://10.0.0.214:8081";
+const API_BASE_URL = "http://172.17.16.1:8081";
 
 export type ApiError = {
    timestamp: string;

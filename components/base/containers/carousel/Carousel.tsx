@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useRef, useState, useEffect, ReactNode, Children } from "react";
 import { cn } from "@/lib/utils";
 import { ArrowLeft, ArrowRight } from "lucide-react";
@@ -216,7 +218,7 @@ const Carousel = ({
             </div>
          </div>
 
-         {showArrows && (
+         {showArrows && totalSteps > 1 && (
             <>
                <button
                   onClick={handlePrev}
