@@ -1,6 +1,6 @@
 "use client";
 
-import Button from "@/components/base/Button";
+import Button from "@/components/base/buttons/Button";
 import Form from "@/components/base/form/Form";
 import Input from "@/components/base/form/Input";
 import Modal from "@/components/base/containers/modal/Modal";
@@ -8,7 +8,8 @@ import { Mail, SquareAsterisk } from "lucide-react";
 import { useState } from "react";
 import { ApiRequestError } from "@/lib/exceptions/ApiRequestError";
 import { useNotifications } from "@/components/base/notifications/NotificationsContext";
-import { loginUser } from "@/lib/services/useraccess/userService";
+import { loginUser } from "@/lib/services/useraccess/authService";
+import { useRouter } from "next/navigation";
 
 type ModalLoginProps = {
    isOpen: boolean;
@@ -36,6 +37,8 @@ export default function ModalLogin({
 
    const { addNotification } = useNotifications();
 
+   const router = useRouter();
+
    const handleLogin = async () => {
       try {
          const response = await loginUser(formData);
@@ -53,6 +56,7 @@ export default function ModalLogin({
          });
 
          onClose();
+         router.push("/dashboard");
       } catch (error) {
          if (error instanceof ApiRequestError) {
             if (error.apiError.errors) {

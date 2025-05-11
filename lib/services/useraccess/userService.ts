@@ -15,6 +15,12 @@ export type UserResponseDTO = {
    roles: string[];
 };
 
+export const roleOptions = [
+   { label: "Administrador", value: "ADMIN" },
+   { label: "Cliente", value: "CUSTOMER" },
+   { label: "Funcionário", value: "EMPLOYEE" },
+];
+
 export async function registerUser(
    data: RegisterUserData
 ): Promise<UserResponseDTO> {
@@ -25,21 +31,21 @@ export async function registerUser(
    );
 }
 
-export type LoginUserData = {
-   email: string;
-   password: string;
-};
+export async function getUserById(id: string): Promise<UserResponseDTO> {
+   return await apiRequest<UserResponseDTO>("GET", `/usuarios/${id}`);
+}
 
-export type JwtToken = {
-   token: string;
-   type: string;
-};
+export async function updateUserById(
+   id: string,
+   data: RegisterUserData
+): Promise<UserResponseDTO> {
+   return await apiRequest<UserResponseDTO>("PUT", `/usuarios/${id}`, data);
+}
 
-export type AuthResponseDTO = {
-   accessToken: JwtToken;
-   user: UserResponseDTO;
-};
+export async function deleteUserById(id: string): Promise<void> {
+   await apiRequest<void>("DELETE", `/usuarios/${id}`);
+}
 
-export async function loginUser(data: LoginUserData): Promise<AuthResponseDTO> {
-   return await apiRequest<AuthResponseDTO>("POST", "/auth/login", data);
+export async function getAllUsers(): Promise<UserResponseDTO[]> {
+   return await apiRequest<UserResponseDTO[]>("GET", "/usuarios");
 }

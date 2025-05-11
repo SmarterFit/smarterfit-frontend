@@ -31,3 +31,11 @@ export const isCPF = (value: string): boolean => {
 
    return true;
 };
+
+export const isName = (value: string): boolean => value.length >= 3;
+
+export const isPassword = (value: string): boolean => value.length >= 8;
+
+export const isPhone = (value: string): boolean => value.length === 15;
+
+export const isBirthDate = (value: string): boolean => value.length === 10;

@@ -1,7 +1,7 @@
 "use client";
 
 import { cn, regexFormatter, textToCurrency } from "@/lib/utils";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 type ValidationRule = {
    validate: (value: string) => boolean;
@@ -28,7 +28,9 @@ export default function Input({
    onChange,
    ...props
 }: InputProps) {
-   const [inputValue, setInputValue] = useState("");
+   const [inputValue, setInputValue] = useState(
+      () => props.value?.toString() || ""
+   );
    const [errors, setErrors] = useState<string[]>([]);
 
    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,10 +52,17 @@ export default function Input({
       if (onChange) onChange(e);
    };
 
-   const classes = cn(baseStyles, className, errors.length > 0 && "error");
+   useEffect(() => {}, [props.value]);
+
+   const classes = cn(
+      props.disabled && "disabled",
+      baseStyles,
+      className,
+      errors.length > 0 && "error"
+   );
 
    return (
-      <div>
+      <div className="input-parent">
          <label className={classes}>
             {icon &&
                React.cloneElement(icon, {

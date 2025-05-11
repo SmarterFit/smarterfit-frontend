@@ -50,3 +50,22 @@ export function textToCurrency(value: string) {
 
    return money.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
+
+export const getRoleColorMap = (roleOptions: string[]) => {
+   const colorMap: Record<string, number> = {};
+   const usedColors = new Set<number>();
+
+   for (const role of roleOptions) {
+      let color = Math.floor(Math.random() * 32) + 1;
+
+      // Evita repetir cor se possível
+      while (usedColors.has(color) && usedColors.size < 32) {
+         color = Math.floor(Math.random() * 32) + 1;
+      }
+
+      usedColors.add(color);
+      colorMap[role] = color;
+   }
+
+   return colorMap;
+};

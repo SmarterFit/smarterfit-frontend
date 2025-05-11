@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { registerUser } from "@/lib/services/useraccess/userService";
-import Button from "@/components/base/Button";
+import Button from "@/components/base/buttons/Button";
 import Form from "@/components/base/form/Form";
 import Input from "@/components/base/form/Input";
 import Modal from "@/components/base/containers/modal/Modal";

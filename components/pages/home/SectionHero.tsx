@@ -1,14 +1,20 @@
 "use client";
 
-import Button from "@/components/base/Button";
+import Button from "@/components/base/buttons/Button";
 import Section from "@/components/base/containers/section/Section";
 import ModalLogin from "./modal/ModalLogin";
 import { useState } from "react";
 import ModalRegister from "./modal/ModalRegister";
+import { UserResponseDTO } from "@/lib/services/useraccess/userService";
+import { useRouter } from "next/navigation";
 
 export default function SectionHero() {
    const [loginIsOpen, setLoginIsOpen] = useState(false);
    const [registerIsOpen, setRegisterIsOpen] = useState(false);
+   const user: UserResponseDTO | null = JSON.parse(
+      localStorage.getItem("user") ?? "null"
+   );
+   const router = useRouter();
 
    return (
       <Section
@@ -26,22 +32,36 @@ export default function SectionHero() {
             <p className="text-lg sm:text-xl mb-8">
                Transforme seu corpo e sua vida com os melhores planos de treino.
             </p>
-            <div className="flex justify-center gap-4 w-full md:w-1/2">
-               <Button
-                  variant="primary"
-                  className="py-2 flex-1 text-lg rounded-full hover:bg-primary/80"
-                  onClick={() => setLoginIsOpen(true)}
-               >
-                  Entrar
-               </Button>
-               <Button
-                  variant="secondary"
-                  className="flex-1 py-2 text-lg rounded-full hover:bg-accent/80"
-                  onClick={() => setRegisterIsOpen(true)}
-               >
-                  Cadastre-se
-               </Button>
-            </div>
+            {user ? (
+               <div className="flex justify-center gap-4 w-full md:w-1/3">
+                  <Button
+                     variant="primary"
+                     className="py-2 flex-1 text-lg rounded-full hover:bg-primary/80"
+                     onClick={() => {
+                        router.push("/dashboard");
+                     }}
+                  >
+                     Acesse o seu Dashboard
+                  </Button>
+               </div>
+            ) : (
+               <div className="flex justify-center gap-4 w-full md:w-1/2">
+                  <Button
+                     variant="primary"
+                     className="py-2 flex-1 text-lg rounded-full hover:bg-primary/80"
+                     onClick={() => setLoginIsOpen(true)}
+                  >
+                     Entrar
+                  </Button>
+                  <Button
+                     variant="secondary"
+                     className="flex-1 py-2 text-lg rounded-full hover:bg-accent/80"
+                     onClick={() => setRegisterIsOpen(true)}
+                  >
+                     Cadastre-se
+                  </Button>
+               </div>
+            )}
          </div>
          <ModalLogin
             isOpen={loginIsOpen}
