@@ -13,7 +13,6 @@ import {
    updateProfile,
    ProfileResponseDTO,
 } from "@/lib/services/useraccess/profileService";
-import { isCPF, isPhone, isBirthDate } from "@/lib/validations/userValidations"; // Importar funções de validação
 import { Mail, Phone, IdCard, Calendar, Home, User } from "lucide-react"; // Ícones para os campos
 import InputGroup from "@/components/base/form/InputGroup";
 import Select from "@/components/base/form/Select";
@@ -22,6 +21,14 @@ import { useNotifications } from "@/components/base/notifications/NotificationsC
 import { ApiRequestError } from "@/lib/exceptions/ApiRequestError";
 import Alert from "@/components/base/Alert";
 import { useRouter } from "next/navigation";
+import { isPast, isTextField } from "@/lib/validations/generalValidation";
+import { isCPF, isPhone } from "@/lib/validations/profileValidation";
+import {
+   isCEP,
+   isHouseNumber,
+   isState,
+} from "@/lib/validations/addressValidation";
+import { getAddressByCep } from "@/lib/viaCepRequest";
 
 const isBrowser = typeof window !== "undefined";
 const getStoredUser = (): UserResponseDTO | null => {
@@ -51,6 +58,13 @@ export default function DashboardProfile() {
    const [deleteAccount, setDeleteAccount] = useState(false);
 
    const userId = user?.id ?? "";
+
+   const [providedByExternalApi, setProvidedByExternalApi] = useState({
+      street: false,
+      neighborhood: false,
+      city: false,
+      state: false,
+   });
 
    const router = useRouter();
    const { addNotification } = useNotifications();
@@ -106,6 +120,44 @@ export default function DashboardProfile() {
 
       if (userId) fetchProfile();
    }, [userId]);
+
+   const handleCepChange = async (cep: string) => {
+      if (!isCEP(cep)) {
+         setProvidedByExternalApi({
+            street: false,
+            neighborhood: false,
+            city: false,
+            state: false,
+         });
+         return;
+      }
+
+      const address = await getAddressByCep(cep);
+      if (address && profile) {
+         setProfile({
+            ...profile,
+            address: {
+               ...profile?.address,
+               cep,
+               ...address,
+            },
+         });
+
+         setProvidedByExternalApi({
+            street: address.street !== "",
+            neighborhood: address.neighborhood !== "",
+            city: address.city !== "",
+            state: address.state !== "",
+         });
+      } else {
+         setProvidedByExternalApi({
+            street: false,
+            neighborhood: false,
+            city: false,
+            state: false,
+         });
+      }
+   };
 
    const updateProfileField = (field: string, value: string) => {
       if (field.startsWith("address.")) {
@@ -199,11 +251,12 @@ export default function DashboardProfile() {
                      className="rounded-full shadow"
                   />
                   <div className="flex flex-col w-2/3">
-                     <Input
-                        disabled
-                        value={user?.email || ""}
-                        icon={<Mail />}
-                     />
+                     <div className="input-parent">
+                        <label className="group input disabled">
+                           <Mail className="input-icon" width={16} />
+                           <input value={user?.email || ""} disabled />
+                        </label>
+                     </div>
                      <div className="mt-4 flex flex-wrap gap-2">
                         {user?.roles?.map((role, index) => (
                            <Badge
@@ -229,6 +282,12 @@ export default function DashboardProfile() {
                         name="fullName"
                         value={profile?.fullName || ""}
                         setValue={(val) => updateProfileField("fullName", val)}
+                        validationRules={[
+                           {
+                              validate: isTextField,
+                              message: "Nome inválido",
+                           },
+                        ]}
                         required
                      />
 
@@ -242,7 +301,7 @@ export default function DashboardProfile() {
                         setValue={(val) => updateProfileField("cpf", val)}
                         validationRules={[
                            {
-                              validate: (value) => isCPF(value),
+                              validate: isCPF,
                               message: "CPF inválido",
                            },
                         ]}
@@ -261,7 +320,7 @@ export default function DashboardProfile() {
                         setValue={(val) => updateProfileField("phone", val)}
                         validationRules={[
                            {
-                              validate: (value) => isPhone(value),
+                              validate: isPhone,
                               message: "Telefone inválido",
                            },
                         ]}
@@ -279,8 +338,8 @@ export default function DashboardProfile() {
                         setValue={(val) => updateProfileField("birthDate", val)}
                         validationRules={[
                            {
-                              validate: (value) => isBirthDate(value),
-                              message: "Data inválida",
+                              validate: isPast,
+                              message: "Data de nascimento inválida",
                            },
                         ]}
                         required
@@ -295,6 +354,7 @@ export default function DashboardProfile() {
                            { label: "Feminino", value: "FEMALE" },
                            { label: "Outro", value: "OTHER" },
                         ]}
+                        required
                      />
                   </InputGroup>
 
@@ -308,6 +368,13 @@ export default function DashboardProfile() {
                      value={profile?.address?.cep || ""}
                      setValue={(val) => updateProfileField("address.cep", val)}
                      mask="99999-999"
+                     validationRules={[
+                        {
+                           validate: isCEP,
+                           message: "CEP inválido",
+                        },
+                     ]}
+                     onChange={(event) => handleCepChange(event.target.value)}
                      required
                   />
                   <InputGroup>
@@ -320,7 +387,14 @@ export default function DashboardProfile() {
                         setValue={(val) =>
                            updateProfileField("address.street", val)
                         }
+                        validationRules={[
+                           {
+                              validate: isTextField,
+                              message: "Rua inválida",
+                           },
+                        ]}
                         required
+                        disabled={providedByExternalApi.street}
                      />
                      <Input
                         icon={<Home />}
@@ -331,6 +405,12 @@ export default function DashboardProfile() {
                         setValue={(val) =>
                            updateProfileField("address.number", val)
                         }
+                        validationRules={[
+                           {
+                              validate: isHouseNumber,
+                              message: "Número inválido",
+                           },
+                        ]}
                         required
                      />
                   </InputGroup>
@@ -344,6 +424,13 @@ export default function DashboardProfile() {
                         setValue={(val) =>
                            updateProfileField("address.neighborhood", val)
                         }
+                        validationRules={[
+                           {
+                              validate: isTextField,
+                              message: "Bairro inválido",
+                           },
+                        ]}
+                        disabled={providedByExternalApi.neighborhood}
                         required
                      />
                      <Input
@@ -355,6 +442,13 @@ export default function DashboardProfile() {
                         setValue={(val) =>
                            updateProfileField("address.city", val)
                         }
+                        validationRules={[
+                           {
+                              validate: isTextField,
+                              message: "Cidade inválida",
+                           },
+                        ]}
+                        disabled={providedByExternalApi.city}
                         required
                      />
                      <Input
@@ -366,6 +460,13 @@ export default function DashboardProfile() {
                         setValue={(val) =>
                            updateProfileField("address.state", val)
                         }
+                        validationRules={[
+                           {
+                              validate: isState,
+                              message: "Estado inválido",
+                           },
+                        ]}
+                        disabled={providedByExternalApi.state}
                         required
                      />
                   </InputGroup>

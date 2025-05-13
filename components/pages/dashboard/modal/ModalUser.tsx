@@ -14,13 +14,14 @@ import InputGroup from "@/components/base/form/InputGroup";
 import Select from "@/components/base/form/Select";
 import Form from "@/components/base/form/Form";
 import { useNotifications } from "@/components/base/notifications/NotificationsContext";
-import { isCPF, isEmail } from "@/lib/validations/userValidations";
+import { isEmail } from "@/lib/validations/userValidations";
 import { ApiRequestError } from "@/lib/exceptions/ApiRequestError";
 import {
    getProfileById,
    ProfileResponseDTO,
 } from "@/lib/services/useraccess/profileService";
 import { IdCard, Mail, SquareAsterisk, User, PlusCircle } from "lucide-react";
+import { isCPF } from "@/lib/validations/profileValidation";
 
 type ModalUserProps = {
    isOpen: boolean;

@@ -91,6 +91,14 @@ export default function Input({
       }
    };
 
+   /// Adiciona a máscara no valor inicial
+   if (mask) {
+      const newValue = regexFormatter(mask, value);
+      if (setValue) {
+         setValue(newValue);
+      }
+   }
+
    const classes = cn(
       props.disabled && "disabled",
       baseStyles,

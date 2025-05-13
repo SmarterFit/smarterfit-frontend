@@ -11,12 +11,12 @@ import { IdCard, Mail, SquareAsterisk, User } from "lucide-react";
 import { useNotifications } from "@/components/base/notifications/NotificationsContext";
 import { ApiRequestError } from "@/lib/exceptions/ApiRequestError";
 import {
-   isCPF,
    isEmail,
-   isName,
    isPassword,
    validateConfirmPassword,
 } from "@/lib/validations/userValidations";
+import { isTextField } from "@/lib/validations/generalValidation";
+import { isCPF } from "@/lib/validations/profileValidation";
 
 type ModalRegisterProps = {
    isOpen: boolean;
@@ -122,7 +122,7 @@ export default function ModalRegister({
                      value={nameFields.firstName}
                      setValue={(val) => updateNameField("firstName", val)}
                      validationRules={[
-                        { validate: isName, message: "Nome inválido" },
+                        { validate: isTextField, message: "Nome inválido" },
                      ]}
                      required
                   />
