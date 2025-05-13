@@ -1,7 +1,8 @@
 "use client";
 
 import { cn, regexFormatter, textToCurrency } from "@/lib/utils";
-import React, { useEffect, useState } from "react";
+import React, { useState, useCallback, useEffect } from "react";
+import { useFormContext } from "@/components/base/form/Form"; // ajuste o caminho conforme necessário
 
 type ValidationRule = {
    validate: (value: string) => boolean;
@@ -13,6 +14,8 @@ type InputProps = {
    validationRules?: ValidationRule[];
    mask?: string;
    className?: string;
+   value: string;
+   setValue?: (value: string) => void;
 } & React.ComponentProps<"input">;
 
 const baseStyles = "group input";
@@ -26,33 +29,67 @@ export default function Input({
    className,
    type,
    onChange,
+   value,
+   setValue,
    ...props
 }: InputProps) {
-   const [inputValue, setInputValue] = useState(
-      () => props.value?.toString() || ""
-   );
+   const { registerValidator, unregisterValidator } = useFormContext();
    const [errors, setErrors] = useState<string[]>([]);
 
-   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      let value =
-         (mask && regexFormatter(mask, e.target.value)) || e.target.value;
-
-      if (type === "currency") {
-         value = textToCurrency(value);
+   // Função que valida o campo com base nas regras e atualiza os erros;
+   // esta função será registrada no contexto do formulário.
+   const validateField = useCallback(() => {
+      if (!validationRules || validationRules.length === 0) {
+         setErrors([]);
+         return true;
       }
 
-      setInputValue(value);
+      const failedRules = validationRules.filter(
+         (rule) => !rule.validate(value)
+      );
+      setErrors(failedRules.map((rule) => rule.message));
+      return failedRules.length === 0;
+   }, [validationRules, value]);
 
-      const failedRules = validationRules
-         .filter((rule) => !rule.validate(value))
-         .map((rule) => rule.message);
+   // Registra a função de validação quando o componente monta
+   // e a remove quando o componente desmonta.
+   useEffect(() => {
+      registerValidator(validateField);
+      return () => {
+         unregisterValidator(validateField);
+      };
+   }, [registerValidator, unregisterValidator, validateField]);
 
-      setErrors(failedRules);
+   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      // Aplica formatação de máscara, se houver
+      let newValue = mask
+         ? regexFormatter(mask, e.target.value)
+         : e.target.value;
 
-      if (onChange) onChange(e);
+      // Aplica formatação de moeda se o tipo for "currency"
+      if (type === "currency") {
+         newValue = textToCurrency(newValue);
+      }
+
+      // Atualiza o estado no componente pai
+      if (setValue) {
+         setValue(newValue);
+      }
+
+      // Executa a validação com base nas regras definidas
+      const failedRules = validationRules.filter(
+         (rule) => !rule.validate(newValue)
+      );
+      setErrors(failedRules.map((rule) => rule.message));
+
+      // Propaga o evento onChange, se houver
+      if (onChange) {
+         onChange({
+            ...e,
+            target: { ...e.target, value: newValue },
+         } as React.ChangeEvent<HTMLInputElement>);
+      }
    };
-
-   useEffect(() => {}, [props.value]);
 
    const classes = cn(
       props.disabled && "disabled",
@@ -70,7 +107,7 @@ export default function Input({
                })}
             <input
                {...props}
-               value={inputValue}
+               value={value}
                onChange={handleChange}
                type={type}
             />

@@ -90,7 +90,7 @@
    }
 
    .button {
-      @apply px-2 py-1 rounded cursor-pointer;
+      @apply p-2 rounded cursor-pointer;
    }
 
    .link {

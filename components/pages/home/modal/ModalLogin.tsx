@@ -10,6 +10,7 @@ import { ApiRequestError } from "@/lib/exceptions/ApiRequestError";
 import { useNotifications } from "@/components/base/notifications/NotificationsContext";
 import { loginUser } from "@/lib/services/useraccess/authService";
 import { useRouter } from "next/navigation";
+import { isEmail, isPassword } from "@/lib/validations/userValidations";
 
 type ModalLoginProps = {
    isOpen: boolean;
@@ -27,32 +28,34 @@ export default function ModalLogin({
       password: "",
    });
 
-   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const { name, value } = e.target;
-      setFormData((prev) => ({
-         ...prev,
-         [name]: value,
-      }));
+   // Atualiza o estado do campo a partir do input controlado
+   const updateField = (field: keyof typeof formData, value: string) => {
+      setFormData((prev) => ({ ...prev, [field]: value }));
    };
 
    const { addNotification } = useNotifications();
-
    const router = useRouter();
 
+   // Essa função será chamada se o Form (por meio do contexto de validação) confirmar que os inputs estão válidos.
    const handleLogin = async () => {
       try {
          const response = await loginUser(formData);
 
-         // Salvar token e dados do usuário
+         // Salva token e dados do usuário
          localStorage.setItem("token", response.accessToken.token);
          localStorage.setItem("tokenType", response.accessToken.type);
          localStorage.setItem("user", JSON.stringify(response.user));
 
-         // Notificação de sucesso
          addNotification({
             type: "success",
             title: "Login realizado com sucesso",
             message: "Você está conectado.",
+         });
+
+         // Limpa o formulário
+         setFormData({
+            email: "",
+            password: "",
          });
 
          onClose();
@@ -60,7 +63,7 @@ export default function ModalLogin({
       } catch (error) {
          if (error instanceof ApiRequestError) {
             if (error.apiError.errors) {
-               error.apiError.errors.forEach((err) => {
+               error.apiError.errors.forEach((err: string) => {
                   addNotification({
                      type: "error",
                      title: "Erro ao logar",
@@ -93,20 +96,42 @@ export default function ModalLogin({
                   placeholder="Email"
                   type="email"
                   name="email"
-                  onChange={handleChange}
+                  value={formData.email}
+                  setValue={(val) => updateField("email", val)}
                   required
+                  validationRules={[
+                     {
+                        validate: (value) => !!value,
+                        message: "Email é obrigatório",
+                     },
+                     {
+                        validate: (value) => isEmail(value),
+                        message: "Email inválido",
+                     },
+                  ]}
                />
                <Input
                   icon={<SquareAsterisk />}
                   placeholder="Senha"
                   type="password"
                   name="password"
-                  onChange={handleChange}
+                  value={formData.password}
+                  setValue={(val) => updateField("password", val)}
                   required
+                  validationRules={[
+                     {
+                        validate: (value) => !!value,
+                        message: "Senha é obrigatória",
+                     },
+                     {
+                        validate: (value) => isPassword(value),
+                        message: "Senha deve ter no mínimo 8 caracteres",
+                     },
+                  ]}
                />
                <Button
                   variant="secondary"
-                  className="p-2 hover:bg-accent/80"
+                  className="hover:bg-accent/80"
                   type="submit"
                >
                   Entrar
@@ -114,7 +139,7 @@ export default function ModalLogin({
             </Form>
             <div className="text-center">
                <p className="text-sm">
-                  Não possui uma conta?{" "}
+                  Não possui uma conta?{" "}
                   <span
                      className="text-accent cursor-pointer hover:underline"
                      onClick={() => {

@@ -107,17 +107,11 @@ export default function DashboardProfile() {
       if (userId) fetchProfile();
    }, [userId]);
 
-   const handleChange = (
-      e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-   ) => {
-      const { name, value } = e.target;
-
-      if (name.startsWith("address.")) {
-         const addressField = name.split(".")[1];
-
+   const updateProfileField = (field: string, value: string) => {
+      if (field.startsWith("address.")) {
+         const addressField = field.split(".")[1];
          setProfile((prevProfile) => {
             if (!prevProfile) return prevProfile;
-
             return {
                ...prevProfile,
                address: {
@@ -128,7 +122,7 @@ export default function DashboardProfile() {
          });
       } else {
          setProfile((prevProfile) =>
-            prevProfile ? { ...prevProfile, [name]: value } : prevProfile
+            prevProfile ? { ...prevProfile, [field]: value } : prevProfile
          );
       }
    };
@@ -205,7 +199,11 @@ export default function DashboardProfile() {
                      className="rounded-full shadow"
                   />
                   <div className="flex flex-col w-2/3">
-                     <Input disabled value={user?.email} icon={<Mail />} />
+                     <Input
+                        disabled
+                        value={user?.email || ""}
+                        icon={<Mail />}
+                     />
                      <div className="mt-4 flex flex-wrap gap-2">
                         {user?.roles?.map((role, index) => (
                            <Badge
@@ -230,7 +228,7 @@ export default function DashboardProfile() {
                         type="text"
                         name="fullName"
                         value={profile?.fullName || ""}
-                        onChange={handleChange}
+                        setValue={(val) => updateProfileField("fullName", val)}
                         required
                      />
 
@@ -241,7 +239,7 @@ export default function DashboardProfile() {
                         type="text"
                         name="cpf"
                         value={profile?.cpf || ""}
-                        onChange={handleChange}
+                        setValue={(val) => updateProfileField("cpf", val)}
                         validationRules={[
                            {
                               validate: (value) => isCPF(value),
@@ -260,7 +258,7 @@ export default function DashboardProfile() {
                         type="text"
                         name="phone"
                         value={profile?.phone || ""}
-                        onChange={handleChange}
+                        setValue={(val) => updateProfileField("phone", val)}
                         validationRules={[
                            {
                               validate: (value) => isPhone(value),
@@ -278,7 +276,7 @@ export default function DashboardProfile() {
                         type="date"
                         name="birthDate"
                         value={profile?.birthDate || ""}
-                        onChange={handleChange}
+                        setValue={(val) => updateProfileField("birthDate", val)}
                         validationRules={[
                            {
                               validate: (value) => isBirthDate(value),
@@ -290,8 +288,8 @@ export default function DashboardProfile() {
                      <Select
                         name="gender"
                         placeholder="Sexo..."
-                        value={profile?.gender}
-                        onChange={handleChange}
+                        value={profile?.gender || "OTHER"}
+                        setValue={(val) => updateProfileField("gender", val)}
                         options={[
                            { label: "Masculino", value: "MALE" },
                            { label: "Feminino", value: "FEMALE" },
@@ -308,7 +306,7 @@ export default function DashboardProfile() {
                      type="text"
                      name="address.cep"
                      value={profile?.address?.cep || ""}
-                     onChange={handleChange}
+                     setValue={(val) => updateProfileField("address.cep", val)}
                      mask="99999-999"
                      required
                   />
@@ -319,7 +317,9 @@ export default function DashboardProfile() {
                         type="text"
                         name="address.street"
                         value={profile?.address?.street || ""}
-                        onChange={handleChange}
+                        setValue={(val) =>
+                           updateProfileField("address.street", val)
+                        }
                         required
                      />
                      <Input
@@ -328,7 +328,9 @@ export default function DashboardProfile() {
                         type="text"
                         name="address.number"
                         value={profile?.address?.number || ""}
-                        onChange={handleChange}
+                        setValue={(val) =>
+                           updateProfileField("address.number", val)
+                        }
                         required
                      />
                   </InputGroup>
@@ -339,7 +341,9 @@ export default function DashboardProfile() {
                         type="text"
                         name="address.neighborhood"
                         value={profile?.address?.neighborhood || ""}
-                        onChange={handleChange}
+                        setValue={(val) =>
+                           updateProfileField("address.neighborhood", val)
+                        }
                         required
                      />
                      <Input
@@ -348,7 +352,9 @@ export default function DashboardProfile() {
                         type="text"
                         name="address.city"
                         value={profile?.address?.city || ""}
-                        onChange={handleChange}
+                        setValue={(val) =>
+                           updateProfileField("address.city", val)
+                        }
                         required
                      />
                      <Input
@@ -357,7 +363,9 @@ export default function DashboardProfile() {
                         type="text"
                         name="address.state"
                         value={profile?.address?.state || ""}
-                        onChange={handleChange}
+                        setValue={(val) =>
+                           updateProfileField("address.state", val)
+                        }
                         required
                      />
                   </InputGroup>

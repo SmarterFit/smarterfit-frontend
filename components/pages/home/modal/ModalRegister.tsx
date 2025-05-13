@@ -1,19 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { registerUser } from "@/lib/services/useraccess/userService";
 import Button from "@/components/base/buttons/Button";
 import Form from "@/components/base/form/Form";
 import Input from "@/components/base/form/Input";
+import InputGroup from "@/components/base/form/InputGroup";
 import Modal from "@/components/base/containers/modal/Modal";
 import { IdCard, Mail, SquareAsterisk, User } from "lucide-react";
-import InputGroup from "@/components/base/form/InputGroup";
 import { useNotifications } from "@/components/base/notifications/NotificationsContext";
 import { ApiRequestError } from "@/lib/exceptions/ApiRequestError";
-import { isCPF, isEmail } from "@/lib/validations/userValidations";
-
-const nameIsValid = (name: string) => name.length > 3;
-const passwordIsValid = (password: string) => password.length >= 8;
+import {
+   isCPF,
+   isEmail,
+   isName,
+   isPassword,
+   validateConfirmPassword,
+} from "@/lib/validations/userValidations";
 
 type ModalRegisterProps = {
    isOpen: boolean;
@@ -26,68 +29,62 @@ export default function ModalRegister({
    onClose,
    openLoginModal,
 }: ModalRegisterProps) {
-   const [formData, setFormData] = useState({
-      name: "",
-      email: "",
-      cpf: "",
-      password: "",
-      confirmPassword: "",
-      roles: ["CUSTOMER"],
-   });
-
+   // Estado separado para nome e sobrenome, que serão combinados posteriormente.
    const [nameFields, setNameFields] = useState({
       firstName: "",
       lastName: "",
    });
-
-   const [isFormValid, setIsFormValid] = useState(false);
+   // Outros dados do formulário.
+   const [formData, setFormData] = useState({
+      email: "",
+      cpf: "",
+      password: "",
+      confirmPassword: "",
+      roles: ["MEMBER"],
+   });
 
    const { addNotification } = useNotifications();
 
-   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const { name, value } = e.target;
-      setNameFields((prev) => ({ ...prev, [name]: value }));
+   // Atualiza os campos de nome
+   const updateNameField = (field: "firstName" | "lastName", value: string) => {
+      setNameFields((prev) => ({ ...prev, [field]: value }));
    };
 
-   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const { name, value } = e.target;
-      setFormData((prev) => ({
-         ...prev,
-         [name]: value,
-      }));
+   // Atualiza os demais campos do formulário
+   const updateFormField = (field: keyof typeof formData, value: string) => {
+      setFormData((prev) => ({ ...prev, [field]: value }));
    };
-
-   useEffect(() => {
-      const allValid =
-         nameIsValid(nameFields.firstName) &&
-         isEmail(formData.email) &&
-         isCPF(formData.cpf) &&
-         passwordIsValid(formData.password) &&
-         formData.password === formData.confirmPassword;
-
-      setIsFormValid(allValid);
-   }, [nameFields, formData]);
 
    const handleRegister = async () => {
-      const fullName = `${nameFields.firstName.trim()} ${nameFields.lastName.trim()}`;
+      // Combina primeiro e sobrenome em um único nome.
+      const fullName =
+         `${nameFields.firstName.trim()} ${nameFields.lastName.trim()}`.trim();
 
       try {
          await registerUser({ ...formData, name: fullName });
 
-         // Notificação de sucesso via notificações globais
          addNotification({
             type: "success",
             title: "Conta criada com sucesso",
             message: "Sua conta foi criada com sucesso.",
          });
 
+         /// Limpa o formulário
+         setNameFields({ firstName: "", lastName: "" });
+         setFormData({
+            email: "",
+            cpf: "",
+            password: "",
+            confirmPassword: "",
+            roles: ["MEMBER"],
+         });
+
          onClose();
          openLoginModal();
       } catch (error) {
-         // Notificação de erro via notificações globais
          if (error instanceof ApiRequestError) {
             if (error.apiError.errors) {
-               error.apiError.errors.forEach((err) => {
+               error.apiError.errors.forEach((err: string) => {
                   addNotification({
                      type: "error",
                      title: "Erro ao registrar",
@@ -123,12 +120,9 @@ export default function ModalRegister({
                      type="text"
                      name="firstName"
                      value={nameFields.firstName}
-                     onChange={handleNameChange}
+                     setValue={(val) => updateNameField("firstName", val)}
                      validationRules={[
-                        {
-                           validate: (value) => nameIsValid(value),
-                           message: "Nome inválido",
-                        },
+                        { validate: isName, message: "Nome inválido" },
                      ]}
                      required
                   />
@@ -138,7 +132,7 @@ export default function ModalRegister({
                      type="text"
                      name="lastName"
                      value={nameFields.lastName}
-                     onChange={handleNameChange}
+                     setValue={(val) => updateNameField("lastName", val)}
                   />
                </InputGroup>
 
@@ -149,12 +143,9 @@ export default function ModalRegister({
                   type="email"
                   name="email"
                   value={formData.email}
-                  onChange={handleChange}
+                  setValue={(val) => updateFormField("email", val)}
                   validationRules={[
-                     {
-                        validate: (value) => isEmail(value),
-                        message: "Email inválido",
-                     },
+                     { validate: isEmail, message: "Email inválido" },
                   ]}
                   required
                />
@@ -167,12 +158,9 @@ export default function ModalRegister({
                   name="cpf"
                   mask="999.999.999-99"
                   value={formData.cpf}
-                  onChange={handleChange}
+                  setValue={(val) => updateFormField("cpf", val)}
                   validationRules={[
-                     {
-                        validate: (value) => isCPF(value),
-                        message: "CPF inválido",
-                     },
+                     { validate: isCPF, message: "CPF inválido" },
                   ]}
                   required
                />
@@ -185,10 +173,10 @@ export default function ModalRegister({
                      type="password"
                      name="password"
                      value={formData.password}
-                     onChange={handleChange}
+                     setValue={(val) => updateFormField("password", val)}
                      validationRules={[
                         {
-                           validate: (value) => passwordIsValid(value),
+                           validate: isPassword,
                            message: "A senha deve ter pelo menos 8 caracteres",
                         },
                      ]}
@@ -200,10 +188,11 @@ export default function ModalRegister({
                      type="password"
                      name="confirmPassword"
                      value={formData.confirmPassword}
-                     onChange={handleChange}
+                     setValue={(val) => updateFormField("confirmPassword", val)}
                      validationRules={[
                         {
-                           validate: (value) => value === formData.password,
+                           validate: (value) =>
+                              validateConfirmPassword(formData.password, value),
                            message: "As senhas devem ser iguais",
                         },
                      ]}
@@ -211,12 +200,10 @@ export default function ModalRegister({
                   />
                </InputGroup>
 
-               {/* Botão de cadastro */}
                <Button
                   variant="secondary"
-                  className="p-2 hover:bg-accent/80 disabled:bg-accent/60 disabled:cursor-default"
+                  className="hover:bg-accent/80"
                   type="submit"
-                  disabled={!isFormValid}
                >
                   Cadastrar
                </Button>

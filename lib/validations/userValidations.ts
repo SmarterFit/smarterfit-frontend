@@ -39,3 +39,8 @@ export const isPassword = (value: string): boolean => value.length >= 8;
 export const isPhone = (value: string): boolean => value.length === 15;
 
 export const isBirthDate = (value: string): boolean => value.length === 10;
+
+export const validateConfirmPassword = (
+   password: string,
+   confirmPassword: string
+) => password === confirmPassword;

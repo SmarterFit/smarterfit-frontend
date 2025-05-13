@@ -1,8 +1,9 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { useFormContext } from "@/components/base/form/Form"; // ajuste o caminho conforme necessário
 
 type ValidationRule = {
    validate: (value: string) => boolean;
@@ -14,6 +15,8 @@ type SelectProps = {
    validationRules?: ValidationRule[];
    options: { label: string; value: string }[];
    className?: string;
+   value: string;
+   setValue: (value: string) => void;
 } & Omit<React.ComponentProps<"input">, "type">;
 
 const baseStyles = "group input relative cursor-pointer";
@@ -28,16 +31,16 @@ export default function Select({
    options,
    className,
    onChange,
+   value,
+   setValue,
    ...props
 }: SelectProps) {
-   const [selectedLabel, setSelectedLabel] = useState(
-      () => options.find((opt) => opt.value === props.value)?.label || ""
-   );
-   const [selectedValue, setSelectedValue] = useState(() => props.value || "");
-   const [showOptions, setShowOptions] = useState(false);
+   const { registerValidator, unregisterValidator } = useFormContext();
    const [errors, setErrors] = useState<string[]>([]);
+   const [showOptions, setShowOptions] = useState<boolean>(false);
    const ref = useRef<HTMLDivElement>(null);
 
+   // Fecha o dropdown ao clicar fora do componente
    useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
          if (ref.current && !ref.current.contains(event.target as Node)) {
@@ -49,23 +52,42 @@ export default function Select({
          document.removeEventListener("mousedown", handleClickOutside);
    }, []);
 
-   const handleSelect = (value: string, label: string) => {
-      setSelectedValue(value);
-      setSelectedLabel(label);
+   // Função de validação registrada no contexto
+   const validateField = useCallback(() => {
+      const failedRules = validationRules.filter(
+         (rule) => !rule.validate(value)
+      );
+      setErrors(failedRules.map((rule) => rule.message));
+      return failedRules.length === 0;
+   }, [validationRules, value]);
+
+   // Registra a função de validação quando o componente monta
+   useEffect(() => {
+      registerValidator(validateField);
+      return () => unregisterValidator(validateField);
+   }, [registerValidator, unregisterValidator, validateField]);
+
+   const currentValue = value;
+   const currentLabel =
+      options.find((opt) => opt.value === currentValue)?.label || "";
+
+   const handleSelect = (selectedVal: string, selectedLabel: string) => {
       setShowOptions(false);
 
-      const failedRules = validationRules
-         .filter((rule) => !rule.validate(value))
-         .map((rule) => rule.message);
-      setErrors(failedRules);
+      // Executa as validações definidas para o select
+      const failedRules = validationRules.filter(
+         (rule) => !rule.validate(selectedVal)
+      );
+      setErrors(failedRules.map((rule) => rule.message));
 
+      // Atualiza o valor via a função setValue fornecida pelo pai
+      setValue(selectedVal);
+
+      // Propaga um evento onChange se houver
       if (onChange) {
          const event = {
-            target: {
-               name: props.name,
-               value: value,
-            },
-         } as unknown as React.ChangeEvent<HTMLInputElement>;
+            target: { name: props.name, value: selectedVal },
+         } as React.ChangeEvent<HTMLInputElement>;
          onChange(event);
       }
    };
@@ -86,7 +108,7 @@ export default function Select({
                })}
             <input
                {...props}
-               value={selectedLabel}
+               value={currentLabel}
                readOnly
                placeholder={props.placeholder || "Selecione..."}
                className="cursor-pointer"
@@ -104,7 +126,10 @@ export default function Select({
                {options.map((opt) => (
                   <div
                      key={opt.value}
-                     className={cn(optionStyles,opt.value === selectedValue && "selected" )}
+                     className={cn(
+                        optionStyles,
+                        opt.value === currentValue && "selected"
+                     )}
                      onClick={() => handleSelect(opt.value, opt.label)}
                   >
                      {opt.label}
