@@ -3,7 +3,7 @@
 import Button from "@/components/base/buttons/Button";
 import Section from "@/components/base/containers/section/Section";
 import ModalLogin from "./modal/ModalLogin";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ModalRegister from "./modal/ModalRegister";
 import { UserResponseDTO } from "@/lib/services/useraccess/userService";
 import { useRouter } from "next/navigation";
@@ -11,10 +11,14 @@ import { useRouter } from "next/navigation";
 export default function SectionHero() {
    const [loginIsOpen, setLoginIsOpen] = useState(false);
    const [registerIsOpen, setRegisterIsOpen] = useState(false);
-   const user: UserResponseDTO | null = JSON.parse(
-      localStorage.getItem("user") ?? "null"
-   );
+   const [user, setUser] = useState<UserResponseDTO | null>(null);
    const router = useRouter();
+
+   useEffect(() => {
+      if (typeof window !== "undefined") {
+         setUser(JSON.parse(localStorage.getItem("user") ?? "null"));
+      }
+   }, []);
 
    return (
       <Section
