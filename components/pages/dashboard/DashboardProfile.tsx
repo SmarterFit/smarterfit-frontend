@@ -57,14 +57,14 @@ export default function DashboardProfile() {
       useState(false);
    const [deleteAccount, setDeleteAccount] = useState(false);
 
-   const userId = user?.id ?? "";
-
    const [providedByExternalApi, setProvidedByExternalApi] = useState({
       street: false,
       neighborhood: false,
       city: false,
       state: false,
    });
+
+   const userId = user?.id ?? "";
 
    const router = useRouter();
    const { addNotification } = useNotifications();
@@ -91,38 +91,9 @@ export default function DashboardProfile() {
       }
    }, [deleteAccount]);
 
-   useEffect(() => {
-      const fetchProfile = async () => {
-         try {
-            const profileData = await getProfileById(userId);
-            if (!profileData.address) {
-               profileData.address = {
-                  cep: "",
-                  street: "",
-                  number: "",
-                  neighborhood: "",
-                  city: "",
-                  state: "",
-               };
-            }
-
-            setProfile(profileData);
-         } catch (error) {
-            addNotification({
-               title: "Erro ao buscar perfil",
-               message: "Não foi possível buscar o perfil.",
-               type: "error",
-            });
-         } finally {
-            setIsLoading(false);
-         }
-      };
-
-      if (userId) fetchProfile();
-   }, [userId]);
-
    const handleCepChange = async (cep: string) => {
       if (!isCEP(cep)) {
+         console.log("Não é um CEP!");
          setProvidedByExternalApi({
             street: false,
             neighborhood: false,
@@ -158,6 +129,38 @@ export default function DashboardProfile() {
          });
       }
    };
+
+   useEffect(() => {
+      const fetchProfile = async () => {
+         try {
+            const profileData = await getProfileById(userId);
+            if (!profileData.address) {
+               profileData.address = {
+                  cep: "",
+                  street: "",
+                  number: "",
+                  neighborhood: "",
+                  city: "",
+                  state: "",
+               };
+            }
+
+            setProfile(profileData);
+            /// TODO: Bloquear campos cujo CEP dele já retorna
+         } catch (error) {
+            addNotification({
+               title: "Erro ao buscar perfil",
+               message: "Não foi possível buscar o perfil.",
+               type: "error",
+            });
+         } finally {
+            setIsLoading(false);
+         }
+      };
+
+      if (userId) fetchProfile();
+      
+   }, [userId]);
 
    const updateProfileField = (field: string, value: string) => {
       if (field.startsWith("address.")) {
