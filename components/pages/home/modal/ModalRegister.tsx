@@ -105,13 +105,7 @@ export default function ModalRegister({
    return (
       <Modal isOpen={isOpen} onClose={onClose} title="Registre-se">
          <div className="space-y-6 px-2">
-            <Form
-               method="POST"
-               onSubmit={(e) => {
-                  e.preventDefault();
-                  handleRegister();
-               }}
-            >
+            <Form method="POST" onSubmit={handleRegister}>
                {/* Nome e sobrenome */}
                <InputGroup>
                   <Input

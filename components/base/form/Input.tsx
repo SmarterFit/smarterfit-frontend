@@ -91,13 +91,24 @@ export default function Input({
       }
    };
 
-   /// Adiciona a máscara no valor inicial
-   if (mask) {
-      const newValue = regexFormatter(mask, value);
-      if (setValue) {
+   /// Aplica formatação de mascara, se o value mudar externamente
+   useEffect(() => {
+      if (!value) return;
+
+      let newValue = value;
+
+      if (mask) {
+         newValue = regexFormatter(mask, newValue);
+      }
+
+      if (type === "currency") {
+         newValue = textToCurrency(newValue);
+      }
+
+      if (newValue !== value && setValue) {
          setValue(newValue);
       }
-   }
+   }, [value]);
 
    const classes = cn(
       props.disabled && "disabled",
