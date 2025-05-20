@@ -1,13 +1,24 @@
 import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { NotificationsProvider } from "@/components/base/notifications/NotificationsContext";
+import { Toaster } from "sonner";
+
+const geistSans = Geist({
+   variable: "--font-geist-sans",
+   subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+   variable: "--font-geist-mono",
+   subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
    title: "SmarterFit",
-   description: "Aplicação de controle da academia SmarterFit",
+   description: "A smarter fitness app",
    authors: [
       { name: "Gabriel Henrique" },
-      { name: "Gabriel Silva" },
+      { name: "Gabriel Victor" },
       { name: "Pedro Lucas" },
    ],
 };
@@ -18,11 +29,12 @@ export default function RootLayout({
    children: React.ReactNode;
 }>) {
    return (
-      <html lang="pt-BR">
-         <body className="antialiased min-h-screen flex flex-col max-w-[1920px]">
-            <NotificationsProvider>
-               {children}
-            </NotificationsProvider>
+      <html lang="pt-br" className="dark">
+         <body
+            className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
+         >
+            {children}
+            <Toaster />
          </body>
       </html>
    );

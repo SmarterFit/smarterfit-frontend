@@ -1,24 +1,19 @@
-import SectionHero from "@/components/pages/home/SectionHero";
-import SectionsContainer from "@/components/base/containers/section/SectionsContainer";
-import SectionPlans from "@/components/pages/home/SectionPlans";
-import SectionAbout from "@/components/pages/home/SectionAbout";
-import SectionClasses from "@/components/pages/home/SectionClasses";
-import SectionTestimonials from "@/components/pages/home/SectionTestimonials";
-import Footer from "@/components/base/nav/footer/Footer";
-import Header from "@/components/base/nav/header/Header";
+import Header from "@/components/Header";
+import SectionAbout from "@/components/sections/SectionAbout";
+import SectionContact from "@/components/sections/SectionContact";
+import SectionHero from "@/components/sections/SectionHero";
+import SectionPlans from "@/components/sections/SectionPlans";
 
 export default function Home() {
    return (
       <div>
          <Header />
-         <SectionsContainer>
+         <main className="flex flex-col items-center justify-center">
             <SectionHero />
             <SectionAbout />
             <SectionPlans />
-            <SectionClasses />
-            <SectionTestimonials />
-         </SectionsContainer>
-         <Footer />
+            <SectionContact />
+         </main>
       </div>
    );
 }
