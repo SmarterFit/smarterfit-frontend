@@ -1,4 +1,5 @@
 import AuthGuard from "@/components/base/AuthGuard";
+import { SidebarProvider } from "@/components/base/nav/sidebar/SidebarContext";
 import DashboardSidebar from "@/components/pages/dashboard/DashboardSidebar";
 import { Metadata } from "next";
 
@@ -15,10 +16,12 @@ export default function DashboardLayout({
       <html lang="pt-BR">
          <body className="antialiased min-h-screen flex flex-col max-w-[1920px]">
             <AuthGuard />
-            <main className="h-screen flex">
+            <SidebarProvider>
                <DashboardSidebar />
-               <div className="p-8 flex-1">{children}</div>
-            </main>
+               <main className="h-screen flex">
+                  <div className="p-8 flex-1">{children}</div>
+               </main>
+            </SidebarProvider>
          </body>
       </html>
    );

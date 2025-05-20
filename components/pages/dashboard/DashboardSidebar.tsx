@@ -24,12 +24,29 @@ export default function DashboardSidebar() {
       }
    }, []);
 
+   const handleLogout = () => {
+      localStorage.clear();
+      router.push("/");
+   };
+
    return (
-      <Sidebar>
+      <Sidebar
+         logo={<img src="/logo.png" alt="Logo" />}
+         title="Meu App"
+         specialButton={
+            <SidebarOption
+               index={-1} // índice especial para botões que não compõem a navegação principal
+               title="Sair"
+               icon={<LogOut />}
+               onClick={handleLogout}
+            />
+         }
+      >
          <SidebarOption
             index={0}
             title="Dashboard"
             icon={<LayoutDashboard />}
+            onClick={() => router.push("/dashboard")}
          />
          <SidebarOption
             index={1}
@@ -45,15 +62,6 @@ export default function DashboardSidebar() {
                onClick={() => router.push("/dashboard/usuarios")}
             />
          )}
-         <SidebarOption
-            index={10}
-            title="Sair"
-            icon={<LogOut />}
-            onClick={() => {
-               localStorage.clear();
-               router.push("/");
-            }}
-         />
       </Sidebar>
    );
 }

@@ -1,17 +1,30 @@
-"use client";
+import React, { createContext, useState, useContext, ReactNode } from "react";
 
-import { createContext, useContext } from "react";
+interface SidebarContextProps {
+   isCollapsed: boolean;
+   setIsCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-type SidebarContextProps = {
-   sidebarOpen: boolean;
-   activeIndex: number | null;
-   setActiveIndex: (index: number) => void;
+const SidebarContext = createContext<SidebarContextProps | undefined>(
+   undefined
+);
+
+export const SidebarProvider: React.FC<{ children: ReactNode }> = ({
+   children,
+}) => {
+   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
+
+   return (
+      <SidebarContext.Provider value={{ isCollapsed, setIsCollapsed }}>
+         {children}
+      </SidebarContext.Provider>
+   );
 };
 
-export const SidebarContext = createContext<SidebarContextProps | null>(null);
-
-export function useSidebarContext() {
+export const useSidebar = (): SidebarContextProps => {
    const context = useContext(SidebarContext);
-   if (!context) throw new Error("SidebarContext não encontrado");
+   if (!context) {
+      throw new Error("useSidebar must be used within a SidebarProvider");
+   }
    return context;
-}
+};

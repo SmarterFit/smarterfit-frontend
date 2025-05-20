@@ -1,18 +1,25 @@
 "use client";
 
+import React from "react";
 import SidebarOption from "./SidebarOption";
-import { ArrowRightCircle, ArrowLeftCircle } from "lucide-react";
 import { useSidebarContext } from "./SidebarContext";
+import { ArrowLeftCircle, ArrowRightCircle } from "lucide-react";
 
 type SidebarToggleProps = {
-   onClick: () => void;
+   onClick?: () => void;
 };
 
 export default function SidebarToggle({ onClick }: SidebarToggleProps) {
-   const { sidebarOpen } = useSidebarContext();
+   const { sidebarOpen, setSidebarOpen } = useSidebarContext();
+
+   const handleToggle = () => {
+      setSidebarOpen(!sidebarOpen);
+      onClick?.();
+   };
 
    return (
       <SidebarOption
+         index={-1} 
          title={sidebarOpen ? "Minimizar" : "Expandir"}
          icon={
             sidebarOpen ? (
@@ -21,8 +28,8 @@ export default function SidebarToggle({ onClick }: SidebarToggleProps) {
                <ArrowRightCircle className="text-white" />
             )
          }
-         onClick={onClick}
-         index={-1}
+         onClick={handleToggle}
+         className="sidebar-toggle"
       />
    );
 }

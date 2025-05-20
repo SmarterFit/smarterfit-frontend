@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useSidebarContext } from "./SidebarContext";
 import { cn } from "@/lib/utils";
 
@@ -18,9 +19,10 @@ export default function SidebarOption({
    onClick,
    className,
 }: SidebarOptionProps) {
-   const { sidebarOpen, activeIndex, setActiveIndex } = useSidebarContext();
+   const { activeIndex, setActiveIndex, sidebarOpen } = useSidebarContext();
 
    const handleClick = () => {
+      // Atualiza o índice ativo, ignorando botões especiais (como toggle, com index -1)
       if (index !== -1) {
          setActiveIndex(index);
       }
@@ -36,8 +38,8 @@ export default function SidebarOption({
          )}
          onClick={handleClick}
       >
-         {icon}
-         {sidebarOpen && <span>{title}</span>}
+         <span className="icon">{icon}</span>
+         {sidebarOpen && <span className="title">{title}</span>}
       </button>
    );
 }

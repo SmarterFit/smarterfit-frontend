@@ -1,53 +1,40 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import { SidebarContext } from "./SidebarContext";
+import React from "react";
+import { useSidebarContext } from "./SidebarContext";
 import SidebarToggle from "./SidebarToggle";
 import { cn } from "@/lib/utils";
-import SidebarOption from "./SidebarOption";
 
 type SidebarProps = {
    children: React.ReactNode;
+   logo?: React.ReactNode;
+   title?: string;
    className?: string;
+   specialButton?: React.ReactNode; // Exemplo: botão de Logout
 };
 
-export default function Sidebar({ children, className }: SidebarProps) {
-   const [sidebarOpen, setSidebarOpen] = useState(false);
-   const [activeIndex, setActiveIndex] = useState<number | null>(0);
-
-   const toggleSidebarOpen = () => {
-      setSidebarOpen(!sidebarOpen);
-   };
-
-   const triggerFirstSidebarOptionClick = () => {
-      React.Children.forEach(children, (child) => {
-         if (React.isValidElement(child) && child.type === SidebarOption) {
-            const typedChild = child as React.ReactElement<{
-               index: number;
-               onClick?: () => void;
-            }>;
-
-            if (typedChild.props.index === activeIndex) {
-               typedChild.props.onClick && typedChild.props.onClick();
-            }
-         }
-      });
-   };
-
-   useEffect(() => {
-      if (activeIndex === 0) {
-         triggerFirstSidebarOptionClick();
-      }
-   }, [activeIndex, children]);
+export default function Sidebar({
+   children,
+   logo,
+   title,
+   className,
+   specialButton,
+}: SidebarProps) {
+   const { sidebarOpen } = useSidebarContext();
 
    return (
-      <SidebarContext.Provider
-         value={{ sidebarOpen, activeIndex, setActiveIndex }}
+      <div
+         className={cn("sidebar-container", className, sidebarOpen && "open")}
       >
-         <div className={cn("sidebar", className, sidebarOpen && "open")}>
-            <div className="sidebar-content">{children}</div>
-            <SidebarToggle onClick={toggleSidebarOpen} />
+         <div className="sidebar-header">
+            {logo && <div className="sidebar-logo">{logo}</div>}
+            {sidebarOpen && title && <h1 className="sidebar-title">{title}</h1>}
+            {}
          </div>
-      </SidebarContext.Provider>
+         <div className="sidebar-options">{children}</div>
+         <div className="sidebar-footer">
+            {specialButton}
+         </div>
+      </div>
    );
 }
