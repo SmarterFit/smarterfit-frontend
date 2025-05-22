@@ -216,7 +216,10 @@ export function RegisterDialog({
                                           ? "border-red-500"
                                           : "border-green-500")
                                  )}
-                                 ref={withMask("cpf")}
+                                 ref={withMask("cpf", {
+                                    showMaskOnHover: false,
+                                    showMaskOnFocus: false,
+                                 })}
                               />
                            </FormControl>
                            <FormMessage />
