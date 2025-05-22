@@ -30,8 +30,17 @@ import { Input } from "@/components/ui/input";
 import { userService } from "@/backend/modules/useraccess/services/userServices";
 import { toast } from "sonner";
 
-export function RegisterDialog({ openLogin }: { openLogin?: () => void }) {
-   const [open, setOpen] = React.useState(false);
+type RegisterDialogProps = {
+   open: boolean;
+   setOpen: (open: boolean) => void;
+   openLogin?: () => void;
+};
+
+export function RegisterDialog({
+   open,
+   setOpen,
+   openLogin,
+}: RegisterDialogProps) {
    const form = useForm<CreateUserRequestDTO>({
       resolver: zodResolver(createUserSchema),
       mode: "onChange",

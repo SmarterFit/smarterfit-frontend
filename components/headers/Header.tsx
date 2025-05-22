@@ -8,8 +8,8 @@ import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { usePathname } from "next/navigation";
-import { RegisterDialog } from "./dialogs/RegisterDialog";
-import { LoginDialog } from "./dialogs/LoginDialog";
+import { RegisterDialog } from "../dialogs/RegisterDialog";
+import { LoginDialog } from "../dialogs/LoginDialog";
 
 interface NavItem {
    title: string;
@@ -38,10 +38,12 @@ const navItems: NavItem[] = [
 export default function Header() {
    const pathname = usePathname();
    const [open, setOpen] = useState(false);
+   const [openLogin, setOpenLogin] = useState(false);
+   const [openRegister, setOpenRegister] = useState(false);
    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
    useEffect(() => {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("user");
       setIsAuthenticated(token !== null);
    }, []);
 
@@ -81,11 +83,28 @@ export default function Header() {
             {/* Desktop Auth Button */}
             <div className="hidden md:flex">
                {isAuthenticated ? (
-                  <Button className="cursor-pointer">Dashboard</Button>
+                  <Button
+                     className="cursor-pointer"
+                     onClick={() => {
+                        window.location.href = "/dashboard";
+                     }}
+                  >
+                     Dashboard
+                  </Button>
                ) : (
                   <div className="flex gap-2">
-                     <LoginDialog />
-                     <RegisterDialog />
+                     <LoginDialog
+                        open={openLogin}
+                        setOpen={setOpenLogin}
+                        openRegister={() => {
+                           setOpenRegister(true);
+                        }}
+                     />
+                     <RegisterDialog
+                        open={openRegister}
+                        setOpen={setOpenRegister}
+                        openLogin={() => setOpenLogin(true)}
+                     />
                   </div>
                )}
             </div>
@@ -134,13 +153,26 @@ export default function Header() {
                            <Button
                               variant="outline"
                               className="w-full cursor-pointer"
+                              onClick={() => {
+                                 window.location.href = "/dashboard";
+                              }}
                            >
                               Dashboard
                            </Button>
                         ) : (
                            <div className="flex flex-col gap-2">
-                              <LoginDialog />
-                              <RegisterDialog />
+                              <LoginDialog
+                                 open={openLogin}
+                                 setOpen={setOpenLogin}
+                                 openRegister={() => {
+                                    setOpenRegister(true);
+                                 }}
+                              />
+                              <RegisterDialog
+                                 open={openRegister}
+                                 setOpen={setOpenRegister}
+                                 openLogin={() => setOpenLogin(true)}
+                              />
                            </div>
                         )}
                      </div>

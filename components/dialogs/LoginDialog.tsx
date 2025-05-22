@@ -27,9 +27,16 @@ import {
    loginRequestSchema,
 } from "@/backend/modules/useraccess/schemas/authSchemas";
 import { authService } from "@/backend/modules/useraccess/services/authServices";
+import { AuthResponseDTO } from "@/backend/modules/useraccess/types/authTypes";
+import Cookies from "js-cookie";
 
-export function LoginDialog({ openRegister }: { openRegister?: () => void }) {
-   const [open, setOpen] = React.useState(false);
+type LoginDialogProps = {
+   open: boolean;
+   setOpen: (open: boolean) => void;
+   openRegister?: () => void;
+};
+
+export function LoginDialog({ open, setOpen, openRegister }: LoginDialogProps) {
    const form = useForm<LoginRequestDTO>({
       resolver: zodResolver(loginRequestSchema),
       mode: "onChange",
@@ -48,7 +55,7 @@ export function LoginDialog({ openRegister }: { openRegister?: () => void }) {
 
    async function onSubmit(data: LoginRequestDTO) {
       try {
-         await authService.login(data);
+         const response: AuthResponseDTO = await authService.login(data);
          toast("Usuário logado com sucesso!", {
             description: "É um prazer te ver de volta 😊!",
             closeButton: true,
@@ -56,7 +63,11 @@ export function LoginDialog({ openRegister }: { openRegister?: () => void }) {
          setOpen(false);
          reset();
 
-         /// TODO: Redirecionar para o dashboard
+         Cookies.set("token", response.accessToken.token, { expires: 7 });
+         Cookies.set("userId", response.user.id, { expires: 7 });
+         localStorage.setItem("user", JSON.stringify(response.user));
+
+         window.location.href = "/dashboard";
       } catch (e: any) {
          toast("Ops, algo deu errado!", {
             description: e.message,

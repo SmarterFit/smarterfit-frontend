@@ -1,4 +1,4 @@
-import { Gender } from "@/backend/common/enums/genderEnums";
+import { Gender } from "@/backend/common/enums/genderEnum";
 import { AddressResponseDTO } from "./addressTypes";
 import { UserResponseDTO } from "./userTypes";
 
@@ -10,5 +10,4 @@ export interface ProfileResponseDTO {
    birthDate: string;
    gender: Gender;
    address: AddressResponseDTO;
-   user: UserResponseDTO;
 }

@@ -1,4 +1,5 @@
 import axios, { AxiosRequestConfig, Method } from "axios";
+import Cookies from "js-cookie";
 
 export interface ApiRequestOptions<Req = any> {
    method: Method;
@@ -20,6 +21,8 @@ export async function apiRequest<Res, Req = any>(
       headers,
       baseUrl = process.env.NEXT_PUBLIC_API_URL,
    } = opts;
+   const token = Cookies.get("token");
+   const userId = Cookies.get("userId");
 
    const config: AxiosRequestConfig = {
       baseURL: baseUrl,
@@ -27,6 +30,8 @@ export async function apiRequest<Res, Req = any>(
       method,
       headers: {
          "Content-Type": "application/json",
+         ...(token ? { Authorization: `Bearer ${token}` } : {}),
+         ...(userId ? { "X-User-Id": userId } : {}),
          ...headers,
       },
       data,

@@ -1,7 +1,7 @@
 import { JwtToken } from "@/backend/common/types/jwtTypes";
-import { ProfileResponseDTO } from "./profileTypes";
+import { UserResponseDTO } from "./userTypes";
 
 export interface AuthResponseDTO {
    accessToken: JwtToken;
-   profile: ProfileResponseDTO;
+   user: UserResponseDTO;
 }
