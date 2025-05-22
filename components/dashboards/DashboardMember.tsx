@@ -46,7 +46,6 @@ import {
    FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
-import { withMask } from "use-mask-input";
 
 export default function DashboardMember() {
    const user = useUser();
@@ -134,21 +133,28 @@ export default function DashboardMember() {
                   </CardDescription>
                </CardHeader>
                <CardContent>
-                  <ChartContainer config={chartConfig} className="h-32 w-full">
-                     <BarChart data={lastData} accessibilityLayer>
-                        <ChartTooltip content={<ChartTooltipContent />} />
-                        <XAxis
-                           dataKey="label"
-                           tickLine={false}
-                           tickMargin={10}
-                           axisLine={false}
-                           tickFormatter={(value) => {
-                              return value.split(" ")[0];
-                           }}
-                        />
-                        <Bar dataKey="value" fill="#3b82f6" />
-                     </BarChart>
-                  </ChartContainer>
+                  {lastData.length !== 0 ? (
+                     <ChartContainer
+                        config={chartConfig}
+                        className="h-32 w-full"
+                     >
+                        <BarChart data={lastData} accessibilityLayer>
+                           <ChartTooltip content={<ChartTooltipContent />} />
+                           <XAxis
+                              dataKey="label"
+                              tickLine={false}
+                              tickMargin={10}
+                              axisLine={false}
+                              tickFormatter={(value) => {
+                                 return value.split(" ")[0];
+                              }}
+                           />
+                           <Bar dataKey="value" fill="#3b82f6" />
+                        </BarChart>
+                     </ChartContainer>
+                  ) : (
+                     <p>Sem dados disponíveis</p>
+                  )}
                </CardContent>
             </Card>
             {/* MiniCard 2: Evolução do Peso */}
@@ -160,28 +166,35 @@ export default function DashboardMember() {
                   </CardDescription>
                </CardHeader>
                <CardContent>
-                  <ChartContainer config={chartConfig} className="h-32 w-full">
-                     <AreaChart data={chartData} accessibilityLayer>
-                        <CartesianGrid vertical={false} />
-                        <XAxis
-                           dataKey="date"
-                           tickLine={false}
-                           axisLine={false}
-                           tickMargin={8}
-                        />
-                        <ChartTooltip
-                           content={<ChartTooltipContent indicator="dot" />}
-                        />
-                        <Area
-                           dataKey="value"
-                           type="natural"
-                           fill="#3b82f6"
-                           fillOpacity={0.4}
-                           stroke="#3b82f6"
-                           stackId="a"
-                        />
-                     </AreaChart>
-                  </ChartContainer>
+                  {chartData.length !== 0 ? (
+                     <ChartContainer
+                        config={chartConfig}
+                        className="h-32 w-full"
+                     >
+                        <AreaChart data={chartData} accessibilityLayer>
+                           <CartesianGrid vertical={false} />
+                           <XAxis
+                              dataKey="date"
+                              tickLine={false}
+                              axisLine={false}
+                              tickMargin={8}
+                           />
+                           <ChartTooltip
+                              content={<ChartTooltipContent indicator="dot" />}
+                           />
+                           <Area
+                              dataKey="value"
+                              type="natural"
+                              fill="#3b82f6"
+                              fillOpacity={0.4}
+                              stroke="#3b82f6"
+                              stackId="a"
+                           />
+                        </AreaChart>
+                     </ChartContainer>
+                  ) : (
+                     <p>Sem dados disponíveis</p>
+                  )}
                </CardContent>
             </Card>
 
