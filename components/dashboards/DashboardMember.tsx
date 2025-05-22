@@ -1,51 +1,25 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
 import {
    Card,
    CardHeader,
    CardTitle,
-   CardContent,
    CardDescription,
+   CardContent,
 } from "@/components/ui/card";
-import { BarChart, Bar, CartesianGrid, XAxis, AreaChart, Area } from "recharts";
-import {
-   ChartConfig,
-   ChartContainer,
-   ChartTooltip,
-   ChartTooltipContent,
-} from "@/components/ui/chart";
 import { useUser } from "@/hooks/useUser";
 import { profileMetricService } from "@/backend/modules/useraccess/services/profileMetricServices";
 import { ProfileMetricResponseDTO } from "@/backend/modules/useraccess/types/profileMetricTypes";
 import { ProfileMetricType } from "@/backend/common/enums/profileMetricEnum";
-import { ProfileMetricLabels } from "@/backend/common/enums/profileMetricEnum";
-import { LoadingSpinnerCSS } from "@/components/LoadingSpinner";
-import {
-   CreateProfileMetricRequestDTO,
-   createProfileMetricSchema,
-} from "@/backend/modules/useraccess/schemas/profileMetricSchemas";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import {
-   Select,
-   SelectTrigger,
-   SelectValue,
-   SelectContent,
-   SelectItem,
-   SelectGroup,
-   SelectLabel,
-} from "@/components/ui/select";
-import { Button } from "../ui/button";
-import {
-   Form,
-   FormField,
-   FormItem,
-   FormLabel,
-   FormControl,
-   FormMessage,
-} from "../ui/form";
-import { Input } from "../ui/input";
+import { LastMetricsChart } from "../charts/LastMetricsChart";
+import { WeightEvolutionChart } from "../charts/WeightEvolutionChart";
+import { MetricForm } from "../forms/ProfileMetricForm";
+import { Skeleton } from "@/components/ui/skeleton";
+import { CreateProfileMetricRequestDTO } from "@/backend/modules/useraccess/schemas/profileMetricSchemas";
+import { ChartConfig } from "../ui/chart";
+import GymPresenceCard from "../cards/GymCheckInCard";
 
 export default function DashboardMember() {
    const user = useUser();
@@ -55,71 +29,41 @@ export default function DashboardMember() {
    const [weightMetrics, setWeightMetrics] = useState<
       ProfileMetricResponseDTO[] | null
    >(null);
-   const metricForm = useForm<CreateProfileMetricRequestDTO>({
-      resolver: zodResolver(createProfileMetricSchema),
-      defaultValues: { type: undefined, value: undefined },
-   });
-   const [metricRegisterLoading, setMetricRegisterLoading] = useState(false);
+   const [loading, setLoading] = useState(false);
 
    useEffect(() => {
       if (!user) return;
-      const profileId = user.id;
-      profileMetricService.getLasts(profileId).then(setAllMetrics);
+      const id = user.id;
+      profileMetricService.getLasts(id).then((data) => setAllMetrics(data));
       profileMetricService
-         .getByType(profileId, ProfileMetricType.WEIGHT)
-         .then(setWeightMetrics);
+         .getByType(id, ProfileMetricType.WEIGHT)
+         .then((data) => setWeightMetrics(data));
    }, [user]);
 
-   async function onSubmit(data: CreateProfileMetricRequestDTO) {
+   async function handleMetricSubmit(data: CreateProfileMetricRequestDTO) {
       if (!user) return;
-
-      setMetricRegisterLoading(true);
+      setLoading(true);
       try {
          await profileMetricService.create(user.id, data);
-         toast("Nova métrica criada!", {
-            description: "Seus dados estão bem guardados!",
-            closeButton: true,
-         });
-
+         toast.success("Nova métrica criada! Seus dados estão bem guardados!");
          window.location.reload();
-      } catch (e: any) {
-         toast("Ops, algo deu errado!", {
-            description: e.message,
-            closeButton: true,
-         });
+      } catch (err: any) {
+         toast.error("Ops, algo deu errado: " + err.message);
       } finally {
-         setMetricRegisterLoading(false);
+         setLoading(false);
       }
-   }
-
-   if (!user || !allMetrics || !weightMetrics) {
-      return <LoadingSpinnerCSS />;
    }
 
    const chartConfig: ChartConfig = {};
 
-   // Dados para últimos valores: cada métrica com label e valor
-   const lastData = allMetrics.map((m) => ({
-      label: ProfileMetricLabels[m.type],
-      value: m.value,
-   }));
-
-   // Dados para gráfico de peso ao longo do tempo
-   const chartData = weightMetrics.map((m) => ({
-      date: new Date(m.createdAt).toLocaleDateString("pt-BR", {
-         day: "2-digit",
-         month: "2-digit",
-      }),
-      value: m.value,
-   }));
-
-   const dateFromLastMetric =
-      allMetrics[0] &&
-      new Date(allMetrics[0].createdAt).toLocaleDateString("pt-BR", {
-         day: "2-digit",
-         month: "long",
-         year: "numeric",
-      });
+   const lastMetricDate =
+      allMetrics && allMetrics[0]
+         ? new Date(allMetrics[0].createdAt).toLocaleDateString("pt-BR", {
+              day: "2-digit",
+              month: "long",
+              year: "numeric",
+           })
+         : null;
 
    return (
       <div className="w-full space-y-2">
@@ -133,30 +77,14 @@ export default function DashboardMember() {
                   </CardDescription>
                </CardHeader>
                <CardContent>
-                  {lastData.length !== 0 ? (
-                     <ChartContainer
-                        config={chartConfig}
-                        className="h-32 w-full"
-                     >
-                        <BarChart data={lastData} accessibilityLayer>
-                           <ChartTooltip content={<ChartTooltipContent />} />
-                           <XAxis
-                              dataKey="label"
-                              tickLine={false}
-                              tickMargin={10}
-                              axisLine={false}
-                              tickFormatter={(value) => {
-                                 return value.split(" ")[0];
-                              }}
-                           />
-                           <Bar dataKey="value" fill="#3b82f6" />
-                        </BarChart>
-                     </ChartContainer>
+                  {allMetrics ? (
+                     <LastMetricsChart data={allMetrics} config={chartConfig} />
                   ) : (
-                     <p>Sem dados disponíveis</p>
+                     <Skeleton className="h-32 w-full" />
                   )}
                </CardContent>
             </Card>
+
             {/* MiniCard 2: Evolução do Peso */}
             <Card>
                <CardHeader>
@@ -166,34 +94,13 @@ export default function DashboardMember() {
                   </CardDescription>
                </CardHeader>
                <CardContent>
-                  {chartData.length !== 0 ? (
-                     <ChartContainer
+                  {weightMetrics ? (
+                     <WeightEvolutionChart
+                        data={weightMetrics}
                         config={chartConfig}
-                        className="h-32 w-full"
-                     >
-                        <AreaChart data={chartData} accessibilityLayer>
-                           <CartesianGrid vertical={false} />
-                           <XAxis
-                              dataKey="date"
-                              tickLine={false}
-                              axisLine={false}
-                              tickMargin={8}
-                           />
-                           <ChartTooltip
-                              content={<ChartTooltipContent indicator="dot" />}
-                           />
-                           <Area
-                              dataKey="value"
-                              type="natural"
-                              fill="#3b82f6"
-                              fillOpacity={0.4}
-                              stroke="#3b82f6"
-                              stackId="a"
-                           />
-                        </AreaChart>
-                     </ChartContainer>
+                     />
                   ) : (
-                     <p>Sem dados disponíveis</p>
+                     <Skeleton className="h-32 w-full" />
                   )}
                </CardContent>
             </Card>
@@ -203,106 +110,29 @@ export default function DashboardMember() {
                <CardHeader>
                   <CardTitle>Registre novas Métricas</CardTitle>
                   <CardDescription>
-                     {dateFromLastMetric
-                        ? `Você não registra novas métricas desde ${dateFromLastMetric}
-                     !`
+                     {lastMetricDate
+                        ? `Você não registra novas métricas desde ${lastMetricDate}!`
                         : `Você nunca registrou novas métricas!`}
                   </CardDescription>
                </CardHeader>
                <CardContent>
-                  <Form {...metricForm}>
-                     <form
-                        onSubmit={metricForm.handleSubmit(onSubmit)}
-                        className="space-y-4"
-                     >
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                           {/* Select de tipo */}
-                           <FormField
-                              control={metricForm.control}
-                              name="type"
-                              render={({ field }) => (
-                                 <FormItem>
-                                    <FormLabel>Tipo</FormLabel>
-                                    <Select
-                                       onValueChange={field.onChange}
-                                       defaultValue={field.value}
-                                    >
-                                       <FormControl>
-                                          <SelectTrigger className="w-full">
-                                             <SelectValue placeholder="Selecione o tipo" />
-                                          </SelectTrigger>
-                                       </FormControl>
-                                       <SelectContent>
-                                          <SelectGroup>
-                                             <SelectLabel>Métricas</SelectLabel>
-                                             {Object.entries(
-                                                ProfileMetricLabels
-                                             ).map(([metric, label]) => (
-                                                <SelectItem
-                                                   key={metric}
-                                                   value={metric}
-                                                >
-                                                   {label}
-                                                </SelectItem>
-                                             ))}
-                                          </SelectGroup>
-                                       </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                 </FormItem>
-                              )}
-                           />
-                           {/* Input de valor */}
-                           <FormField
-                              control={metricForm.control}
-                              name="value"
-                              render={({ field }) => (
-                                 <FormItem>
-                                    <FormLabel>Valor</FormLabel>
-                                    <FormControl>
-                                       <Input
-                                          placeholder="Ex: 0,00"
-                                          inputMode="numeric"
-                                          value={
-                                             field.value !== undefined
-                                                ? Number(field.value)
-                                                     .toFixed(2)
-                                                     .replace(".", ",")
-                                                : ""
-                                          }
-                                          onChange={(e) => {
-                                             const raw = e.target.value.replace(
-                                                /\D/g,
-                                                ""
-                                             );
-                                             const num = Number(raw) / 100;
-                                             field.onChange(num);
-                                          }}
-                                       />
-                                    </FormControl>
-                                    <FormMessage />
-                                 </FormItem>
-                              )}
-                           />
-                        </div>
-
-                        {/* Botão de submit */}
-                        <Button
-                           type="submit"
-                           disabled={metricRegisterLoading}
-                           className="w-full cursor-pointer
-                           "
-                        >
-                           {metricRegisterLoading ? (
-                              <LoadingSpinnerCSS />
-                           ) : (
-                              "Registrar Métrica"
-                           )}
-                        </Button>
-                     </form>
-                  </Form>
+                  {user ? (
+                     <MetricForm
+                        onSubmit={handleMetricSubmit}
+                        loading={loading}
+                     />
+                  ) : (
+                     <div className="space-y-4">
+                        <Skeleton className="h-6 w-2/3" />
+                        <Skeleton className="h-6 w-1/3" />
+                        <Skeleton className="h-10 w-full" />
+                     </div>
+                  )}
                </CardContent>
             </Card>
+         </div>
+         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <GymPresenceCard />
          </div>
       </div>
    );
