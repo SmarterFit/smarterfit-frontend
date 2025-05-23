@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -16,11 +16,23 @@ import {
    Layers,
    Group,
    Landmark,
+   Home,
 } from "lucide-react";
+import {
+   DropdownMenu,
+   DropdownMenuTrigger,
+   DropdownMenuContent,
+   DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import { useUser } from "@/hooks/useUser";
 import Cookies from "js-cookie";
 
 const navItems = [
+   {
+      title: "Home",
+      href: "/dashboard",
+      icon: <Home className="mr-2 h-4 w-4" />,
+   },
    {
       title: "Usuários",
       href: "/dashboard/users",
@@ -51,9 +63,14 @@ const navItems = [
 export default function DashboardHeader() {
    const router = useRouter();
    const user = useUser();
+   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+
+   useEffect(() => {
+      const stored = localStorage.getItem("userAvatar");
+      if (stored) setAvatarUrl(stored);
+   }, []);
 
    const handleLogout = () => {
-      // limpa storage e redireciona
       localStorage.clear();
       Cookies.remove("token");
       Cookies.remove("userId");
@@ -63,24 +80,46 @@ export default function DashboardHeader() {
    return (
       <header className="fixed top-0 w-full z-50 bg-background/90 backdrop-blur border-b">
          <div className="max-w-7xl mx-auto flex items-center justify-between h-16 px-4">
-            {/* Left: Avatar + Welcome */}
+            {/* Left: Avatar + Welcome + Menu */}
             <div className="flex items-center space-x-3">
-               <Avatar>
-                  <AvatarImage
-                     src="/imgs/avatar-placeholder.png"
-                     alt={user?.profile.fullName || "Usuário"}
-                  />
-                  <AvatarFallback>
-                     {user?.profile.fullName?.charAt(0) || "U"}
-                  </AvatarFallback>
-               </Avatar>
+               <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                     <Avatar className="h-8 w-8 cursor-pointer">
+                        {avatarUrl ? (
+                           <AvatarImage
+                              src={avatarUrl}
+                              alt={user?.profile.fullName || "Usuário"}
+                           />
+                        ) : (
+                           <AvatarFallback>
+                              {user?.profile.fullName?.charAt(0) || "U"}
+                           </AvatarFallback>
+                        )}
+                     </Avatar>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="mt-1">
+                     <DropdownMenuItem asChild>
+                        <Link
+                           href="/dashboard/perfil"
+                           className="flex items-center"
+                        >
+                           <User className="mr-2 h-4 w-4" /> Perfil
+                        </Link>
+                     </DropdownMenuItem>
+                     <DropdownMenuItem
+                        onSelect={handleLogout}
+                        className="flex items-center"
+                     >
+                        <LogOut className="mr-2 h-4 w-4" /> Sair
+                     </DropdownMenuItem>
+                  </DropdownMenuContent>
+               </DropdownMenu>
                <div className="flex items-center space-x-1">
                   <span className="text-sm font-medium">
                      Bem-vindo à <strong>SmarterFit</strong>,{" "}
                      {user?.profile.fullName || "Usuário"}!
                   </span>
                   <motion.span
-                     className="inline-block"
                      animate={{ rotate: [0, 20, -10, 20, 0] }}
                      transition={{ repeat: Infinity, duration: 2 }}
                   >
@@ -91,12 +130,6 @@ export default function DashboardHeader() {
 
             {/* Desktop Nav */}
             <nav className="hidden md:flex space-x-6">
-               <Link
-                  href="/dashboard/profile"
-                  className="flex items-center text-sm font-medium hover:text-primary"
-               >
-                  <User className="mr-2 h-4 w-4" /> Perfil
-               </Link>
                {navItems.map((item) => (
                   <Link
                      key={item.href}
@@ -109,54 +142,45 @@ export default function DashboardHeader() {
                ))}
             </nav>
 
-            {/* Desktop Logout */}
-            <div className="hidden md:block">
-               <Button
-                  variant="ghost"
-                  onClick={handleLogout}
-                  className="flex items-center"
-               >
-                  <LogOut className="mr-2 h-4 w-4" /> Sair
-               </Button>
+            {/* Mobile Menu & Logout */}
+            <div className="flex items-center md:hidden space-x-2">
+               <Sheet>
+                  <SheetTrigger asChild>
+                     <Button
+                        variant="ghost"
+                        size="icon"
+                        className="cursor-pointer"
+                     >
+                        <Menu />
+                     </Button>
+                  </SheetTrigger>
+                  <SheetContent side="right" className="w-64">
+                     <div className="flex flex-col space-y-4 m-4">
+                        {navItems.map((item) => (
+                           <Link
+                              key={item.href}
+                              href={item.href}
+                              className="flex items-center text-sm font-medium"
+                           >
+                              {item.icon}
+                              {item.title}
+                           </Link>
+                        ))}
+                     </div>
+                     <div className="mt-auto m-4">
+                        <Button
+                           variant="outline"
+                           className="w-full flex items-center cursor-pointer"
+                           onClick={handleLogout}
+                        >
+                           <LogOut className="mr-2 h-4 w-4" /> Sair
+                        </Button>
+                     </div>
+                  </SheetContent>
+               </Sheet>
             </div>
 
-            {/* Mobile Menu */}
-            <Sheet>
-               <SheetTrigger asChild className="md:hidden">
-                  <Button variant="ghost" size="icon">
-                     <Menu />
-                  </Button>
-               </SheetTrigger>
-               <SheetContent side="right" className="w-64">
-                  <div className="flex flex-col space-y-4 mt-4">
-                     <Link
-                        href="/dashboard/profile"
-                        className="flex items-center text-sm font-medium"
-                     >
-                        <User className="mr-2 h-4 w-4" /> Perfil
-                     </Link>
-                     {navItems.map((item) => (
-                        <Link
-                           key={item.href}
-                           href={item.href}
-                           className="flex items-center text-sm font-medium"
-                        >
-                           {item.icon}
-                           {item.title}
-                        </Link>
-                     ))}
-                  </div>
-                  <div className="mt-auto mb-4">
-                     <Button
-                        variant="outline"
-                        className="w-full flex items-center cursor-pointer"
-                        onClick={handleLogout}
-                     >
-                        <LogOut className="mr-2 h-4 w-4" /> Sair
-                     </Button>
-                  </div>
-               </SheetContent>
-            </Sheet>
+            {/* Desktop Logout hidden (now in avatar menu) */}
          </div>
       </header>
    );

@@ -7,7 +7,15 @@ export function useUser(): UserResponseDTO | null {
    useEffect(() => {
       const data = localStorage.getItem("user");
       if (data) {
-         setUser(JSON.parse(data));
+         try {
+            setUser(JSON.parse(data));
+         } catch (error) {
+            console.error(
+               "Falha ao parsear dados do usuário do localStorage:",
+               error
+            );
+            setUser(null);
+         }
       }
    }, []);
 

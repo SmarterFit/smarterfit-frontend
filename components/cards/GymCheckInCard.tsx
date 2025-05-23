@@ -14,7 +14,7 @@ import { useUser } from "@/hooks/useUser";
 import { gymCheckInService } from "@/backend/modules/checkin/services/gymCheckInServices";
 import { presenceSnapshotService } from "@/backend/modules/checkin/services/presenceSnapshotServices";
 import { Separator } from "../ui/separator";
-import { toast } from "sonner";
+import { ErrorToast } from "../toasts/Toasts";
 
 export default function GymPresenceCard() {
    const user = useUser();
@@ -34,10 +34,7 @@ export default function GymPresenceCard() {
          setCount(snapshot.presenceCount);
          setLastUpdated(snapshot.createdAt);
       } catch (e: any) {
-         toast("Ops, algo deu errado!", {
-            description: e.message,
-            closeButton: true,
-         });
+         setCount(0);
       } finally {
          setLoading(false);
       }
@@ -60,8 +57,8 @@ export default function GymPresenceCard() {
          localStorage.setItem("gymCheckedIn", "true");
          setCheckedIn(true);
          await loadCount();
-      } catch (e) {
-         console.error(e);
+      } catch (e: any) {
+         ErrorToast(e.message);
       } finally {
          setProcessing(false);
       }
@@ -76,8 +73,8 @@ export default function GymPresenceCard() {
          localStorage.setItem("gymCheckedIn", "false");
          setCheckedIn(false);
          await loadCount();
-      } catch (e) {
-         console.error(e);
+      } catch (e: any) {
+         ErrorToast(e.message);
       } finally {
          setProcessing(false);
       }

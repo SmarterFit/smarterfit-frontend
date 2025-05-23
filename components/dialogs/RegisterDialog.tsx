@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { userService } from "@/backend/modules/useraccess/services/userServices";
-import { toast } from "sonner";
+import { ErrorToast, SuccessToast } from "../toasts/Toasts";
 
 type RegisterDialogProps = {
    open: boolean;
@@ -64,10 +64,7 @@ export function RegisterDialog({
    async function onSubmit(data: CreateUserRequestDTO) {
       try {
          await userService.create(data);
-         toast("Usuário criado com sucesso!", {
-            description: "Seja bem-vindo ao SmarterFit!",
-            closeButton: true,
-         });
+         SuccessToast("Conta criada com sucesso!", "Entre em sua conta!");
          setOpen(false);
          reset();
 
@@ -75,10 +72,7 @@ export function RegisterDialog({
             openLogin();
          }
       } catch (e: any) {
-         toast("Ops, algo deu errado!", {
-            description: e.message,
-            closeButton: true,
-         });
+         ErrorToast(e.message);
       }
    }
 

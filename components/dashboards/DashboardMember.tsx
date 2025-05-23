@@ -12,7 +12,6 @@ import { useUser } from "@/hooks/useUser";
 import { profileMetricService } from "@/backend/modules/useraccess/services/profileMetricServices";
 import { ProfileMetricResponseDTO } from "@/backend/modules/useraccess/types/profileMetricTypes";
 import { ProfileMetricType } from "@/backend/common/enums/profileMetricEnum";
-import { toast } from "sonner";
 import { LastMetricsChart } from "../charts/LastMetricsChart";
 import { WeightEvolutionChart } from "../charts/WeightEvolutionChart";
 import { MetricForm } from "../forms/ProfileMetricForm";
@@ -20,6 +19,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { CreateProfileMetricRequestDTO } from "@/backend/modules/useraccess/schemas/profileMetricSchemas";
 import { ChartConfig } from "../ui/chart";
 import GymPresenceCard from "../cards/GymCheckInCard";
+import { ErrorToast, SuccessToast } from "../toasts/Toasts";
 
 export default function DashboardMember() {
    const user = useUser();
@@ -45,10 +45,13 @@ export default function DashboardMember() {
       setLoading(true);
       try {
          await profileMetricService.create(user.id, data);
-         toast.success("Nova métrica criada! Seus dados estão bem guardados!");
+         SuccessToast(
+            "Métrica cadastrada com sucesso!",
+            "Você pode ver ela logo ali!"
+         );
          window.location.reload();
-      } catch (err: any) {
-         toast.error("Ops, algo deu errado: " + err.message);
+      } catch (e: any) {
+         ErrorToast(e.message);
       } finally {
          setLoading(false);
       }
@@ -131,7 +134,7 @@ export default function DashboardMember() {
                </CardContent>
             </Card>
          </div>
-         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             <GymPresenceCard />
          </div>
       </div>

@@ -65,16 +65,20 @@ export type UpdateUserEmailRequestDTO = z.infer<typeof updateUserEmailSchema>;
  */
 export const updateUserPasswordSchema = z
    .object({
-      password: z
+      currentPassword: z
+         .string()
+         .min(8, "A senha atual deve ter no mínimo 8 caracteres")
+         .max(50, "A senha atual deve ter no máximo 50 caracteres"),
+      newPassword: z
          .string()
          .min(8, "A senha deve ter no mínimo 8 caracteres")
          .max(50, "A senha deve ter no máximo 50 caracteres"),
-      confirmPassword: z
+      confirmNewPassword: z
          .string()
          .min(8, "A confirmação deve ter no mínimo 8 caracteres")
          .max(50, "A confirmação deve ter no máximo 50 caracteres"),
    })
-   .refine((data) => data.password === data.confirmPassword, {
+   .refine((data) => data.newPassword === data.confirmNewPassword, {
       message: "As senhas devem coincidir",
       path: ["confirmPassword"],
    });

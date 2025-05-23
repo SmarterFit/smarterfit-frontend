@@ -21,7 +21,6 @@ import {
    FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
 import {
    LoginRequestDTO,
    loginRequestSchema,
@@ -29,6 +28,8 @@ import {
 import { authService } from "@/backend/modules/useraccess/services/authServices";
 import { AuthResponseDTO } from "@/backend/modules/useraccess/types/authTypes";
 import Cookies from "js-cookie";
+import { CheckCircle } from "lucide-react";
+import { ErrorToast, SuccessToast } from "../toasts/Toasts";
 
 type LoginDialogProps = {
    open: boolean;
@@ -56,10 +57,7 @@ export function LoginDialog({ open, setOpen, openRegister }: LoginDialogProps) {
    async function onSubmit(data: LoginRequestDTO) {
       try {
          const response: AuthResponseDTO = await authService.login(data);
-         toast("Usuário logado com sucesso!", {
-            description: "É um prazer te ver de volta 😊!",
-            closeButton: true,
-         });
+         SuccessToast("Login efetuado com sucesso!", "Seja bem-vindo!");
          setOpen(false);
          reset();
 
@@ -69,10 +67,7 @@ export function LoginDialog({ open, setOpen, openRegister }: LoginDialogProps) {
 
          window.location.href = "/dashboard";
       } catch (e: any) {
-         toast("Ops, algo deu errado!", {
-            description: e.message,
-            closeButton: true,
-         });
+         ErrorToast(e.message);
       }
    }
 
