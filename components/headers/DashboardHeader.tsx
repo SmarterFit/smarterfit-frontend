@@ -29,13 +29,13 @@ import Cookies from "js-cookie";
 
 const navItems = [
    {
-      title: "Home",
+      title: "Início",
       href: "/dashboard",
       icon: <Home className="mr-2 h-4 w-4" />,
    },
    {
       title: "Usuários",
-      href: "/dashboard/users",
+      href: "/dashboard/usuarios",
       icon: <Users className="mr-2 h-4 w-4" />,
    },
    {

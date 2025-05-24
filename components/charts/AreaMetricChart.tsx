@@ -8,15 +8,21 @@ import {
 import { ChartConfig } from "@/components/ui/chart";
 import { ProfileMetricResponseDTO } from "@/backend/modules/useraccess/types/profileMetricTypes";
 
-interface WeightEvolutionChartProps {
+interface AreaMetricChartProps {
    data: ProfileMetricResponseDTO[];
    config: ChartConfig;
+   color?: string;
+   height?: string;
+   width?: string;
 }
 
-export function WeightEvolutionChart({
+export function AreaMetricChart({
    data,
    config,
-}: WeightEvolutionChartProps) {
+   color = "#3b82f6",
+   height = "h-32",
+   width = "w-full",
+}: AreaMetricChartProps) {
    const chartData = data.map((m) => ({
       date: new Date(m.createdAt).toLocaleDateString("pt-BR", {
          day: "2-digit",
@@ -25,10 +31,13 @@ export function WeightEvolutionChart({
       value: m.value,
    }));
 
-   if (!chartData.length) return <p>Sem dados disponíveis</p>;
+   if (!chartData.length)
+      return (
+         <p className="text-sm text-muted-foreground">Sem dados disponíveis</p>
+      );
 
    return (
-      <ChartContainer config={config} className="h-32 w-full">
+      <ChartContainer config={config} className={`${height} ${width}`}>
          <AreaChart data={chartData} accessibilityLayer>
             <CartesianGrid vertical={false} />
             <XAxis
@@ -41,9 +50,9 @@ export function WeightEvolutionChart({
             <Area
                dataKey="value"
                type="natural"
-               fill="#3b82f6"
+               fill={color}
                fillOpacity={0.4}
-               stroke="#3b82f6"
+               stroke={color}
                stackId="a"
             />
          </AreaChart>

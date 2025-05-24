@@ -55,7 +55,8 @@ export const updateUserEmailSchema = z.object({
    email: z
       .string({ required_error: "O e-mail é obrigatório" })
       .email("Formato de e-mail inválido")
-      .min(1, "O e-mail não pode estar em branco"),
+      .min(1, "O e-mail não pode estar em branco")
+      .nonempty("E-mail não pode estar em branco"),
 });
 
 export type UpdateUserEmailRequestDTO = z.infer<typeof updateUserEmailSchema>;
@@ -68,19 +69,22 @@ export const updateUserPasswordSchema = z
       currentPassword: z
          .string()
          .min(8, "A senha atual deve ter no mínimo 8 caracteres")
-         .max(50, "A senha atual deve ter no máximo 50 caracteres"),
+         .max(50, "A senha atual deve ter no máximo 50 caracteres")
+         .nonempty("Senha atual não pode estar em branco"),
       newPassword: z
          .string()
-         .min(8, "A senha deve ter no mínimo 8 caracteres")
-         .max(50, "A senha deve ter no máximo 50 caracteres"),
+         .min(8, "A nova senha deve ter no mínimo 8 caracteres")
+         .max(50, "A nova senha deve ter no máximo 50 caracteres")
+         .nonempty("Nova senha não pode estar em branco"),
       confirmNewPassword: z
          .string()
          .min(8, "A confirmação deve ter no mínimo 8 caracteres")
-         .max(50, "A confirmação deve ter no máximo 50 caracteres"),
+         .max(50, "A confirmação deve ter no máximo 50 caracteres")
+         .nonempty("A confirmação não pode estar em branco"),
    })
    .refine((data) => data.newPassword === data.confirmNewPassword, {
       message: "As senhas devem coincidir",
-      path: ["confirmPassword"],
+      path: ["confirmNewPassword"],
    });
 
 export type UpdateUserPasswordRequestDTO = z.infer<

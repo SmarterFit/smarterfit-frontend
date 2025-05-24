@@ -1,17 +1,18 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { UserSettings } from "@/components/user/UserSettings";
-import { SecuritySettings } from "@/components/user/SecuritySettings";
-import { ProfileSettings } from "@/components/user/ProfileSettings";
-import { useUser as useUserFromHook } from "@/hooks/useUser";
-import { UserResponseDTO } from "@/backend/modules/useraccess/types/userTypes";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
+import { AddressResponseDTO } from "@/backend/modules/useraccess/types/addressTypes";
 import { ProfileResponseDTO } from "@/backend/modules/useraccess/types/profileTypes";
+import { UserResponseDTO } from "@/backend/modules/useraccess/types/userTypes";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AddressTab } from "@/components/user/AddressTab";
+import { MetricsTab } from "@/components/user/MetricsTab";
+import { ProfileTab } from "@/components/user/ProfileTab";
+import { SecurityTab } from "@/components/user/SecurityTab";
+import { useUser } from "@/hooks/useUser";
+import { useState, useEffect } from "react";
 
-export default function PerfilPage() {
-   const rawUserFromHook = useUserFromHook();
+export default function Test() {
+   const rawUserFromHook = useUser();
 
    const [user, setUser] = useState<UserResponseDTO | null>(null);
    const [isLoading, setIsLoading] = useState(true);
@@ -44,77 +45,60 @@ export default function PerfilPage() {
       }
    };
 
-   if (isLoading) {
-      return (
-         <div className="container mx-auto py-10 px-4 space-y-8">
-            {/* Skeleton para UserSettings */}
-            <div className="flex items-center justify-between space-x-4 p-6 border-b">
-               <div className="flex items-center space-x-4">
-                  <Skeleton className="h-20 w-20 rounded-full" />
-                  <div className="space-y-2">
-                     <Skeleton className="h-6 w-[200px]" />
-                     <Skeleton className="h-4 w-[180px]" />
-                     <Skeleton className="h-4 w-[150px]" />
-                  </div>
-               </div>
-               <Skeleton className="h-10 w-32 rounded-md" />{" "}
-               {/* Botão Editar Email */}
-            </div>
-            <Separator className="my-8" />
-            {/* Skeleton para SecuritySettings */}
-            <div className="p-6 border rounded-lg shadow-sm">
-               <Skeleton className="h-6 w-1/3 mb-2" /> {/* Título */}
-               <Skeleton className="h-4 w-full mb-4" /> {/* Descrição */}
-               <Skeleton className="h-10 w-32 rounded" />{" "}
-               {/* Botão Alterar Senha */}
-            </div>
-            <Separator className="my-8" />
-            <div className="p-6 border rounded-lg shadow-sm">
-               <Skeleton className="h-8 w-3/4 mb-4" /> {/* Nome */}
-               <div className="space-y-3">
-                  <Skeleton className="h-5 w-1/2" />
-                  <Skeleton className="h-5 w-1/2" />
-                  <Skeleton className="h-5 w-1/2" />
-               </div>
-               <Skeleton className="h-10 w-32 mt-6 rounded" />{" "}
-            </div>
-         </div>
-      );
-   }
-
-   if (!user) {
-      return (
-         <div className="container mx-auto py-10 px-4">
-            <div className="mt-10 text-center">
-               <p className="text-muted-foreground">
-                  Para visualizar o perfil, por favor, faça o login.
-               </p>
-            </div>
-         </div>
-      );
-   }
-
+   const handleAddressUpdated = (updatedAddress: AddressResponseDTO) => {
+      if (user) {
+         const updatedUser: UserResponseDTO = {
+            ...user,
+            profile: {
+               ...user.profile,
+               address: updatedAddress,
+            },
+         };
+         setUser(updatedUser);
+         localStorage.setItem("user", JSON.stringify(updatedUser));
+      }
+   };
    return (
-      <>
-         <div className="container mx-auto py-10 px-4 space-y-8">
-            <UserSettings
+      <Tabs defaultValue="perfil" className="flex w-full sm:flex-row p-2 gap-4">
+         <TabsList className="flex sm:flex-col h-full sm:w-1/6 sm:gap-2 sm:!bg-transparent w-full items-start sm:px-4">
+            <TabsTrigger value="perfil" className="w-full">
+               Perfil
+            </TabsTrigger>
+            <TabsTrigger value="seguranca" className="w-full">
+               Segurança
+            </TabsTrigger>
+            <TabsTrigger value="endereco" className="w-full">
+               Endereço
+            </TabsTrigger>
+            <TabsTrigger value="metricas" className="w-full">
+               Métricas
+            </TabsTrigger>
+            <TabsTrigger value="treinos" className="w-full">
+               Treinos
+            </TabsTrigger>
+         </TabsList>
+         <TabsContent value="perfil">
+            <ProfileTab
                user={user}
-               isLoading={false}
-               onUserEmailUpdated={handleUserEmailUpdated}
-            />
-
-            <Separator className="my-8" />
-
-            <SecuritySettings user={user} />
-
-            <Separator className="my-8" />
-
-            <ProfileSettings
-               profile={user.profile}
-               isLoading={false}
+               isLoading={isLoading}
+               onUserUpdated={handleUserEmailUpdated}
                onProfileUpdated={handleProfileUpdated}
             />
-         </div>
-      </>
+         </TabsContent>
+         <TabsContent value="seguranca">
+            <SecurityTab user={user} isLoading={isLoading} />
+         </TabsContent>
+         <TabsContent value="endereco">
+            <AddressTab
+               user={user}
+               isLoading={isLoading}
+               onAddressUpdated={handleAddressUpdated}
+            />
+         </TabsContent>
+         <TabsContent value="metricas">
+            <MetricsTab user={user} isLoading={isLoading} />
+         </TabsContent>
+         <TabsContent value="treinos">Change your trainings here.</TabsContent>
+      </Tabs>
    );
 }

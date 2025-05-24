@@ -13,7 +13,7 @@ import { profileMetricService } from "@/backend/modules/useraccess/services/prof
 import { ProfileMetricResponseDTO } from "@/backend/modules/useraccess/types/profileMetricTypes";
 import { ProfileMetricType } from "@/backend/common/enums/profileMetricEnum";
 import { LastMetricsChart } from "../charts/LastMetricsChart";
-import { WeightEvolutionChart } from "../charts/WeightEvolutionChart";
+import { AreaMetricChart } from "../charts/AreaMetricChart";
 import { MetricForm } from "../forms/ProfileMetricForm";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CreateProfileMetricRequestDTO } from "@/backend/modules/useraccess/schemas/profileMetricSchemas";
@@ -98,7 +98,7 @@ export default function DashboardMember() {
                </CardHeader>
                <CardContent>
                   {weightMetrics ? (
-                     <WeightEvolutionChart
+                     <AreaMetricChart
                         data={weightMetrics}
                         config={chartConfig}
                      />
