@@ -55,7 +55,7 @@ const navItems = [
    },
    {
       title: "Turmas",
-      href: "/dashboard/classes",
+      href: "/dashboard/turmas",
       icon: <Landmark className="mr-2 h-4 w-4" />,
    },
 ];
@@ -88,11 +88,11 @@ export default function DashboardHeader() {
                         {avatarUrl ? (
                            <AvatarImage
                               src={avatarUrl}
-                              alt={user?.profile.fullName || "Usuário"}
+                              alt={user?.profile?.fullName || "Usuário"}
                            />
                         ) : (
                            <AvatarFallback>
-                              {user?.profile.fullName?.charAt(0) || "U"}
+                              {user?.profile?.fullName?.charAt(0) || "U"}
                            </AvatarFallback>
                         )}
                      </Avatar>
@@ -117,7 +117,7 @@ export default function DashboardHeader() {
                <div className="flex items-center space-x-1">
                   <span className="text-sm font-medium">
                      Bem-vindo à <strong>SmarterFit</strong>,{" "}
-                     {user?.profile.fullName || "Usuário"}!
+                     {user?.profile?.fullName || "Usuário"}!
                   </span>
                   <motion.span
                      animate={{ rotate: [0, 20, -10, 20, 0] }}

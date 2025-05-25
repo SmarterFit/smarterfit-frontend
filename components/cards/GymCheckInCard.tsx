@@ -22,9 +22,12 @@ export default function GymPresenceCard() {
    const [lastUpdated, setLastUpdated] = useState<string | null>(null);
    const [loading, setLoading] = useState(true);
    const [processing, setProcessing] = useState(false);
-   const [checkedIn, setCheckedIn] = useState<boolean>(() => {
-      return localStorage.getItem("gymCheckedIn") === "true";
-   });
+   const [checkedIn, setCheckedIn] = useState<boolean>(false);
+
+   useEffect(() => {
+   setCheckedIn(localStorage.getItem("gymCheckedIn") === "true");
+   }, []);
+
 
    // Carrega dados iniciais de presença
    async function loadCount() {

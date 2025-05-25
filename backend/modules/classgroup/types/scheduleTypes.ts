@@ -1,0 +1,10 @@
+import { DayOfWeek } from "@/backend/common/enums/dayOfWeek";
+
+
+export interface ClassGroupScheduleResponseDTO {
+  id: string; // UUID
+  classGroupId: string; // UUID
+  dayOfWeek: DayOfWeek;
+  startTime: string; // formato "HH:mm"
+  endTime: string;   // formato "HH:mm"
+}
