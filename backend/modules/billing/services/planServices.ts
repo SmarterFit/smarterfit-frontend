@@ -1,27 +1,27 @@
-import type {
-   CreatedPlanResponseDTO,
-   SearchPlanRequestDTO,
-   CreatePlanRequestDTO,
-} from "@/backend/modules/billing/types/planTypes";
-import type { PageResponseDTO } from "@/backend/common/types/pageTypes";
 import { apiRequest } from "@/backend/api";
+import {
+   CreatePlanRequestDTO,
+   SearchPlanRequestDTO,
+   UpdatePlanRequestDTO,
+} from "../schemas/planSchemas";
+import { CreatedPlanResponseDTO } from "../types/planTypes";
 
 export const planService = {
    /**
-    * Cria um novo plano (Admin)
+    * Cria um novo plano (admin)
     */
-   create(payload: CreatePlanRequestDTO): Promise<CreatedPlanResponseDTO> {
+   createPlan(payload: CreatePlanRequestDTO): Promise<CreatedPlanResponseDTO> {
       return apiRequest<CreatedPlanResponseDTO, CreatePlanRequestDTO>({
          method: "post",
-         path: "/planos",
+         path: `/planos`,
          data: payload,
       });
    },
 
    /**
-    * Retorna um plano por ID
+    * Busca plano pelo ID
     */
-   getById(id: string): Promise<CreatedPlanResponseDTO> {
+   getPlanById(id: string): Promise<CreatedPlanResponseDTO> {
       return apiRequest<CreatedPlanResponseDTO>({
          method: "get",
          path: `/planos/${id}`,
@@ -29,38 +29,52 @@ export const planService = {
    },
 
    /**
-    * Retorna todos os planos
+    * Busca todos os planos
     */
-   getAll(): Promise<CreatedPlanResponseDTO[]> {
+   getAllPlans(): Promise<CreatedPlanResponseDTO[]> {
       return apiRequest<CreatedPlanResponseDTO[]>({
          method: "get",
-         path: "/planos",
+         path: `/planos`,
       });
    },
 
    /**
     * Busca planos com filtros e paginação
     */
-   search(
-      filters: SearchPlanRequestDTO = {},
-      page = 0,
-      size = 10
-   ): Promise<PageResponseDTO<CreatedPlanResponseDTO>> {
-      return apiRequest<PageResponseDTO<CreatedPlanResponseDTO>>({
+   searchPlans(
+      payload: SearchPlanRequestDTO,
+      page?: number,
+      size?: number
+   ): Promise<{
+      content: CreatedPlanResponseDTO[];
+      totalElements: number;
+      totalPages: number;
+      number: number;
+   }> {
+      return apiRequest<{
+         content: CreatedPlanResponseDTO[];
+         totalElements: number;
+         totalPages: number;
+         number: number;
+      }>({
          method: "get",
-         path: "/planos/buscar",
-         params: { ...filters, page, size },
+         path: `/planos/buscar`,
+         params: {
+            ...payload,
+            page,
+            size,
+         },
       });
    },
 
    /**
-    * Atualiza um plano existente (Admin)
+    * Atualiza plano pelo ID (admin)
     */
-   update(
+   updatePlan(
       id: string,
-      payload: CreatePlanRequestDTO
+      payload: UpdatePlanRequestDTO
    ): Promise<CreatedPlanResponseDTO> {
-      return apiRequest<CreatedPlanResponseDTO, CreatePlanRequestDTO>({
+      return apiRequest<CreatedPlanResponseDTO, UpdatePlanRequestDTO>({
          method: "put",
          path: `/planos/${id}`,
          data: payload,
@@ -68,9 +82,9 @@ export const planService = {
    },
 
    /**
-    * Remove um plano (Admin)
+    * Deleta plano pelo ID (admin)
     */
-   delete(id: string): Promise<void> {
+   deletePlan(id: string): Promise<void> {
       return apiRequest<void>({
          method: "delete",
          path: `/planos/${id}`,

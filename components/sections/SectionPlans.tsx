@@ -22,7 +22,7 @@ export default function SectionPlans() {
 
    useEffect(() => {
       planService
-         .search({}, 0, 10)
+         .searchPlans({}, 0, 10)
          .then((page) => {
             setPlans(page.content);
          })
