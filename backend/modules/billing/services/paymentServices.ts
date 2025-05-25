@@ -14,9 +14,7 @@ export const paymentService = {
    /**
     * Cria um novo pagamento
     */
-   createPayment(
-      payload: CreatePaymentRequestDTO
-   ): Promise<PaymentResponseDTO> {
+   create(payload: CreatePaymentRequestDTO): Promise<PaymentResponseDTO> {
       return apiRequest<PaymentResponseDTO, CreatePaymentRequestDTO>({
          method: "post",
          path: `/pagamentos`,
@@ -27,7 +25,7 @@ export const paymentService = {
    /**
     * Busca um pagamento pelo ID
     */
-   getPaymentById(id: string): Promise<PaymentResponseDTO> {
+   getById(id: string): Promise<PaymentResponseDTO> {
       return apiRequest<PaymentResponseDTO>({
          method: "get",
          path: `/pagamentos/${id}`,
@@ -57,9 +55,21 @@ export const paymentService = {
    },
 
    /**
+    * Busca todos os pagamentos por ID da assinatura
+    */
+   getAllBySubscriptionId(
+      subscriptionId: string
+   ): Promise<PaymentWithSubscriptionResponseDTO[]> {
+      return apiRequest<PaymentWithSubscriptionResponseDTO[]>({
+         method: "get",
+         path: `/pagamentos/assinatura/${subscriptionId}`,
+      });
+   },
+
+   /**
     * Busca pagamentos com filtros (com paginação)
     */
-   searchPayments(
+   search(
       payload: SearchPaymentRequestDTO,
       page?: number,
       size?: number
@@ -88,7 +98,7 @@ export const paymentService = {
    /**
     * Processa pagamento pelo ID
     */
-   processPayment(
+   process(
       id: string,
       payload: ProcessorPaymentRequestDTO
    ): Promise<PaymentProcessorResponseDTO> {
@@ -105,7 +115,7 @@ export const paymentService = {
    /**
     * Cancela pagamento pelo ID
     */
-   cancelPayment(id: string): Promise<void> {
+   cancel(id: string): Promise<void> {
       return apiRequest<void>({
          method: "patch",
          path: `/pagamentos/${id}/cancelar`,

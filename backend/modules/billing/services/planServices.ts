@@ -5,12 +5,13 @@ import {
    UpdatePlanRequestDTO,
 } from "../schemas/planSchemas";
 import { CreatedPlanResponseDTO } from "../types/planTypes";
+import { PageResponseDTO } from "@/backend/common/types/pageTypes";
 
 export const planService = {
    /**
     * Cria um novo plano (admin)
     */
-   createPlan(payload: CreatePlanRequestDTO): Promise<CreatedPlanResponseDTO> {
+   create(payload: CreatePlanRequestDTO): Promise<CreatedPlanResponseDTO> {
       return apiRequest<CreatedPlanResponseDTO, CreatePlanRequestDTO>({
          method: "post",
          path: `/planos`,
@@ -21,7 +22,7 @@ export const planService = {
    /**
     * Busca plano pelo ID
     */
-   getPlanById(id: string): Promise<CreatedPlanResponseDTO> {
+   getById(id: string): Promise<CreatedPlanResponseDTO> {
       return apiRequest<CreatedPlanResponseDTO>({
          method: "get",
          path: `/planos/${id}`,
@@ -31,7 +32,7 @@ export const planService = {
    /**
     * Busca todos os planos
     */
-   getAllPlans(): Promise<CreatedPlanResponseDTO[]> {
+   getAll(): Promise<CreatedPlanResponseDTO[]> {
       return apiRequest<CreatedPlanResponseDTO[]>({
          method: "get",
          path: `/planos`,
@@ -41,22 +42,12 @@ export const planService = {
    /**
     * Busca planos com filtros e paginação
     */
-   searchPlans(
+   search(
       payload: SearchPlanRequestDTO,
       page?: number,
       size?: number
-   ): Promise<{
-      content: CreatedPlanResponseDTO[];
-      totalElements: number;
-      totalPages: number;
-      number: number;
-   }> {
-      return apiRequest<{
-         content: CreatedPlanResponseDTO[];
-         totalElements: number;
-         totalPages: number;
-         number: number;
-      }>({
+   ): Promise<PageResponseDTO<CreatedPlanResponseDTO>> {
+      return apiRequest<PageResponseDTO<CreatedPlanResponseDTO>>({
          method: "get",
          path: `/planos/buscar`,
          params: {
@@ -70,7 +61,7 @@ export const planService = {
    /**
     * Atualiza plano pelo ID (admin)
     */
-   updatePlan(
+   update(
       id: string,
       payload: UpdatePlanRequestDTO
    ): Promise<CreatedPlanResponseDTO> {
@@ -84,7 +75,7 @@ export const planService = {
    /**
     * Deleta plano pelo ID (admin)
     */
-   deletePlan(id: string): Promise<void> {
+   delete(id: string): Promise<void> {
       return apiRequest<void>({
          method: "delete",
          path: `/planos/${id}`,

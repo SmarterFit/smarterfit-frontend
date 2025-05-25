@@ -8,7 +8,7 @@ export const subscriptionUserService = {
    /**
     * Adiciona membro à assinatura pelo subscriptionId e userId
     */
-   addMemberToSubscription(
+   addMember(
       subscriptionId: string,
       userId: string
    ): Promise<SubscriptionUserResponseDTO> {
@@ -21,7 +21,7 @@ export const subscriptionUserService = {
    /**
     * Adiciona membro à assinatura pelo email
     */
-   addMemberByEmailToSubscription(
+   addMemberByEmail(
       payload: AddMemberByEmailRequestDTO
    ): Promise<SubscriptionUserResponseDTO> {
       return apiRequest<
@@ -37,7 +37,7 @@ export const subscriptionUserService = {
    /**
     * Remove membro da assinatura
     */
-   removeMemberFromSubscription(
+   removeMember(
       subscriptionId: string,
       userId: string
    ): Promise<void> {
@@ -50,7 +50,7 @@ export const subscriptionUserService = {
    /**
     * Busca membro específico da assinatura
     */
-   getSubscriptionUser(
+   getById(
       subscriptionId: string,
       userId: string
    ): Promise<SubscriptionUserResponseDTO> {
@@ -63,7 +63,7 @@ export const subscriptionUserService = {
    /**
     * Busca todos os membros das assinaturas (acesso funcionários)
     */
-   getAllSubscriptionUsers(): Promise<SubscriptionUserResponseDTO[]> {
+   getAll(): Promise<SubscriptionUserResponseDTO[]> {
       return apiRequest<SubscriptionUserResponseDTO[]>({
          method: "get",
          path: `/assinaturas/usuarios`,

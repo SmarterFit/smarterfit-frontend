@@ -14,7 +14,7 @@ export const subscriptionService = {
    /**
     * Cria uma nova assinatura (usuário comum e funcionários)
     */
-   createSubscription(
+   create(
       payload: CreateSubscriptionRequestDTO
    ): Promise<SubscriptionResponseDTO> {
       return apiRequest<SubscriptionResponseDTO, CreateSubscriptionRequestDTO>({
@@ -27,7 +27,7 @@ export const subscriptionService = {
    /**
     * Busca assinatura pelo ID (usuário dono e funcionários)
     */
-   getSubscriptionById(id: string): Promise<SubscriptionResponseDTO> {
+   getById(id: string): Promise<SubscriptionResponseDTO> {
       return apiRequest<SubscriptionResponseDTO>({
          method: "get",
          path: `/assinaturas/${id}`,
@@ -37,7 +37,7 @@ export const subscriptionService = {
    /**
     * Busca todas as assinaturas (funcionários)
     */
-   getAllSubscriptions(): Promise<SubscriptionResponseDTO[]> {
+   getAll(): Promise<SubscriptionResponseDTO[]> {
       return apiRequest<SubscriptionResponseDTO[]>({
          method: "get",
          path: `/assinaturas`,
@@ -47,7 +47,7 @@ export const subscriptionService = {
    /**
     * Busca todas as assinaturas por dono da assinatura (usuário dono e funcionários)
     */
-   getAllSubscriptionsByOwnerId(
+   getAllByOwnerId(
       subscriptionOwnerId: string
    ): Promise<SubscriptionResponseDTO[]> {
       return apiRequest<SubscriptionResponseDTO[]>({
@@ -59,7 +59,7 @@ export const subscriptionService = {
    /**
     * Busca assinaturas com filtros e paginação (usuário dono e funcionários)
     */
-   searchSubscriptions(
+   search(
       filters: SearchSubscriptionRequestDTO,
       page?: number,
       size?: number
@@ -81,9 +81,7 @@ export const subscriptionService = {
    /**
     * Verifica se um participante possui assinatura atual
     */
-   existsCurrentSubscriptionByParticipantId(
-      participantId: string
-   ): Promise<boolean> {
+   existsCurrentByParticipantId(participantId: string): Promise<boolean> {
       return apiRequest<boolean>({
          method: "get",
          path: `/assinaturas/possui-assinatura/${participantId}`,
@@ -93,7 +91,7 @@ export const subscriptionService = {
    /**
     * Cancela uma assinatura pelo ID (usuário dono e funcionários)
     */
-   cancelSubscription(id: string): Promise<void> {
+   cancel(id: string): Promise<void> {
       return apiRequest<void>({
          method: "patch",
          path: `/assinaturas/${id}/cancelar`,
@@ -103,7 +101,7 @@ export const subscriptionService = {
    /**
     * Busca assinaturas disponíveis por turma e usuário (usuário dono e funcionários)
     */
-   getAvailableSubscriptionsByClassGroupAndUser(
+   getAvailableByClassGroupAndUser(
       classGroupId: string,
       userId: string
    ): Promise<SubscriptionResponseDTO[]> {

@@ -3,7 +3,7 @@ import { User } from "lucide-react";
 
 export default function Users() {
    return (
-      <div className="p-4 w-full lg:max-w-4xl mx-auto">
+      <div className="w-full lg:max-w-4xl mx-auto">
          {/* Header com ícone, título e descrição */}
          <div className="flex items-center space-x-3 mb-6">
             <User className="h-8 w-8 text-primary" />

@@ -40,12 +40,12 @@ const navItems = [
    },
    {
       title: "Planos",
-      href: "/dashboard/plans",
+      href: "/dashboard/planos",
       icon: <ClipboardList className="mr-2 h-4 w-4" />,
    },
    {
       title: "Assinaturas",
-      href: "/dashboard/subscriptions",
+      href: "/dashboard/assinaturas",
       icon: <Layers className="mr-2 h-4 w-4" />,
    },
    {
