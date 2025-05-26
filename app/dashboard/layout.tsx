@@ -1,3 +1,4 @@
+import ChatBot from "@/components/ai/ChatBot";
 import DashboardHeader from "@/components/headers/DashboardHeader";
 
 export default function DashboardLayout({
@@ -11,6 +12,7 @@ export default function DashboardLayout({
          <main className="flex flex-col items-center justify-center mt-16 p-4">
             {children}
          </main>
+         <ChatBot />
       </div>
    );
 }
