@@ -26,8 +26,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useUser } from "@/hooks/useUser";
 import Cookies from "js-cookie";
+import { RoleType } from "@/backend/common/enums/rolesEnum";
 
-const navItems = [
+const navItems: Array<{
+   title: string;
+   href: string;
+   icon: React.ReactNode;
+   nonMember?: boolean;
+}> = [
    {
       title: "Início",
       href: "/dashboard",
@@ -37,11 +43,13 @@ const navItems = [
       title: "Usuários",
       href: "/dashboard/usuarios",
       icon: <Users className="mr-2 h-4 w-4" />,
+      nonMember: true,
    },
    {
       title: "Planos",
       href: "/dashboard/planos",
       icon: <ClipboardList className="mr-2 h-4 w-4" />,
+      nonMember: true,
    },
    {
       title: "Assinaturas",
@@ -76,6 +84,10 @@ export default function DashboardHeader() {
       Cookies.remove("userId");
       router.push("/");
    };
+
+   // Verifica se usuário tem apenas role MEMBER
+   const isMemberOnly =
+      user?.roles && user.roles.every((r) => r === RoleType.MEMBER);
 
    return (
       <header className="fixed top-0 w-full z-50 bg-background/90 backdrop-blur border-b">
@@ -130,16 +142,18 @@ export default function DashboardHeader() {
 
             {/* Desktop Nav */}
             <nav className="hidden md:flex space-x-6">
-               {navItems.map((item) => (
-                  <Link
-                     key={item.href}
-                     href={item.href}
-                     className="flex items-center text-sm font-medium hover:text-primary"
-                  >
-                     {item.icon}
-                     {item.title}
-                  </Link>
-               ))}
+               {navItems
+                  .filter((item) => !item.nonMember || !isMemberOnly)
+                  .map((item) => (
+                     <Link
+                        key={item.href}
+                        href={item.href}
+                        className="flex items-center text-sm font-medium hover:text-primary"
+                     >
+                        {item.icon}
+                        {item.title}
+                     </Link>
+                  ))}
             </nav>
 
             {/* Mobile Menu & Logout */}
@@ -156,16 +170,18 @@ export default function DashboardHeader() {
                   </SheetTrigger>
                   <SheetContent side="right" className="w-64">
                      <div className="flex flex-col space-y-4 m-4">
-                        {navItems.map((item) => (
-                           <Link
-                              key={item.href}
-                              href={item.href}
-                              className="flex items-center text-sm font-medium"
-                           >
-                              {item.icon}
-                              {item.title}
-                           </Link>
-                        ))}
+                        {navItems
+                           .filter((item) => !item.nonMember || !isMemberOnly)
+                           .map((item) => (
+                              <Link
+                                 key={item.href}
+                                 href={item.href}
+                                 className="flex items-center text-sm font-medium"
+                              >
+                                 {item.icon}
+                                 {item.title}
+                              </Link>
+                           ))}
                      </div>
                      <div className="mt-auto m-4">
                         <Button

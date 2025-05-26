@@ -282,7 +282,7 @@ export function SubscriptionInformation({
                               <TableHead>Avatar</TableHead>
                               <TableHead>Nome</TableHead>
                               <TableHead>Email</TableHead>
-                              {isOwnerLogged && <TableHead>Ações</TableHead>}
+                              <TableHead>Ações</TableHead>
                            </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -315,64 +315,67 @@ export function SubscriptionInformation({
                                        </div>
                                     </TableCell>
                                     <TableCell>{member.email}</TableCell>
-                                    {isOwnerLogged && (
-                                       <TableCell>
-                                          <AlertDialog>
-                                             <AlertDialogTrigger asChild>
-                                                <Button
-                                                   variant="destructive"
-                                                   size="sm"
-                                                   disabled={
-                                                      loadingRemove ===
-                                                      member.id
-                                                   }
-                                                >
-                                                   Remover
-                                                </Button>
-                                             </AlertDialogTrigger>
-                                             <AlertDialogContent>
-                                                <AlertDialogHeader>
-                                                   <AlertDialogTitle>
-                                                      Remover Membro
-                                                   </AlertDialogTitle>
-                                                   <AlertDialogDescription>
-                                                      Tem certeza que deseja
-                                                      remover{" "}
-                                                      <strong>
-                                                         {
-                                                            member.profile
-                                                               .fullName
-                                                         }
-                                                      </strong>{" "}
-                                                      da assinatura? Essa ação
-                                                      não pode ser desfeita.
-                                                   </AlertDialogDescription>
-                                                </AlertDialogHeader>
-                                                <AlertDialogFooter>
-                                                   <AlertDialogCancel>
-                                                      Cancelar
-                                                   </AlertDialogCancel>
-                                                   <AlertDialogAction
-                                                      onClick={() =>
-                                                         handleRemoveMember(
-                                                            member.id
-                                                         )
-                                                      }
+
+                                    <TableCell>
+                                       {isOwnerLogged ||
+                                          (loggedUserId === member.id && (
+                                             <AlertDialog>
+                                                <AlertDialogTrigger asChild>
+                                                   <Button
+                                                      variant="destructive"
+                                                      size="sm"
                                                       disabled={
                                                          loadingRemove ===
                                                          member.id
                                                       }
                                                    >
-                                                      {loadingRemove ===
-                                                      member.id
-                                                         ? "Removendo..."
-                                                         : "Confirmar"}
-                                                   </AlertDialogAction>
-                                                </AlertDialogFooter>
-                                             </AlertDialogContent>
-                                          </AlertDialog>
-                                       </TableCell>
-                                    )}
+                                                      Remover
+                                                   </Button>
+                                                </AlertDialogTrigger>
+                                                <AlertDialogContent>
+                                                   <AlertDialogHeader>
+                                                      <AlertDialogTitle>
+                                                         Remover Membro
+                                                      </AlertDialogTitle>
+                                                      <AlertDialogDescription>
+                                                         Tem certeza que deseja
+                                                         remover{" "}
+                                                         <strong>
+                                                            {
+                                                               member.profile
+                                                                  .fullName
+                                                            }
+                                                         </strong>{" "}
+                                                         da assinatura? Essa
+                                                         ação não pode ser
+                                                         desfeita.
+                                                      </AlertDialogDescription>
+                                                   </AlertDialogHeader>
+                                                   <AlertDialogFooter>
+                                                      <AlertDialogCancel>
+                                                         Cancelar
+                                                      </AlertDialogCancel>
+                                                      <AlertDialogAction
+                                                         onClick={() =>
+                                                            handleRemoveMember(
+                                                               member.id
+                                                            )
+                                                         }
+                                                         disabled={
+                                                            loadingRemove ===
+                                                            member.id
+                                                         }
+                                                      >
+                                                         {loadingRemove ===
+                                                         member.id
+                                                            ? "Removendo..."
+                                                            : "Confirmar"}
+                                                      </AlertDialogAction>
+                                                   </AlertDialogFooter>
+                                                </AlertDialogContent>
+                                             </AlertDialog>
+                                          ))}
+                                    </TableCell>
                                  </TableRow>
                               );
                            })}
