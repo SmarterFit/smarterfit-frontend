@@ -1,5 +1,5 @@
+import { ClassCheckInRequestDTO } from "./../schemas/classCheckInSchemas";
 import type { ClassCheckInResponseDTO } from "@/backend/modules/checkin/types/classCheckInTypes";
-import type { ClassCheckInRequestDTO } from "@/backend/modules/checkin/schemas/classCheckInSchemas";
 import { apiRequest } from "@/backend/api";
 
 /**

@@ -59,7 +59,7 @@ export default function Test() {
       }
    };
    return (
-      <Tabs defaultValue="perfil" className="flex w-full sm:flex-row p-2 gap-4">
+      <Tabs defaultValue="perfil" className="flex w-full sm:flex-row gap-4">
          <TabsList className="flex sm:flex-col h-full sm:w-1/6 sm:gap-2 sm:!bg-transparent w-full items-start sm:px-4">
             <TabsTrigger value="perfil" className="w-full">
                Perfil

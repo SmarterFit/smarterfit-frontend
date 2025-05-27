@@ -1,6 +1,13 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import {
+   Dialog,
+   DialogContent,
+   DialogDescription,
+   DialogHeader,
+   DialogTitle,
+   DialogTrigger,
+} from "@/components/ui/dialog";
 import {
    AlertDialog,
    AlertDialogTrigger,
@@ -140,6 +147,12 @@ export function ProfileDetailsDialog({
                </Button>
             </DialogTrigger>
             <DialogContent className="max-w-md p-4">
+               <DialogHeader>
+                  <DialogTitle>Detalhes do usuário</DialogTitle>
+                  <DialogDescription>
+                     Você pode adicionar ou remover cargos do usuário.
+                  </DialogDescription>
+               </DialogHeader>
                {/* Container principal */}
                <div className="space-y-4">
                   {/* Cabeçalho com nome e ações */}
