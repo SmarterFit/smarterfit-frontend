@@ -1,5 +1,9 @@
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dumbbell } from "lucide-react";
-import { ClassGroupTable } from "@/components/classgroup/ClassGroupTable";
+import { ClassGroupTab } from "@/components/classgroup/ClassGroupTab";
+import { ModalityTab } from "@/components/classgroup/modality/ModalityTab";
+// import { ClassPlanTab } from "@/components/classgroup/ClassPlanTab";
+// import { ClassEventTab } from "@/components/classgroup/ClassEventTab";
 
 export default function ClassGroups() {
    return (
@@ -15,10 +19,27 @@ export default function ClassGroups() {
             </div>
          </div>
 
-         {/* Container da tabela */}
-         <div className="w-full">
-            <ClassGroupTable />
-         </div>
+         <Tabs defaultValue="turmas" className="w-full">
+         <TabsList>
+            <TabsTrigger value="turmas">Turmas</TabsTrigger>
+            <TabsTrigger value="modalidades">Modalidades</TabsTrigger>
+            <TabsTrigger value="eventos">Eventos</TabsTrigger>
+         </TabsList>
+
+         <TabsContent value="turmas" className="mt-4">
+            <ClassGroupTab />
+         </TabsContent>
+
+         <TabsContent value="modalidades" className="mt-4">
+            <ModalityTab />
+         </TabsContent>
+
+
+         <TabsContent value="eventos" className="mt-4">
+            {/* <ClassEventTab /> */}
+         </TabsContent>
+         </Tabs>
+
       </div>
    );
 }

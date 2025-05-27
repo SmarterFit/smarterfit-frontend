@@ -11,7 +11,7 @@ export const ClassGroupService = {
   create(payload: CreateClassGroupRequestDTO): Promise<ClassGroupResponseDTO> {
     return apiRequest<ClassGroupResponseDTO, CreateClassGroupRequestDTO>({
       method: "post",
-      path: "/classgroup",
+      path: "/turma/cadastrar",
       data: payload,
     });
   },
@@ -22,7 +22,7 @@ export const ClassGroupService = {
   getById(id: string): Promise<ClassGroupResponseDTO> {
     return apiRequest<ClassGroupResponseDTO>({
       method: "get",
-      path: `/classgroup/${id}`,
+      path: `/turma/${id}`,
     });
   },
 
@@ -32,7 +32,7 @@ export const ClassGroupService = {
   getAll(): Promise<ClassGroupResponseDTO[]> {
     return apiRequest<ClassGroupResponseDTO[]>({
       method: "get",
-      path: "/classgroup",
+      path: "/turma",
     });
   },
 
@@ -42,7 +42,7 @@ export const ClassGroupService = {
   update(id: string, payload: CreateClassGroupRequestDTO): Promise<ClassGroupResponseDTO> {
     return apiRequest<ClassGroupResponseDTO, CreateClassGroupRequestDTO>({
       method: "put",
-      path: `/classgroup/${id}`,
+      path: `/turma/${id}`,
       data: payload,
     });
   },
@@ -53,7 +53,7 @@ export const ClassGroupService = {
   delete(id: string): Promise<void> {
     return apiRequest<void>({
       method: "delete",
-      path: `/classgroup/${id}`,
+      path: `/turma/${id}`,
     });
   },
 };

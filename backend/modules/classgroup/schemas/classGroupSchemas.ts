@@ -1,11 +1,7 @@
 import { z } from "zod";
 
 // Schema para criação de grupo de aula
-export const createClassGroupSchema = z.object({
-  userCreatorId: z
-    .string()
-    .uuid({ message: "ID do criador inválido" }),
-
+export const CreateClassGroupSchema = z.object({
   title: z
     .string()
     .min(3, { message: "O título deve ter pelo menos 3 caracteres" })

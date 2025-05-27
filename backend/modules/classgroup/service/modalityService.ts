@@ -8,7 +8,7 @@ export const modalityService = {
    create(payload: ModalityRequestDTO): Promise<ModalityResponseDTO> {
       return apiRequest<ModalityResponseDTO, ModalityRequestDTO>({
          method: "post",
-         path: "/modalidades",
+         path: "/modalidade/cadastrar",
          data: payload,
       });
    },
@@ -19,7 +19,7 @@ export const modalityService = {
    getById(id: string): Promise<ModalityResponseDTO> {
       return apiRequest<ModalityResponseDTO>({
          method: "get",
-         path: `/modalidades/${id}`,
+         path: `/modalidade/${id}`,
       });
    },
 
@@ -29,7 +29,7 @@ export const modalityService = {
    getAll(): Promise<ModalityResponseDTO[]> {
       return apiRequest<ModalityResponseDTO[]>({
          method: "get",
-         path: "/modalidades",
+         path: "/modalidade",
       });
    },
 
@@ -39,7 +39,7 @@ export const modalityService = {
    searchByName(name: string): Promise<ModalityResponseDTO[]> {
       return apiRequest<ModalityResponseDTO[]>({
          method: "get",
-         path: "/modalidades/buscar",
+         path: "/modalidade/buscar",
          params: { name },
       });
    },
@@ -50,7 +50,7 @@ export const modalityService = {
    update(id: string, payload: ModalityRequestDTO): Promise<ModalityResponseDTO> {
       return apiRequest<ModalityResponseDTO, ModalityRequestDTO>({
          method: "put",
-         path: `/modalidades/${id}`,
+         path: `/modalidade/${id}`,
          data: payload,
       });
    },
@@ -61,7 +61,7 @@ export const modalityService = {
    delete(id: string): Promise<void> {
       return apiRequest<void>({
          method: "delete",
-         path: `/modalidades/${id}`,
+         path: `/modalidade/${id}`,
       });
    },
 };

@@ -2,7 +2,6 @@ import { ModalityResponseDTO } from "@/backend/modules/classgroup/types/modality
 import { ClassGroupScheduleResponseDTO } from "@/backend/modules/classgroup/types/scheduleTypes";
 
 export interface CreateClassGroupRequestDTO {
-  userCreatorId: string; // UUID
   title: string;
   capacity: number;
   description: string;
@@ -24,6 +23,7 @@ export interface ClassGroupResponseDTO {
   endDate: string;   // formato ISO: "yyyy-MM-dd"
   nameCreator: string;
   schedulesDTO: ClassGroupScheduleResponseDTO[];
+  slug: string;
 }
 
 
