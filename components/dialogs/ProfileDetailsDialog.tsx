@@ -37,6 +37,8 @@ import { RoleLabels, RoleType } from "@/backend/common/enums/rolesEnum";
 import { Separator } from "../ui/separator";
 import { LoadingSpinnerCSS } from "../LoadingSpinner";
 import { ErrorToast, SuccessToast } from "../toasts/Toasts";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 export interface ProfileDetailsDialogProps {
    profile: ProfileResponseDTO;
@@ -84,7 +86,9 @@ export function ProfileDetailsDialog({
       const d = new Date(dateStr);
       return isNaN(d.getTime())
          ? "Não informado"
-         : d.toLocaleDateString("pt-BR");
+         : format(d, "dd/MM/yyyy", {
+              locale: ptBR,
+           });
    };
 
    const handleDelete = async () => {

@@ -26,6 +26,8 @@ import { profileService } from "@/backend/modules/useraccess/services/profileSer
 import { ProfileDetailsDialog } from "../dialogs/ProfileDetailsDialog";
 import { ErrorToast } from "../toasts/Toasts";
 import { GenderLabels } from "@/backend/common/enums/genderEnum";
+import { format, parseISO } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 export function ProfileTable() {
    const [data, setData] = useState<PageResponseDTO<ProfileResponseDTO> | null>(
@@ -87,13 +89,9 @@ export function ProfileTable() {
                      <TableCell>{profile.fullName}</TableCell>
                      <TableCell>{profile.cpf}</TableCell>
                      <TableCell>{profile.phone}</TableCell>
-                     <TableCell>
-                        {profile.birthDate
-                           ? new Date(profile.birthDate).toLocaleDateString(
-                                "pt-BR"
-                             )
-                           : ""}
-                     </TableCell>
+                     <TableCell>{profile.birthDate ? format(profile.birthDate, "dd/MM/yyyy", {
+                        locale: ptBR
+                     }) : ""}</TableCell>
 
                      <TableCell>{GenderLabels[profile.gender]}</TableCell>
                      <TableCell>

@@ -37,7 +37,7 @@ export const WorkoutPlanForm: React.FC<WorkoutPlanFormProps> = ({
    const [isCreate, setIsCreate] = useState(true);
    const [loading, setLoading] = useState(true);
    const [submitting, setSubmitting] = useState(false);
-   const [showPreview, setShowPreview] = useState(false);
+   const [showPreview, setShowPreview] = useState(true);
    const [generating, setGenerating] = useState(false);
 
    const form = useForm<CreateWorkoutPlanRequestDTO>({
@@ -58,7 +58,7 @@ export const WorkoutPlanForm: React.FC<WorkoutPlanFormProps> = ({
                setIsCreate(false);
             }
          } catch (e: any) {
-            console.log(e)
+            console.log(e);
          } finally {
             setLoading(false);
          }
@@ -129,20 +129,21 @@ export const WorkoutPlanForm: React.FC<WorkoutPlanFormProps> = ({
                name="description"
                render={({ field }) => (
                   <FormItem>
-                     <FormLabel>Descrição</FormLabel>
-                     <div className="flex items-center justify-between mb-2">
-                        <Button
-                           variant="outline"
-                           size="sm"
-                           type="button"
-                           onClick={() => setShowPreview(!showPreview)}
-                        >
-                           {showPreview ? "Editar" : "Visualizar Markdown"}
-                        </Button>
+                     <div className="flex justify-between">
+                        <FormLabel>Descrição</FormLabel>
+                           <Button
+                              variant="outline"
+                              size="sm"
+                              type="button"
+                              onClick={() => setShowPreview(!showPreview)}
+                           >
+                              {showPreview ? "Editar" : "Visualizar"}
+                           </Button>
                      </div>
+
                      <FormControl>
                         {showPreview ? (
-                           <div className="prose max-w-full p-4 border rounded">
+                           <div className="prose dark:prose-invert max-w-full p-4 border rounded">
                               <ReactMarkdown remarkPlugins={[remarkGfm]}>
                                  {field.value || ""}
                               </ReactMarkdown>
@@ -150,7 +151,7 @@ export const WorkoutPlanForm: React.FC<WorkoutPlanFormProps> = ({
                         ) : (
                            <Textarea
                               rows={8}
-                              placeholder="Descrição do plano (Markdown)"
+                              placeholder="Descrição do plano"
                               {...field}
                            />
                         )}

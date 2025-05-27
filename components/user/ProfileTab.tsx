@@ -52,7 +52,7 @@ import {
 import { userService } from "@/backend/modules/useraccess/services/userServices";
 import { profileService } from "@/backend/modules/useraccess/services/profileServices";
 import { RoleLabels } from "@/backend/common/enums/rolesEnum";
-import { GenderLabels } from "@/backend/common/enums/genderEnum";
+import { Gender, GenderLabels } from "@/backend/common/enums/genderEnum";
 import { withMask } from "use-mask-input";
 import { SuccessToast, ErrorToast } from "../toasts/Toasts";
 import { UserResponseDTO } from "@/backend/modules/useraccess/types/userTypes";
@@ -416,73 +416,27 @@ export function ProfileTab({
                                     </Button>
                                  </PopoverTrigger>
                                  <PopoverContent className="w-auto p-2">
-                                    <div className="flex gap-2 mb-2">
-                                       <Select
-                                          value={String(month)}
-                                          onValueChange={handleMonthChange}
-                                       >
-                                          <SelectTrigger className="w-full">
-                                             <SelectValue placeholder="Mês" />
-                                          </SelectTrigger>
-                                          <SelectContent>
-                                             {Array.from(
-                                                { length: 12 },
-                                                (_, i) => (
-                                                   <SelectItem
-                                                      key={i}
-                                                      value={String(i)}
-                                                   >
-                                                      {format(
-                                                         new Date(2000, i, 1),
-                                                         "MMMM",
-                                                         { locale: ptBR }
-                                                      )}
-                                                   </SelectItem>
-                                                )
-                                             )}
-                                          </SelectContent>
-                                       </Select>
-                                       <Select
-                                          value={String(year)}
-                                          onValueChange={handleYearChange}
-                                       >
-                                          <SelectTrigger className="w-full">
-                                             <SelectValue placeholder="Ano" />
-                                          </SelectTrigger>
-                                          <SelectContent>
-                                             {Array.from(
-                                                { length: 100 },
-                                                (_, i) => {
-                                                   const y =
-                                                      new Date().getFullYear() -
-                                                      i;
-                                                   return (
-                                                      <SelectItem
-                                                         key={y}
-                                                         value={String(y)}
-                                                      >
-                                                         {y}
-                                                      </SelectItem>
-                                                   );
-                                                }
-                                             )}
-                                          </SelectContent>
-                                       </Select>
-                                    </div>
-                                    <div className="rounded-md border">
-                                       <Calendar
-                                          mode="single"
-                                          selected={field.value}
-                                          onSelect={field.onChange}
-                                          month={new Date(year, month)}
-                                          onMonthChange={(date) => {
-                                             setMonth(date.getMonth());
-                                             setYear(date.getFullYear());
-                                          }}
-                                          toDate={new Date()}
-                                          locale={ptBR}
-                                       />
-                                    </div>
+                                    <Calendar
+                                       mode="single"
+                                       captionLayout="dropdown"
+                                       selected={
+                                          field.value
+                                             ? new Date(field.value)
+                                             : undefined
+                                       }
+                                       onSelect={field.onChange}
+                                       month={new Date(year, month)}
+                                       onMonthChange={(date) => {
+                                          setMonth(date.getMonth());
+                                          setYear(date.getFullYear());
+                                       }}
+                                       disabled={(date) =>
+                                          date > new Date() ||
+                                          date < new Date("1900-01-01")
+                                       }
+                                       locale={ptBR}
+                                       autoFocus
+                                    />
                                  </PopoverContent>
                               </Popover>
                               <FormMessage />
@@ -499,7 +453,7 @@ export function ProfileTab({
                            <FormLabel>Gênero</FormLabel>
                            <Select
                               onValueChange={field.onChange}
-                              defaultValue={field.value || undefined}
+                              defaultValue={field.value}
                            >
                               <FormControl>
                                  <SelectTrigger
@@ -517,13 +471,11 @@ export function ProfileTab({
                               <SelectContent>
                                  <SelectGroup>
                                     <SelectLabel>Gêneros</SelectLabel>
-                                    {Object.entries(GenderLabels).map(
-                                       ([key, label]) => (
-                                          <SelectItem key={key} value={key}>
-                                             {label}
-                                          </SelectItem>
-                                       )
-                                    )}
+                                    {Object.values(Gender).map((g) => (
+                                       <SelectItem key={g} value={g}>
+                                          {GenderLabels[g]}
+                                       </SelectItem>
+                                    ))}
                                  </SelectGroup>
                               </SelectContent>
                            </Select>
