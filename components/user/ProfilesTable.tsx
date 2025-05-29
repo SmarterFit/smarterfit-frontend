@@ -89,9 +89,7 @@ export function ProfileTable() {
                      <TableCell>{profile.fullName}</TableCell>
                      <TableCell>{profile.cpf}</TableCell>
                      <TableCell>{profile.phone}</TableCell>
-                     <TableCell>{profile.birthDate ? format(profile.birthDate, "dd/MM/yyyy", {
-                        locale: ptBR
-                     }) : ""}</TableCell>
+                     <TableCell>{profile.birthDate && format(parseISO(profile.birthDate), 'dd/MM/yyyy')}</TableCell>
 
                      <TableCell>{GenderLabels[profile.gender]}</TableCell>
                      <TableCell>

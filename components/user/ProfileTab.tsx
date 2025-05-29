@@ -8,8 +8,6 @@ import {
    CalendarDays as CalendarIcon,
    Phone as PhoneIcon,
    FileText as FileTextIcon,
-   Users,
-   Edit,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -22,7 +20,6 @@ import {
    SelectValue,
    SelectContent,
    SelectGroup,
-   SelectLabel,
    SelectItem,
 } from "@/components/ui/select";
 import {
@@ -80,20 +77,17 @@ export function ProfileTab({
    const userForm = useForm<UpdateUserEmailRequestDTO>({
       resolver: zodResolver(updateUserEmailSchema),
       mode: "onChange",
-      defaultValues: { email: user?.email ?? "" },
+      defaultValues: { email: "" },
    });
 
    const profileForm = useForm<UpdateProfileRequestDTO>({
       resolver: zodResolver(updateProfileSchema),
-      mode: "onChange",
       defaultValues: {
-         fullName: user?.profile?.fullName ?? "",
-         cpf: user?.profile?.cpf ?? "",
-         phone: user?.profile?.phone ?? "",
-         birthDate: user?.profile?.birthDate
-            ? parseISO(user.profile.birthDate)
-            : undefined,
-         gender: user?.profile?.gender ?? undefined,
+         fullName: "",
+         cpf: "",
+         phone: "",
+         birthDate: undefined,
+         gender: undefined,
       },
    });
 
@@ -124,9 +118,9 @@ export function ProfileTab({
          resetProfile({
             fullName: p.fullName,
             cpf: p.cpf,
-            phone: p.phone ?? "",
+            phone: p.phone,
             birthDate: p.birthDate ? parseISO(p.birthDate) : undefined,
-            gender: p.gender ?? undefined,
+            gender: p.gender ? Gender[p.gender] : undefined,
          });
       }
    }, [user]);
@@ -172,7 +166,7 @@ export function ProfileTab({
             cpf: updated.cpf,
             phone: updated.phone,
             birthDate: parseISO(updated.birthDate),
-            gender: updated.gender ?? undefined,
+            gender: updated.gender,
          });
       } catch (e: any) {
          ErrorToast(e.message);
@@ -382,17 +376,6 @@ export function ProfileTab({
                         const [year, setYear] = React.useState(
                            selectedDate.getFullYear()
                         );
-
-                        const handleMonthChange = (value: string) => {
-                           const newMonth = parseInt(value);
-                           setMonth(newMonth);
-                        };
-
-                        const handleYearChange = (value: string) => {
-                           const newYear = parseInt(value);
-                           setYear(newYear);
-                        };
-
                         return (
                            <FormItem>
                               <FormLabel>Data de Nascimento</FormLabel>
@@ -451,11 +434,11 @@ export function ProfileTab({
                      render={({ field }) => (
                         <FormItem>
                            <FormLabel>Gênero</FormLabel>
-                           <Select
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                           >
-                              <FormControl>
+                           <FormControl>
+                              <Select
+                                 onValueChange={field.onChange}
+                                 defaultValue={field.value}
+                              >
                                  <SelectTrigger
                                     className={cn(
                                        "w-full",
@@ -467,18 +450,17 @@ export function ProfileTab({
                                  >
                                     <SelectValue placeholder="Selecione" />
                                  </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                 <SelectGroup>
-                                    <SelectLabel>Gêneros</SelectLabel>
-                                    {Object.values(Gender).map((g) => (
-                                       <SelectItem key={g} value={g}>
-                                          {GenderLabels[g]}
-                                       </SelectItem>
-                                    ))}
-                                 </SelectGroup>
-                              </SelectContent>
-                           </Select>
+                                 <SelectContent>
+                                    <SelectGroup>
+                                       {Object.values(Gender).map((g) => (
+                                          <SelectItem key={g} value={g}>
+                                             {GenderLabels[g]}
+                                          </SelectItem>
+                                       ))}
+                                    </SelectGroup>
+                                 </SelectContent>
+                              </Select>
+                           </FormControl>
                            <FormMessage />
                         </FormItem>
                      )}
