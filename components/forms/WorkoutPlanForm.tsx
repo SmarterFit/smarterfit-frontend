@@ -55,10 +55,13 @@ export const WorkoutPlanForm: React.FC<WorkoutPlanFormProps> = ({
                   title: plan.title,
                   description: plan.description,
                } as any);
+               if (plan.description) {
+                  setShowPreview(true);
+               }
                setIsCreate(false);
             }
          } catch (e: any) {
-            console.log(e);
+            ErrorToast(e.message);
          } finally {
             setLoading(false);
          }
@@ -78,6 +81,7 @@ export const WorkoutPlanForm: React.FC<WorkoutPlanFormProps> = ({
                ? "Seu plano foi salvo com sucesso."
                : "Seu plano foi atualizado com sucesso."
          );
+         setShowPreview(true);
          onSaved?.(result);
       } catch (e: any) {
          ErrorToast(e.message);
@@ -97,6 +101,7 @@ export const WorkoutPlanForm: React.FC<WorkoutPlanFormProps> = ({
             description: generated.description,
          } as any);
          setIsCreate(false);
+         setShowPreview(true);
          SuccessToast("Plano gerado!", "Plano de treino criado com IA.");
       } catch (e: any) {
          ErrorToast(e.message);
@@ -131,14 +136,14 @@ export const WorkoutPlanForm: React.FC<WorkoutPlanFormProps> = ({
                   <FormItem>
                      <div className="flex justify-between">
                         <FormLabel>Descrição</FormLabel>
-                           <Button
-                              variant="outline"
-                              size="sm"
-                              type="button"
-                              onClick={() => setShowPreview(!showPreview)}
-                           >
-                              {showPreview ? "Editar" : "Visualizar"}
-                           </Button>
+                        <Button
+                           variant="outline"
+                           size="sm"
+                           type="button"
+                           onClick={() => setShowPreview(!showPreview)}
+                        >
+                           {showPreview ? "Editar" : "Visualizar"}
+                        </Button>
                      </div>
 
                      <FormControl>
