@@ -1,5 +1,5 @@
 import { ModalityResponseDTO } from "@/backend/modules/classgroup/types/modalityTypes";
-import { ClassGroupScheduleResponseDTO } from "@/backend/modules/classgroup/types/scheduleTypes";
+import { ClassGroupScheduleResponseDTO } from "@/backend/modules/classgroup/types/classGroupScheduleTypes";
 
 export interface CreateClassGroupRequestDTO {
   title: string;

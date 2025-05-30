@@ -9,17 +9,32 @@ import { Calendar, Users, BookOpen, Clock, MapPin, AlertCircle } from "lucide-re
 import { ClassGroupService } from "@/backend/modules/classgroup/service/classGroupService";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { StudentsTab } from "@/components/classgroup/StudentsTab";
+import { PlansClassTab } from "@/components/classgroup/PlansClassTab";
+import { SessionsTab } from "@/components/classgroup/SessionsTab";
+import {EditClassGroupDialog} from "@/components/dialogs/classgroup/EditClassGroupDialog"
+import { ScheduleTab } from "@/components/classgroup/ScheduleTab";
+import Cookies from "js-cookie";
+
+
+
+
 
 export default function TurmaPageClient() {
   const [turma, setTurma] = useState(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const params = useParams();
+  const [turmaId, setTurmaId] = useState<string | null>(null);
+  const currentUserId = Cookies.get("userId");
+
+
 
   useEffect(() => {
     const id = localStorage.getItem("selectedTurmaId");
+    setTurmaId(id);
     if (!id) {
-      router.push("/turmas");
+      router.push("/dashboard/turmas");
       return;
     }
 
@@ -27,7 +42,7 @@ export default function TurmaPageClient() {
     ClassGroupService.getById(id)
       .then(data => {
         if (!data) {
-          router.push("/turmas");
+          router.push("/dashboard/turmas");
           return;
         }
         setTurma(data);
@@ -49,31 +64,19 @@ export default function TurmaPageClient() {
     </div>
   );
 
-  // Dados de exemplo (substituir por dados reais)
-  const alunos = [
-    { id: 1, nome: "João Silva", email: "joao@email.com", avatar: "", status: "ativo" },
-    { id: 2, nome: "Maria Souza", email: "maria@email.com", avatar: "", status: "ativo" },
-    { id: 3, nome: "Carlos Oliveira", email: "carlos@email.com", avatar: "", status: "inativo" },
-  ];
-
-  const planos = [
-    { id: 1, nome: "Plano Mensal", valor: "R$ 200,00", duracao: "30 dias" },
-    { id: 2, nome: "Plano Trimestral", valor: "R$ 550,00", duracao: "90 dias" },
-  ];
 
   const formatDate = (dateString) => {
     const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
     return new Date(dateString).toLocaleDateString('pt-BR', options);
   };
 
-  const ocupacao = Math.round((turma.totalMembers / turma.capacity) * 100);
-
+  
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
       {/* Cabeçalho */}
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold tracking-tight">Detalhes da Turma</h1>
-        <Button variant="outline" onClick={() => router.push("/turmas")}>
+        <Button variant="outline" onClick={() => router.push("/dashboard/turmas")}>
           Voltar
         </Button>
       </div>
@@ -111,13 +114,6 @@ export default function TurmaPageClient() {
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <Clock className="h-5 w-5 text-muted-foreground" />
-              <div>
-                <p className="text-sm text-muted-foreground">Horário</p>
-                <p className="font-medium">Segunda e Quarta, 19:00-20:00</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
               <MapPin className="h-5 w-5 text-muted-foreground" />
               <div>
                 <p className="text-sm text-muted-foreground">Local</p>
@@ -132,23 +128,55 @@ export default function TurmaPageClient() {
                 <span>{Math.round((turma.totalMembers / turma.capacity) * 100)}%</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
-                <div 
-                className="bg-primary h-2 rounded-full" 
-                style={{
-                    width: `${Math.min(100, (turma.totalMembers / turma.capacity) * 100)}%`
-                }}
-                />
+              {(() => {
+                const ocupacao = (turma.totalMembers / turma.capacity) * 100;
+                let bgColor = "bg-red-500";
+
+                if (ocupacao <= 75) {
+                  bgColor = "bg-green-500";
+                } else if (ocupacao >= 75 && ocupacao < 90) {
+                  bgColor = "bg-yellow-500";
+                } else {
+                  bgColor = "bg-red-500";
+                }
+
+                return (
+                  <div 
+                    className={`h-2 rounded-full ${bgColor}`} 
+                    style={{ width: `${Math.min(100, ocupacao)}%` }}
+                  />
+                );
+              })()}
+
             </div>
             </div>
             <div className="flex space-x-2">
-              <Button>Editar Turma</Button>
+              <EditClassGroupDialog
+                turmaId={turmaId}
+                defaultValues={{
+                  title: turma.title,
+                  description: turma.description,
+                  capacity: turma.capacity,
+                  modalityId: turma.modalityDTO.id,
+                  startDate: turma.startDate,
+                  endDate: turma.endDate,
+                  autoGeneratedSessions: turma.autoGeneratedSessions,
+                  isEvent: turma.isEvent
+                }}
+                onUpdated={() => {
+                  // Recarregar os dados da turma após edição
+                  ClassGroupService.getById(turmaId).then(setTurma);
+                }}
+              >
+                <Button>Editar Turma</Button>
+              </EditClassGroupDialog>
               <Button variant="outline">Enviar Aviso</Button>
             </div>
           </CardFooter>
         </Card>
 
         {/* Card de status */}
-        <Card>
+        {/* <Card>
           <CardHeader>
             <CardTitle className="text-xl">Status da Turma</CardTitle>
           </CardHeader>
@@ -185,7 +213,7 @@ export default function TurmaPageClient() {
               </div>
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
 
       {/* Abas de conteúdo */}
@@ -197,93 +225,36 @@ export default function TurmaPageClient() {
           <TabsTrigger value="planos" className="flex items-center gap-2">
             <BookOpen className="h-4 w-4" /> Planos
           </TabsTrigger>
+          <TabsTrigger value="horarios" className="flex items-center gap-2">
+            <Clock className="h-4 w-4" /> Horários
+          </TabsTrigger>
           <TabsTrigger value="aulas" className="flex items-center gap-2">
-            <Clock className="h-4 w-4" /> Aulas
+            <Calendar className="h-4 w-4" /> Aulas
           </TabsTrigger>
-          <TabsTrigger value="avaliacoes" className="flex items-center gap-2">
+          {/* <TabsTrigger value="avaliacoes" className="flex items-center gap-2">
             <BookOpen className="h-4 w-4" /> Avaliações
-          </TabsTrigger>
+          </TabsTrigger> */}
         </TabsList>
 
-        {/* Conteúdo da aba Alunos */}
         <TabsContent value="alunos" className="pt-4">
-          <Card>
-            <CardHeader>
-              <div className="flex justify-between items-center">
-                <CardTitle>Alunos Matriculados</CardTitle>
-                <Button size="sm">Adicionar Aluno</Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {alunos.map((aluno) => (
-                  <div key={aluno.id} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <Avatar>
-                        <AvatarImage src={aluno.avatar} />
-                        <AvatarFallback>{aluno.nome.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="font-medium">{aluno.nome}</p>
-                        <p className="text-sm text-muted-foreground">{aluno.email}</p>
-                      </div>
-                    </div>
-                    <Badge variant={aluno.status === "ativo" ? "default" : "secondary"}>
-                      {aluno.status}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+            {/* {turmaId && <StudentsTab classGroupId={turmaId} />} */}
+            <StudentsTab classGroupId={turmaId} currentUserId={currentUserId} />
+
         </TabsContent>
 
-        {/* Conteúdo da aba Planos */}
         <TabsContent value="planos" className="pt-4">
-          <Card>
-            <CardHeader>
-              <div className="flex justify-between items-center">
-                <CardTitle>Planos Associados</CardTitle>
-                <Button size="sm">Vincular Plano</Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {planos.map((plano) => (
-                  <Card key={plano.id}>
-                    <CardHeader>
-                      <CardTitle className="text-lg">{plano.nome}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-xl font-bold">{plano.valor}</p>
-                      <p className="text-sm text-muted-foreground">{plano.duracao}</p>
-                    </CardContent>
-                    <CardFooter className="flex justify-between">
-                      <Button variant="outline" size="sm">
-                        Detalhes
-                      </Button>
-                      <Button variant="outline" size="sm" className="text-red-500">
-                        Remover
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          {turmaId && <PlansClassTab classGroupId={turmaId} />}
         </TabsContent>
 
-        {/* Conteúdo das outras abas (vazios por enquanto) */}
-        <TabsContent value="aulas" className="pt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Calendário de Aulas</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">Calendário de aulas será exibido aqui.</p>
-            </CardContent>
-          </Card>
+        <TabsContent value="horarios" className="pt-4">
+          {turmaId && <ScheduleTab classGroupId={turmaId} />}
         </TabsContent>
+
+        <TabsContent value="aulas" className="pt-4">
+          {turmaId && <SessionsTab classGroupId={turmaId} />}
+        </TabsContent>
+
+
         <TabsContent value="avaliacoes" className="pt-4">
           <Card>
             <CardHeader>

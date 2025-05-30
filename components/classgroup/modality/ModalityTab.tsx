@@ -5,7 +5,7 @@ import { ModalityResponseDTO } from "@/backend/modules/classgroup/types/modality
 import { modalityService } from "@/backend/modules/classgroup/service/modalityService";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { ModalityDialog } from "@/components/dialogs/ModalityDialog";
+import { ModalityDialog } from "@/components/dialogs/classgroup/ModalityDialog";
 import { ModalityTable } from "./ModalityTable";
 
 export function ModalityTab() {

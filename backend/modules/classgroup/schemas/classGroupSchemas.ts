@@ -34,5 +34,3 @@ export const CreateClassGroupSchema = z.object({
   isEvent: z.boolean().optional()
 });
 
-export type CreateClassGroupForm = z.infer<typeof createClassGroupSchema>;
-

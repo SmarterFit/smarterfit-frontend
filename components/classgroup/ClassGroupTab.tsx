@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, CalendarDays } from "lucide-react";
 import { ClassGroupService } from "@/backend/modules/classgroup/service/classGroupService";
 import type { ClassGroupResponseDTO } from "@/backend/modules/classgroup/types/classGroupTypes";
-import { ClassGroupDialog } from "@/components/dialogs/ClassGroupDialog";
+import { ClassGroupDialog } from "@/components/dialogs/classgroup/ClassGroupDialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
@@ -51,7 +51,7 @@ export function ClassGroupTab() {
         </ClassGroupDialog>
       </div>
 
-      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 w-full">
+      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 w-full">
         {turmas.map((turma) => (
           <Card key={turma.id} className="w-full hover:shadow-lg transition-shadow duration-300 border border-gray-200 dark:border-gray-700">
             <CardHeader className="pb-3 space-y-2">

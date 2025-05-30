@@ -9,7 +9,7 @@ import { modalityService } from "@/backend/modules/classgroup/service/modalitySe
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ErrorToast, SuccessToast } from "../toasts/Toasts";
+import { ErrorToast, SuccessToast } from "../../toasts/Toasts";
 
 type Props = {
   children: React.ReactNode;
@@ -22,10 +22,17 @@ export function ModalityDialog({ children, onCreated }: Props) {
   });
 
   const onSubmit = async (data: z.infer<typeof CreateModalitySchemas>) => {
-    await modalityService.create(data);
-    form.reset();
-    onCreated?.();
+    try {
+      await modalityService.create(data);
+      form.reset();
+      onCreated?.();
+      SuccessToast("Sucesso!", "Modalidade criada com sucesso!");
+    } catch (error) {
+        console.error("Erro ao criar modalidade:", error);
+        ErrorToast("Erro ao criar modalidade. Tente novamente.");
+    }
   };
+  
 
   return (
     <Dialog>
