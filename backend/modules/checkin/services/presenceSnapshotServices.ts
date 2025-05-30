@@ -40,15 +40,15 @@ export const presenceSnapshotService = {
     * Filtra snapshots por intervalo de datas
     */
    filterByDate(
-      params: FilterPresenceSnapshotRequestDTO
+      payload: FilterPresenceSnapshotRequestDTO
    ): Promise<PresenceSnapshotResponseDTO[]> {
       return apiRequest<
          PresenceSnapshotResponseDTO[],
          FilterPresenceSnapshotRequestDTO
       >({
-         method: "get",
+         method: "post",
          path: `/presence-snapshots/date-range`,
-         data: params,
+         data: payload,
       });
    },
 };

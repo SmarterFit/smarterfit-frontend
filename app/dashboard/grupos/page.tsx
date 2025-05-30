@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Users } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TrainingGroupManagerTab from "@/components/training-group/TrainingGroupManagerTab";
+import { UserTrainingGroups } from "@/components/training-group/UserTrainingGroups";
 
 export default function GruposDeTreinamento() {
    const rawUserFromHook = useUser();
@@ -46,7 +47,7 @@ export default function GruposDeTreinamento() {
             </TabsList>
 
             <TabsContent value="meus-grupos">
-               <p className="text-center py-10">Em breve...</p>
+               <UserTrainingGroups userId={user.id} />
             </TabsContent>
 
             <TabsContent value="gerenciar">

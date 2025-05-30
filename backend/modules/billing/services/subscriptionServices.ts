@@ -79,7 +79,7 @@ export const subscriptionService = {
    },
 
    /**
-    * Verifica se um participante possui assinatura atual
+    * Verifica se um participante possui assinatura ativa
     */
    existsCurrentByParticipantId(participantId: string): Promise<boolean> {
       return apiRequest<boolean>({

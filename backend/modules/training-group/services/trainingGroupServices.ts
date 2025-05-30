@@ -35,6 +35,16 @@ export const trainingGroupService = {
    },
 
    /**
+    * Busca um grupo de treinamento pelo Slug
+    */
+   getBySlug(slug: string): Promise<TrainingGroupResponseDTO> {
+      return apiRequest<TrainingGroupResponseDTO>({
+         method: "get",
+         path: `/grupos-de-treinamento/slug/${slug}`,
+      });
+   },
+
+   /**
     * Busca todos os grupos de treinamento
     */
    getAll(): Promise<TrainingGroupResponseDTO[]> {

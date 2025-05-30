@@ -100,14 +100,6 @@ export function TrainingGroupTable({ userId }: TrainingGroupTableProps) {
    const totalPages = data?.totalPages ?? 1;
    const totalElements = data?.totalElements ?? 0;
 
-   // filtra localmente por PUBLIC e não finalizados (endDate > hoje)
-   const displayGroups =
-      data?.content.filter((group) => {
-         const isPublic = group.type === TrainingGroupType.PUBLIC;
-         const notFinished = new Date(group.endDate) > new Date();
-         return isPublic && notFinished;
-      }) ?? [];
-
    return (
       <div className="space-y-4 w-full">
          <div className="flex gap-2 flex-wrap">
@@ -119,7 +111,14 @@ export function TrainingGroupTable({ userId }: TrainingGroupTableProps) {
                }
                className="flex-1"
             />
-            <Button onClick={() => setPage(0)}>Buscar</Button>
+            <Button
+               onClick={() => {
+                  setPage(0);
+                  fetchData();
+               }}
+            >
+               Buscar
+            </Button>
          </div>
 
          <div className="text-sm text-gray-600">
@@ -137,17 +136,21 @@ export function TrainingGroupTable({ userId }: TrainingGroupTableProps) {
                </TableRow>
             </TableHeader>
             <TableBody>
-               {displayGroups.map((group) => (
+               {data?.content.map((group) => (
                   <TableRow key={group.id}>
                      <TableCell>{group.name}</TableCell>
                      <TableCell>
                         {TrainingGroupTypeLabels[group.type]}
                      </TableCell>
                      <TableCell>
-                        {new Date(group.startDate).toLocaleDateString()}
+                        {group.startDate
+                           ? new Date(group.startDate).toLocaleDateString()
+                           : "N/A"}
                      </TableCell>
                      <TableCell>
-                        {new Date(group.endDate).toLocaleDateString()}
+                        {group.endDate
+                           ? new Date(group.endDate).toLocaleDateString()
+                           : "N/A"}
                      </TableCell>
                      <TableCell>
                         <AlertDialog>
