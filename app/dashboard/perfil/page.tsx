@@ -8,7 +8,9 @@ import { AddressTab } from "@/components/user/AddressTab";
 import { MetricsTab } from "@/components/user/MetricsTab";
 import { ProfileTab } from "@/components/user/ProfileTab";
 import { SecurityTab } from "@/components/user/SecurityTab";
+import { TrainingTab } from "@/components/user/TrainingTab";
 import { useUser } from "@/hooks/useUser";
+import { Train } from "lucide-react";
 import { useState, useEffect } from "react";
 
 export default function Test() {
@@ -98,7 +100,9 @@ export default function Test() {
          <TabsContent value="metricas">
             <MetricsTab user={user} isLoading={isLoading} />
          </TabsContent>
-         <TabsContent value="treinos">Change your trainings here.</TabsContent>
+         <TabsContent value="treinos">
+            <TrainingTab user={user} isLoading={isLoading} />
+         </TabsContent>
       </Tabs>
    );
 }

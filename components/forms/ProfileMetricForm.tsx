@@ -38,9 +38,14 @@ export function MetricForm({ onSubmit, loading }: MetricFormProps) {
       defaultValues: { type: undefined, value: undefined },
    });
 
+   const localSubmit = async (data: CreateProfileMetricRequestDTO) => {
+      await onSubmit(data);
+      form.reset();
+   };
+
    return (
       <Form {...form}>
-         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+         <form onSubmit={form.handleSubmit(localSubmit)} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                <FormField
                   control={form.control}

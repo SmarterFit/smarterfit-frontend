@@ -1,4 +1,5 @@
 import axios, { AxiosRequestConfig, Method, AxiosResponse } from "axios";
+import qs from "qs";
 import Cookies from "js-cookie";
 
 export interface ApiRequestOptions<Req = any> {
@@ -49,6 +50,9 @@ export async function apiRequest<Res, Req = any>(
       },
       data,
       params,
+      // usa qs para serializar arrays sem colchetes (arrayFormat: 'repeat')
+      paramsSerializer: (params) =>
+         qs.stringify(params, { arrayFormat: "repeat", skipNulls: true }),
       responseType: "json",
    };
 
@@ -95,8 +99,13 @@ export async function apiRequestStream(
    const url = new URL(path, baseUrl);
 
    if (params) {
+      // serializa arrays repetindo chave sem colchetes
       Object.entries(params).forEach(([key, value]) => {
-         url.searchParams.append(key, String(value));
+         if (Array.isArray(value)) {
+            value.forEach((v) => url.searchParams.append(key, String(v)));
+         } else if (value != null) {
+            url.searchParams.append(key, String(value));
+         }
       });
    }
 

@@ -58,7 +58,7 @@ const navItems: Array<{
    },
    {
       title: "Grupos de Treinamento",
-      href: "/dashboard/groups",
+      href: "/dashboard/grupos",
       icon: <Group className="mr-2 h-4 w-4" />,
    },
    {

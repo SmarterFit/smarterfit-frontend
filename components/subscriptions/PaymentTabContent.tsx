@@ -118,7 +118,7 @@ export function PaymentsTabContent({
    const endedDate = endedIn ? new Date(endedIn) : null;
    const now = new Date();
    const isEndedRecent = endedDate
-      ? now.getTime() - endedDate.getTime() <= 7 * 24 * 60 * 60 * 1000
+      ? endedDate.getTime() - now.getTime() <= 7 * 24 * 60 * 60 * 1000
       : true;
 
    const onSubmit = async (data: CreatePaymentRequestDTO) => {

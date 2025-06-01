@@ -1,5 +1,8 @@
 import type { GymCheckInResponseDTO } from "@/backend/modules/checkin/types/gymCheckInTypes";
-import type { GymCheckInAndCheckOutRequestDTO } from "@/backend/modules/checkin/schemas/gymCheckInSchemas";
+import type {
+   FilterGymCheckInRequestDTO,
+   GymCheckInAndCheckOutRequestDTO,
+} from "@/backend/modules/checkin/schemas/gymCheckInSchemas";
 import { apiRequest } from "@/backend/api";
 
 /**
@@ -43,6 +46,29 @@ export const gymCheckInService = {
       return apiRequest<GymCheckInResponseDTO[]>({
          method: "get",
          path: `/gym-check-in/user/${userId}`,
+      });
+   },
+
+   /**
+    * Verifica se um usuário tem um check-in aberto
+    */
+   hasOpenCheckInByUserId(userId: string): Promise<boolean> {
+      return apiRequest<GymCheckInResponseDTO[]>({
+         method: "get",
+         path: `/gym-check-in/open/${userId}`,
+      });
+   },
+
+   /**
+    * Filtra check-ins/outs por intervalo de datas e por ID do usuário
+    */
+   filterByUserIdAndDate(
+      payload: FilterGymCheckInRequestDTO
+   ): Promise<GymCheckInResponseDTO[]> {
+      return apiRequest<GymCheckInResponseDTO[], FilterGymCheckInRequestDTO>({
+         method: "post",
+         path: `/gym-check-in/filter`,
+         data: payload,
       });
    },
 };

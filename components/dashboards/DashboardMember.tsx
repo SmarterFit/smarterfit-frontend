@@ -1,142 +1,127 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import {
-   Card,
-   CardHeader,
-   CardTitle,
-   CardDescription,
-   CardContent,
-} from "@/components/ui/card";
+import { subscriptionService } from "@/backend/modules/billing/services/subscriptionServices";
 import { useUser } from "@/hooks/useUser";
-import { profileMetricService } from "@/backend/modules/useraccess/services/profileMetricServices";
-import { ProfileMetricResponseDTO } from "@/backend/modules/useraccess/types/profileMetricTypes";
-import { ProfileMetricType } from "@/backend/common/enums/profileMetricEnum";
-import { LastMetricsChart } from "../charts/LastMetricsChart";
-import { AreaMetricChart } from "../charts/AreaMetricChart";
-import { MetricForm } from "../forms/ProfileMetricForm";
-import { Skeleton } from "@/components/ui/skeleton";
-import { CreateProfileMetricRequestDTO } from "@/backend/modules/useraccess/schemas/profileMetricSchemas";
-import { ChartConfig } from "../ui/chart";
-import GymPresenceCard from "../cards/GymCheckInCard";
-import { ErrorToast, SuccessToast } from "../toasts/Toasts";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { ErrorToast } from "../toasts/Toasts";
+import { Skeleton } from "../ui/skeleton";
+import GymCheckInCard from "../cards/GymCheckInCard";
+import { RoleType } from "@/backend/common/enums/rolesEnum";
+import GymPresenceOverviewCard from "../cards/GymPresenceOverviewCard";
 
 export default function DashboardMember() {
    const user = useUser();
-   const [allMetrics, setAllMetrics] = useState<
-      ProfileMetricResponseDTO[] | null
+   const router = useRouter();
+
+   const [isUserSessionChecked, setIsUserSessionChecked] =
+      useState<boolean>(false);
+
+   const [hasActiveSubscription, setHasActiveSubscription] = useState<
+      boolean | null
    >(null);
-   const [weightMetrics, setWeightMetrics] = useState<
-      ProfileMetricResponseDTO[] | null
-   >(null);
-   const [loading, setLoading] = useState(false);
+   const [isLoadingSubscription, setIsLoadingSubscription] =
+      useState<boolean>(true);
+
+   const [isUserOnlyMember, setIsUserOnlyMember] = useState<boolean | null>(
+      null
+   );
+   const [isLoadingRole, setIsLoadingRole] = useState<boolean>(true);
 
    useEffect(() => {
-      if (!user) return;
-      const id = user.id;
-      profileMetricService.getLasts(id).then((data) => setAllMetrics(data));
-      profileMetricService
-         .getByType(id, ProfileMetricType.WEIGHT)
-         .then((data) => setWeightMetrics(data));
+      setIsUserSessionChecked(true);
+   }, []);
+
+   useEffect(() => {
+      if (isUserSessionChecked && !user) {
+         router.push("/");
+      }
+   }, [user, isUserSessionChecked, router]);
+
+   useEffect(() => {
+      if (user?.id) {
+         setIsLoadingSubscription(true);
+         const fetchSubscriptionStatus = async () => {
+            const storedSubscriptionStatus = localStorage.getItem(
+               `hasActiveSubscription`
+            );
+            if (storedSubscriptionStatus) {
+               setHasActiveSubscription(storedSubscriptionStatus === "true");
+               setIsLoadingSubscription(false);
+            } else {
+               try {
+                  const isActive =
+                     await subscriptionService.existsCurrentByParticipantId(
+                        user.id
+                     );
+                  setHasActiveSubscription(isActive);
+                  localStorage.setItem(
+                     `hasActiveSubscription`,
+                     String(isActive)
+                  );
+               } catch (e: any) {
+                  ErrorToast(e.message);
+                  setHasActiveSubscription(false);
+               } finally {
+                  setIsLoadingSubscription(false);
+               }
+            }
+         };
+
+         setIsLoadingRole(true);
+         const checkUserRole = () => {
+            const storedRoleStatus = localStorage.getItem(`isOnlyMember`);
+            if (storedRoleStatus) {
+               setIsUserOnlyMember(storedRoleStatus === "true");
+               setIsLoadingRole(false);
+            } else {
+               const onlyMember = user.roles
+                  ? user.roles.length === 1 && user.roles[0] === RoleType.MEMBER
+                  : false;
+               setIsUserOnlyMember(onlyMember);
+               localStorage.setItem(`isOnlyMember`, String(onlyMember));
+               setIsLoadingRole(false);
+            }
+         };
+
+         fetchSubscriptionStatus();
+         checkUserRole();
+      } else {
+         setIsLoadingSubscription(false);
+         setIsLoadingRole(false);
+      }
    }, [user]);
 
-   async function handleMetricSubmit(data: CreateProfileMetricRequestDTO) {
-      if (!user) return;
-      setLoading(true);
-      try {
-         await profileMetricService.create(user.id, data);
-         SuccessToast(
-            "Métrica cadastrada com sucesso!",
-            "Você pode ver ela logo ali!"
-         );
-         window.location.reload();
-      } catch (e: any) {
-         ErrorToast(e.message);
-      } finally {
-         setLoading(false);
-      }
+   if (
+      !isUserSessionChecked ||
+      (user && (isLoadingSubscription || isLoadingRole))
+   ) {
+      return (
+         <div className="p-4 space-y-4">
+            <Skeleton className="h-12 w-1/3" />
+            <Skeleton className="h-48 w-full" />
+            <Skeleton className="h-10 w-full" />
+         </div>
+      );
    }
 
-   const chartConfig: ChartConfig = {};
-
-   const lastMetricDate =
-      allMetrics && allMetrics[0]
-         ? new Date(allMetrics[0].createdAt).toLocaleDateString("pt-BR", {
-              day: "2-digit",
-              month: "long",
-              year: "numeric",
-           })
-         : null;
-
+   // Se o usuário existe e todos os dados foram carregados
+   if (user && hasActiveSubscription !== null && isUserOnlyMember !== null) {
+      return (
+         <div className="flex flex-row gap-4">
+            <GymPresenceOverviewCard isOnlyMember={isUserOnlyMember} />
+            <div className="flex flex-col gap-4">
+               <GymCheckInCard
+                  userId={user.id}
+                  hasSubscriptionActive={hasActiveSubscription}
+               />
+            </div>
+         </div>
+      );
+   }
    return (
-      <div className="w-full space-y-2">
-         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 w-full">
-            {/* MiniCard 1: Últimas Métricas */}
-            <Card>
-               <CardHeader>
-                  <CardTitle>Últimas Métricas</CardTitle>
-                  <CardDescription>
-                     Suas últimas métricas pessoais!
-                  </CardDescription>
-               </CardHeader>
-               <CardContent>
-                  {allMetrics ? (
-                     <LastMetricsChart data={allMetrics} config={chartConfig} />
-                  ) : (
-                     <Skeleton className="h-32 w-full" />
-                  )}
-               </CardContent>
-            </Card>
-
-            {/* MiniCard 2: Evolução do Peso */}
-            <Card>
-               <CardHeader>
-                  <CardTitle>Evolução do Peso</CardTitle>
-                  <CardDescription>
-                     Evolução do seu peso ao longo do tempo!
-                  </CardDescription>
-               </CardHeader>
-               <CardContent>
-                  {weightMetrics ? (
-                     <AreaMetricChart
-                        data={weightMetrics}
-                        config={chartConfig}
-                     />
-                  ) : (
-                     <Skeleton className="h-32 w-full" />
-                  )}
-               </CardContent>
-            </Card>
-
-            {/* MiniCard 3: Adicionar Métrica */}
-            <Card>
-               <CardHeader>
-                  <CardTitle>Registre novas Métricas</CardTitle>
-                  <CardDescription>
-                     {lastMetricDate
-                        ? `Você não registra novas métricas desde ${lastMetricDate}!`
-                        : `Você nunca registrou novas métricas!`}
-                  </CardDescription>
-               </CardHeader>
-               <CardContent>
-                  {user ? (
-                     <MetricForm
-                        onSubmit={handleMetricSubmit}
-                        loading={loading}
-                     />
-                  ) : (
-                     <div className="space-y-4">
-                        <Skeleton className="h-6 w-2/3" />
-                        <Skeleton className="h-6 w-1/3" />
-                        <Skeleton className="h-10 w-full" />
-                     </div>
-                  )}
-               </CardContent>
-            </Card>
-         </div>
-         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            <GymPresenceCard />
-         </div>
+      <div className="p-4">
+         <Skeleton className="h-48 w-full" />
       </div>
    );
 }
