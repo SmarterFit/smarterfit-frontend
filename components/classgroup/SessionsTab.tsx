@@ -10,6 +10,8 @@ import { useState, useEffect } from "react";
 import { ErrorToast, SuccessToast } from "../toasts/Toasts";
 import { format, parse } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { useAuthorization } from "@/hooks/useAuthorization";
+
 
 interface SessionsTabProps {
   classGroupId: string;
@@ -18,6 +20,7 @@ interface SessionsTabProps {
 export function SessionsTab({ classGroupId }: SessionsTabProps) {
   const [sessions, setSessions] = useState<ClassSessionResponseDTO[]>([]);
   const [loading, setLoading] = useState(true);
+  const { isMember } = useAuthorization();
 
   useEffect(() => {
     loadSessions();
@@ -75,7 +78,7 @@ export function SessionsTab({ classGroupId }: SessionsTabProps) {
           classGroupId={classGroupId}
           onSuccess={loadSessions}
         >
-          <Button>Agendar Nova Aula</Button>
+          {!isMember() && (<Button>Agendar Nova Aula</Button>)}
         </EditSessionDialog>
       </div>
 
@@ -127,15 +130,15 @@ export function SessionsTab({ classGroupId }: SessionsTabProps) {
                   session={session}
                   onSuccess={loadSessions}
                 >
-                  <Button variant="outline" size="sm">Editar</Button>
+                  {!isMember() && (<Button variant="outline" size="sm">Editar</Button>)}
                 </EditSessionDialog>
-                <Button
+                {!isMember() && (<Button
                   variant="outline"
                   size="sm"
                   onClick={() => handleDelete(session.id)}
                 >
                   <Trash2 className="h-4 w-4 text-red-500" />
-                </Button>
+                </Button>)}
               </div>
             </div>
           ))}

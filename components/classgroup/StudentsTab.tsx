@@ -11,6 +11,8 @@ import { Loader2 } from "lucide-react";
 import { AddEmployeeToClassDialog } from "@/components/dialogs/classgroup/AddEmployeeToClassDialog";
 import type { ClassUsersResponseDTO } from "@/backend/modules/classgroup/types/classGroupUserType";
 import { SelectPlanDialog } from "@/components/dialogs/classgroup/SelectPlanDialog";
+import { useAuthorization } from "@/hooks/useAuthorization";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,10 +27,9 @@ import {
 interface StudentsTabProps {
   classGroupId: string;
   currentUserId: string;
-  isTeacher?: boolean;
 }
 
-export function StudentsTab({ classGroupId, currentUserId, isTeacher = false }: StudentsTabProps) {
+export function StudentsTab({ classGroupId, currentUserId}: StudentsTabProps) {
   const [members, setMembers] = useState<ClassUsersResponseDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [joiningAsStudent, setJoiningAsStudent] = useState(false);
@@ -36,7 +37,11 @@ export function StudentsTab({ classGroupId, currentUserId, isTeacher = false }: 
   const [selectPlanDialogOpen, setSelectPlanDialogOpen] = useState(false);
   const [removingUserId, setRemovingUserId] = useState<string | null>(null);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  
+  const { isMember } = useAuthorization();
 
+  const isTeacher = !isMember();
+  
   const fetchMembers = async () => {
     setLoading(true);
     try {
@@ -60,17 +65,51 @@ export function StudentsTab({ classGroupId, currentUserId, isTeacher = false }: 
     fetchMembers();
   }, [classGroupId]);
 
+  const handleJoinAsStudent = () => {
+    setSelectPlanDialogOpen(true);
+  };
+
+  const handleJoinAsTeacher = async () => {
+    setJoiningAsTeacher(true);
+    try {
+      await classGroupUserService.addEmployeeToClassGroup(
+        { classGroupId },
+        currentUserId
+      );
+      SuccessToast("Sucesso", "Você entrou na turma como professor!");
+      await fetchMembers();
+    } catch (error) {
+      ErrorToast(error.response?.data?.message || "Falha ao entrar na turma como professor");
+    } finally {
+      setJoiningAsTeacher(false);
+    }
+  };
+
+  const handleAddMemberSuccess = async () => {
+    try {
+      await fetchMembers();
+    } catch {
+      ErrorToast("Falha ao atualizar lista de membros");
+    }
+  };
+
   const handleRemove = async () => {
-    if (!removingUserId) return;
+    // Adicionamos uma verificação explícita para garantir que removingUserId não é null
+    if (!removingUserId || !classGroupId) {
+      ErrorToast("ID inválido para remoção");
+      setRemovingUserId(null);
+      setShowConfirmDialog(false);
+      return;
+    }
 
     try {
       await classGroupUserService.removeUserFromClassGroup(classGroupId, removingUserId);
       SuccessToast(removingUserId === currentUserId ? "Você saiu da turma" : "Membro removido");
-      fetchMembers();
+      await fetchMembers();
     } catch (error) {
       if (error.response?.status === 404) {
         ErrorToast("Usuário já não está na turma");
-        fetchMembers(); // Atualiza a lista pois pode estar desatualizada
+        await fetchMembers();
       } else {
         ErrorToast(error.response?.data?.message || "Erro ao remover membro");
       }
@@ -80,12 +119,12 @@ export function StudentsTab({ classGroupId, currentUserId, isTeacher = false }: 
     }
   };
 
+
+
   const confirmRemove = (userId: string) => {
     setRemovingUserId(userId);
     setShowConfirmDialog(true);
   };
-
-  // ... (mantenha as outras funções como handleJoinAsTeacher, handleAddMemberSuccess, etc.)
 
   const isCurrentUserInClass = members.some(member => member.userId === currentUserId);
 
@@ -93,10 +132,119 @@ export function StudentsTab({ classGroupId, currentUserId, isTeacher = false }: 
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Membros da Turma</CardTitle>
+          <div className="flex justify-between items-center">
+            <CardTitle>Membros da Turma</CardTitle>
+            <div className="flex gap-2">
+              {!isTeacher && !isCurrentUserInClass && (
+                <>
+                <Button 
+                  onClick={() => setSelectPlanDialogOpen(true)}
+                  disabled={joiningAsStudent}
+                  variant="default"
+                >
+                  {joiningAsStudent ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Entrando...
+                    </>
+                  ) : "Entrar como Aluno"}
+                </Button>
+
+                <SelectPlanDialog
+                  classGroupId={classGroupId}
+                  userId={currentUserId}
+                  open={selectPlanDialogOpen}
+                  onOpenChange={setSelectPlanDialogOpen}
+                  onSuccess={async () => {
+                    setJoiningAsStudent(true);
+                    try {
+                      // Atualiza a lista de membros após entrar na turma
+                      const [students, teachers] = await Promise.all([
+                        classGroupUserService.getStudentsByClassGroupId(classGroupId),
+                        classGroupUserService.getTeachersByClassGroupId(classGroupId)
+                      ]);
+                      setMembers([
+                        ...students.map(s => ({ ...s, isTeacher: false })),
+                        ...teachers.map(t => ({ ...t, isTeacher: true }))
+                      ]);
+                      SuccessToast("Sucesso", "Você entrou na turma como aluno!");
+                    } catch (error) {
+                      ErrorToast("Falha ao atualizar lista de membros");
+                    } finally {
+                      setJoiningAsStudent(false);
+                    }
+                  }}
+                />
+                  {!isMember() && (<Button 
+                    onClick={handleJoinAsTeacher}
+                    disabled={joiningAsTeacher}
+                    variant="outline"
+                  >
+                    {joiningAsTeacher ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Entrando...
+                      </>
+                    ) : "Entrar como Professor"}
+                  </Button>)}
+                </>
+              )}
+
+              {!isTeacher && (
+                <>
+                  <AddEmployeeToClassDialog
+                    classGroupId={classGroupId}
+                    onSuccess={handleAddMemberSuccess}
+                    requesterId={currentUserId}
+                    triggerComponent={
+                      <Button variant="outline">
+                        Adicionar Professor
+                      </Button>
+                    }
+                  />
+                </>
+              )}
+            </div>
+          </div>
         </CardHeader>
-        <CardContent className="flex justify-center py-8">
-          <Loader2 className="h-8 w-8 animate-spin" />
+        <CardContent>
+          <div className="space-y-4">
+            {members.length === 0 ? (
+              <p className="text-muted-foreground text-center py-4">
+                Nenhum membro nesta turma
+              </p>
+            ) : (
+              members.map((member) => (
+                <div 
+                  key={member.userId} 
+                  className="flex items-center justify-between p-3 border rounded-lg"
+                >
+                  <div className="flex items-center space-x-3">
+                    <Avatar>
+                      <AvatarImage src={member.avatar} />
+                      <AvatarFallback>
+                        {member.name?.charAt(0) || 'A'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="font-medium">
+                        {member.name || member.email}
+                        {member.userId === currentUserId && (
+                          <span className="ml-2 text-sm text-muted-foreground">(Você)</span>
+                        )}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {member.email}
+                      </p>
+                    </div>
+                  </div>
+                  <Badge variant={member.isTeacher ? "default" : "secondary"}>
+                    {member.isTeacher ? "Professor" : "Aluno"}
+                  </Badge>
+                </div>
+              ))
+            )}
+          </div>
         </CardContent>
       </Card>
     );
@@ -108,7 +256,65 @@ export function StudentsTab({ classGroupId, currentUserId, isTeacher = false }: 
         <div className="flex justify-between items-center">
           <CardTitle>Membros da Turma</CardTitle>
           <div className="flex gap-2">
-            {/* ... (mantenha os botões existentes) ... */}
+            {!isTeacher && !isCurrentUserInClass && (
+              <>
+                <Button 
+                  onClick={handleJoinAsStudent}
+                  disabled={joiningAsStudent}
+                  variant="default"
+                >
+                  {joiningAsStudent ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Entrando...
+                    </>
+                  ) : "Entrar como Aluno"}
+                </Button>
+
+                <SelectPlanDialog
+                  classGroupId={classGroupId}
+                  userId={currentUserId}
+                  open={selectPlanDialogOpen}
+                  onOpenChange={setSelectPlanDialogOpen}
+                  onSuccess={async () => {
+                    setJoiningAsStudent(true);
+                    try {
+                      await fetchMembers();
+                      SuccessToast("Sucesso", "Você entrou na turma como aluno!");
+                    } catch (error) {
+                      ErrorToast("Falha ao atualizar lista de membros");
+                    } finally {
+                      setJoiningAsStudent(false);
+                    }
+                  }}
+                />
+                {!isMember() && (<Button 
+                  onClick={handleJoinAsTeacher}
+                  disabled={joiningAsTeacher}
+                  variant="outline"
+                >
+                  {joiningAsTeacher ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Entrando...
+                    </>
+                  ) : "Entrar como Professor"}
+                </Button>)}
+              </>
+            )}
+
+            {isTeacher && (
+              <AddEmployeeToClassDialog
+                classGroupId={classGroupId}
+                onSuccess={handleAddMemberSuccess}
+                requesterId={currentUserId}
+                triggerComponent={
+                  <Button variant="outline">
+                    Adicionar Professor
+                  </Button>
+                }
+              />
+            )}
           </div>
         </div>
       </CardHeader>
@@ -145,11 +351,10 @@ export function StudentsTab({ classGroupId, currentUserId, isTeacher = false }: 
                       <p className="text-sm text-muted-foreground">{member.email}</p>
                     </div>
                   </div>
-
                   <div className="flex items-center gap-2">
                     <Badge variant={member.isTeacher ? "default" : "secondary"}
-                     className="h-8 flex items-center px-3"
-                     >
+                      className="h-8 flex items-center px-3"
+                    >
                       {member.isTeacher ? "Professor" : "Aluno"}
                     </Badge>
                     {canRemove && (
@@ -169,7 +374,6 @@ export function StudentsTab({ classGroupId, currentUserId, isTeacher = false }: 
         </div>
       </CardContent>
 
-      {/* Dialog de confirmação */}
       <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>

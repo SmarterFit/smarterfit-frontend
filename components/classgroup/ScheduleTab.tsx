@@ -10,6 +10,8 @@ import { EditScheduleDialog } from "@/components/dialogs/classgroup/EditSchedule
 import { Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { ErrorToast, SuccessToast } from "../toasts/Toasts";
+import { useAuthorization } from "@/hooks/useAuthorization";
+
 
 interface ScheduleTabProps {
   classGroupId: string;
@@ -18,6 +20,7 @@ interface ScheduleTabProps {
 export function ScheduleTab({ classGroupId }: ScheduleTabProps) {
   const [schedules, setSchedules] = useState<ClassGroupScheduleResponseDTO[]>([]);
   const [loading, setLoading] = useState(true);
+  const { isMember } = useAuthorization();
 
   useEffect(() => {
     loadSchedules();
@@ -57,7 +60,7 @@ export function ScheduleTab({ classGroupId }: ScheduleTabProps) {
           classGroupId={classGroupId}
           onSuccess={loadSchedules}
         >
-          <Button>Adicionar Horário</Button>
+          {!isMember() && (<Button>Adicionar Horário</Button>)}
         </EditScheduleDialog>
       </div>
 
@@ -68,7 +71,7 @@ export function ScheduleTab({ classGroupId }: ScheduleTabProps) {
               <TableHead>Dia da Semana</TableHead>
               <TableHead>Horário de Início</TableHead>
               <TableHead>Horário de Término</TableHead>
-              <TableHead>Ações</TableHead>
+              {!isMember() && (<TableHead>Ações</TableHead>)}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -91,15 +94,15 @@ export function ScheduleTab({ classGroupId }: ScheduleTabProps) {
                         schedule={schedule}
                         onSuccess={loadSchedules}
                       >
-                        <Button variant="outline" size="sm">Editar</Button>
+                        {!isMember() && (<Button variant="outline" size="sm">Editar</Button>)}
                       </EditScheduleDialog>
-                      <Button
+                      {!isMember() && (<Button
                         variant="outline"
                         size="sm"
                         onClick={() => handleDelete(schedule.id)}
                       >
                         <Trash2 className="h-4 w-4 text-red-500" />
-                      </Button>
+                      </Button>)}
                     </div>
                   </TableCell>
                 </TableRow>

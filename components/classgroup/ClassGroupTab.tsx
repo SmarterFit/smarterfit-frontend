@@ -9,10 +9,12 @@ import { ClassGroupDialog } from "@/components/dialogs/classgroup/ClassGroupDial
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
+import { useAuthorization } from "@/hooks/useAuthorization";
 
 export function ClassGroupTab() {
   const [turmas, setTurmas] = useState<ClassGroupResponseDTO[]>([]);
   const router = useRouter();
+  const { isMember } = useAuthorization();
 
   const fetchTurmas = async () => {
     const data = await ClassGroupService.getAll();
@@ -45,9 +47,9 @@ export function ClassGroupTab() {
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold tracking-tight">Lista de Turmas</h2>
         <ClassGroupDialog onCreated={fetchTurmas}>
-          <Button className="gap-2">
+          {!isMember() &&(<Button className="gap-2">
             <Plus className="h-4 w-4" /> Nova Turma
-          </Button>
+          </Button>)}
         </ClassGroupDialog>
       </div>
 

@@ -8,6 +8,8 @@ import { AddPlanToClassDialog } from "@/components/dialogs/classgroup/AddPlanToC
 import { Button } from "@/components/ui/button";
 import { classGroupPlanService } from "@/backend/modules/classgroup/service/classGroupPlanService";
 import type { PlanResponseDTO } from "@/backend/modules/billing/types/planTypes";
+import { useAuthorization } from "@/hooks/useAuthorization";
+
 
 interface PlansClassTabProps {
   classGroupId: string;
@@ -17,6 +19,7 @@ export function PlansClassTab({ classGroupId }: PlansClassTabProps) {
   const [plans, setPlans] = useState<PlanResponseDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [removingPlanId, setRemovingPlanId] = useState<string | null>(null);
+  const { isMember } = useAuthorization();
 
   const fetchPlans = useCallback(async () => {
     if (!classGroupId) return;
@@ -70,10 +73,10 @@ export function PlansClassTab({ classGroupId }: PlansClassTabProps) {
             classGroupId={classGroupId}
             onPlanAdded={fetchPlans}
           >
-            <Button size="sm">
+            {!isMember() && (<Button size="sm">
               <Plus className="mr-2 h-4 w-4" />
               Vincular Plano
-            </Button>
+            </Button>)}
           </AddPlanToClassDialog>
         </div>
       </CardHeader>
@@ -93,7 +96,7 @@ export function PlansClassTab({ classGroupId }: PlansClassTabProps) {
                 <div>
                   <h3 className="font-medium">{plan.name}</h3>
                 </div>
-                <Button
+                {!isMember() &&(<Button
                   variant="ghost"
                   size="sm"
                   onClick={() => handleRemovePlan(plan.id)}
@@ -110,7 +113,7 @@ export function PlansClassTab({ classGroupId }: PlansClassTabProps) {
                       Remover
                     </>
                   )}
-                </Button>
+                </Button>)}
               </div>
             ))}
           </div>

@@ -1,7 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dumbbell } from "lucide-react";
 import { ClassGroupTab } from "@/components/classgroup/ClassGroupTab";
-import { ModalityTab } from "@/components/classgroup/modality/ModalityTab";
+import { ModalityTab } from "@/components/classgroup/ModalityTab";
 // import { ClassPlanTab } from "@/components/classgroup/ClassPlanTab";
 // import { ClassEventTab } from "@/components/classgroup/ClassEventTab";
 
