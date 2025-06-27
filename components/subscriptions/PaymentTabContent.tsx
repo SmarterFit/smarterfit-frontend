@@ -87,7 +87,7 @@ export function PaymentsTabContent({
       resolver: zodResolver(createPaymentRequestSchema),
       defaultValues: {
          subscriptionId,
-         method: PaymentMethod.CARD,
+         method: PaymentMethod.CREDIT_CARD,
       },
    });
 
