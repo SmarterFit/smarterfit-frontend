@@ -19,63 +19,67 @@ export interface ApiRequestStreamOptions<Req = any> {
    baseUrl?: string;
    headers?: Record<string, string>;
 }
-
 /**
- * Função padrão para requisições normais (não stream)
+ * Função padrão para requisições normais (não stream) - VERSÃO CORRIGIDA
  */
 export async function apiRequest<Res, Req = any>(
-   opts: ApiRequestOptions<Req>
+    opts: ApiRequestOptions<Req>
 ): Promise<Res | AxiosResponse["data"]> {
-   const {
-      method,
-      path,
-      data,
-      params,
-      headers,
-      baseUrl = process.env.NEXT_PUBLIC_API_URL,
-   } = opts;
+    const {
+        method,
+        path,
+        data,
+        params,
+        headers,
+        baseUrl = process.env.NEXT_PUBLIC_API_URL,
+    } = opts;
 
-   const token = Cookies.get("token");
-   const userId = Cookies.get("userId");
+    const token = Cookies.get("token");
+    const userId = Cookies.get("userId");
 
-   const config: AxiosRequestConfig = {
-      baseURL: baseUrl,
-      url: path,
-      method,
-      headers: {
-         "Content-Type": "application/json",
-         ...(token ? { Authorization: `Bearer ${token}` } : {}),
-         ...(userId ? { "X-User-Id": userId } : {}),
-         ...headers,
-      },
-      data,
-      params,
-      // usa qs para serializar arrays sem colchetes (arrayFormat: 'repeat')
-      paramsSerializer: (params) =>
-         qs.stringify(params, { arrayFormat: "repeat", skipNulls: true }),
-      responseType: "json",
-   };
+    const customHeaders: Record<string, string> = {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(userId ? { "X-User-Id": userId } : {}),
+        ...headers,
+    };
 
-   try {
-      const response = await axios.request(config);
-      return response.data as Res;
-   } catch (error: any) {
-      if (axios.isAxiosError(error) && error.response?.data) {
-         const apiError = error.response.data as {
-            timestamp?: string;
-            code?: number;
-            status?: string;
-            errors?: string[];
-         };
+    if (!(data instanceof FormData)) {
+        customHeaders["Content-Type"] = "application/json";
+    }
 
-         const message = Array.isArray(apiError.errors)
-            ? apiError.errors.join(", ")
-            : apiError.status || "Erro desconhecido";
 
-         throw new Error(message);
-      }
-      throw error;
-   }
+    const config: AxiosRequestConfig = {
+        baseURL: baseUrl,
+        url: path,
+        method,
+        headers: customHeaders, // Usamos os cabeçalhos montados dinamicamente
+        data,
+        params,
+        paramsSerializer: (params) =>
+            qs.stringify(params, { arrayFormat: "repeat", skipNulls: true }),
+        responseType: "json",
+    };
+
+    try {
+        const response = await axios.request(config);
+        return response.data as Res;
+    } catch (error: any) {
+        if (axios.isAxiosError(error) && error.response?.data) {
+            const apiError = error.response.data as {
+                timestamp?: string;
+                code?: number;
+                status?: string;
+                errors?: string[];
+            };
+
+            const message = Array.isArray(apiError.errors)
+                ? apiError.errors.join(", ")
+                : apiError.status || "Erro desconhecido";
+
+            throw new Error(message);
+        }
+        throw error;
+    }
 }
 
 /**
