@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { PaymentMethod } from "@/backend/common/enums/paymentMethodEnum";
 import { PaymentStatus } from "@/backend/common/enums/paymentStatusEnum";
 
 // CreatePaymentRequestDTO
@@ -7,10 +6,8 @@ export const createPaymentRequestSchema = z.object({
    subscriptionId: z
       .string({ required_error: "O ID da assinatura não pode ser nulo" })
       .uuid({ message: "O ID da assinatura deve ser um UUID válido" }),
-   method: z.nativeEnum(PaymentMethod, {
+   method: z.string({
       required_error: "O método de pagamento não pode ser nulo",
-      invalid_type_error:
-         "O método de pagamento deve ser um dos valores válidos de PaymentMethod",
    }),
 });
 
@@ -39,9 +36,8 @@ export const searchPaymentRequestSchema = z.object({
       .optional(),
    methods: z
       .array(
-         z.nativeEnum(PaymentMethod, {
-            invalid_type_error:
-               "O método de pagamento deve ser um dos valores válidos de PaymentMethod",
+         z.string({
+            invalid_type_error: "O método de pagamento deve ser uma string",
          })
       )
       .optional(),
