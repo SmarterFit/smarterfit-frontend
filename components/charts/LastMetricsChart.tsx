@@ -9,6 +9,8 @@ import { ChartConfig } from "@/components/ui/chart";
 import { ProfileMetricResponseDTO } from "@/backend/modules/useraccess/types/profileMetricTypes";
 import { ProfileMetricLabels } from "@/backend/common/enums/profileMetricEnum";
 
+// TODO: corrigir profileMetric
+
 interface LastMetricsChartProps {
    data: ProfileMetricResponseDTO[];
    config: ChartConfig;
