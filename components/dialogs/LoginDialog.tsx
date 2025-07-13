@@ -28,7 +28,6 @@ import {
 import { authService } from "@/backend/modules/useraccess/services/authServices";
 import { AuthResponseDTO } from "@/backend/modules/useraccess/types/authTypes";
 import Cookies from "js-cookie";
-import { CheckCircle } from "lucide-react";
 import { ErrorToast, SuccessToast } from "../toasts/Toasts";
 
 type LoginDialogProps = {

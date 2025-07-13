@@ -1,6 +1,5 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { useState, useEffect } from "react";
 import { paymentService } from "@/backend/modules/billing/services/paymentServices";
 import { Button } from "@/components/ui/button";
@@ -15,7 +14,6 @@ import {
    AlertDialogCancel,
    AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-import { toast } from "sonner";
 import { ErrorToast, SuccessToast } from "../toasts/Toasts";
 import { PaymentResponseDTO } from "@/backend/modules/billing/types/paymentTypes";
 import {
@@ -23,14 +21,9 @@ import {
    createPaymentRequestSchema,
 } from "@/backend/modules/billing/schemas/paymentSchemas";
 import {
-   PaymentMethod,
-   PaymentMethodLabels,
-} from "@/backend/common/enums/paymentMethodEnum";
-import {
    PaymentStatus,
    PaymentStatusLabels,
 } from "@/backend/common/enums/paymentStatusEnum";
-
 import {
    Form,
    FormControl,
@@ -39,7 +32,6 @@ import {
    FormLabel,
    FormMessage,
 } from "../ui/form";
-
 import {
    Table,
    TableHeader,
@@ -48,7 +40,6 @@ import {
    TableBody,
    TableCell,
 } from "../ui/table";
-
 import {
    Select,
    SelectContent,
@@ -57,9 +48,8 @@ import {
    SelectTrigger,
    SelectValue,
 } from "../ui/select";
-
-// Importante: processorPaymentRequestSchema está vazio, só para tipagem
-import { processorPaymentRequestSchema } from "@/backend/modules/billing/schemas/paymentSchemas";
+import { paymentMethodService } from "@/backend/framework/billing/services/paymentMethodServices";
+import { PaymentMethodResponseDTO } from "@/backend/framework/billing/types/paymentMethodTypes";
 
 export function PaymentsTabContent({
    subscriptionId,
@@ -71,6 +61,9 @@ export function PaymentsTabContent({
    isOwnerLogged: boolean;
 }) {
    const [payments, setPayments] = useState<PaymentResponseDTO[]>([]);
+   const [paymentMethods, setPaymentMethods] = useState<
+      PaymentMethodResponseDTO[]
+   >([]);
    const [loading, setLoading] = useState(false);
    const [openDialog, setOpenDialog] = useState(false);
    const [hasPendingPayment, setHasPendingPayment] = useState(false);
@@ -87,19 +80,28 @@ export function PaymentsTabContent({
       resolver: zodResolver(createPaymentRequestSchema),
       defaultValues: {
          subscriptionId,
-         method: PaymentMethod.CARD,
+         methodId: "", // O valor inicial agora é vazio
       },
    });
 
-   // Buscar pagamentos da assinatura
-   const fetchPayments = async () => {
+   // Buscar pagamentos e métodos de pagamento
+   const fetchData = async () => {
       setLoading(true);
       try {
-         const response = await paymentService.getAllBySubscriptionId(
-            subscriptionId
-         );
-         setPayments(response);
-         const pending = response.some(
+         const [paymentsResponse, methodsResponse] = await Promise.all([
+            paymentService.getAllBySubscriptionId(subscriptionId),
+            paymentMethodService.getEnabledPaymentMethods(),
+         ]);
+
+         setPayments(paymentsResponse);
+         setPaymentMethods(methodsResponse);
+
+         // Define o valor padrão do formulário para o primeiro método disponível
+         if (methodsResponse.length > 0) {
+            form.setValue("methodId", methodsResponse[0].id);
+         }
+
+         const pending = paymentsResponse.some(
             (p) => p.status === PaymentStatus.PENDING
          );
          setHasPendingPayment(pending);
@@ -111,7 +113,7 @@ export function PaymentsTabContent({
    };
 
    useEffect(() => {
-      fetchPayments();
+      fetchData();
    }, [subscriptionId]);
 
    // Checa se a data de finalização está nos últimos 7 dias
@@ -131,7 +133,7 @@ export function PaymentsTabContent({
          );
          setOpenDialog(false);
          form.reset();
-         fetchPayments();
+         fetchData();
       } catch (e: any) {
          ErrorToast(e.message);
       } finally {
@@ -152,7 +154,8 @@ export function PaymentsTabContent({
             "O pagamento foi processado e você já pode começar a usar o seu plano."
          );
          setProcessingDialogOpen(false);
-         fetchPayments();
+         localStorage.setItem("hasActiveSubscription", "true");
+         fetchData();
       } catch (e: any) {
          ErrorToast(e.message);
       } finally {
@@ -184,7 +187,7 @@ export function PaymentsTabContent({
                      >
                         <FormField
                            control={form.control}
-                           name="method"
+                           name="methodId"
                            render={({ field }) => (
                               <FormItem>
                                  <FormLabel>Método de pagamento</FormLabel>
@@ -192,20 +195,19 @@ export function PaymentsTabContent({
                                     <Select
                                        onValueChange={field.onChange}
                                        value={field.value}
+                                       disabled={paymentMethods.length === 0}
                                     >
                                        <SelectTrigger className="w-full">
                                           <SelectValue placeholder="Selecione o método" />
                                        </SelectTrigger>
                                        <SelectContent>
                                           <SelectGroup>
-                                             {Object.entries(
-                                                PaymentMethodLabels
-                                             ).map(([key, label]) => (
+                                             {paymentMethods.map((method) => (
                                                 <SelectItem
-                                                   key={key}
-                                                   value={key}
+                                                   key={method.id}
+                                                   value={method.id}
                                                 >
-                                                   {label}
+                                                   {method.name}
                                                 </SelectItem>
                                              ))}
                                           </SelectGroup>
@@ -274,7 +276,7 @@ export function PaymentsTabContent({
                      <TableCell>
                         {new Date(p.expirationIn).toLocaleDateString()}
                      </TableCell>
-                     <TableCell>{PaymentMethodLabels[p.method]}</TableCell>
+                     <TableCell>{p.method.name}</TableCell>
                      <TableCell>{PaymentStatusLabels[p.status]}</TableCell>
                      {isOwnerLogged && (
                         <TableCell>

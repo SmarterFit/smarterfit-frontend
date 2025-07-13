@@ -8,11 +8,8 @@ import {
    Carousel,
    CarouselContent,
    CarouselItem,
-   CarouselNext,
-   CarouselPrevious,
 } from "@/components/ui/carousel";
 import type { CreatedPlanResponseDTO } from "@/backend/modules/billing/types/planTypes";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { planService } from "@/backend/modules/billing/services/planServices";
 
 export default function SectionPlans() {

@@ -18,8 +18,6 @@ import {
    startOfMonth,
    endOfMonth,
    parseISO,
-   getHours,
-   getMinutes,
    getDay,
    isWithinInterval,
    setHours,
@@ -57,15 +55,13 @@ import {
    PopoverTrigger,
 } from "@/components/ui/popover";
 import { CalendarIcon } from "lucide-react";
-// Corrigindo caminhos de importação conforme o último snippet do usuário
 import { PresenceSnapshotResponseDTO } from "@/backend/modules/checkin/types/presenceSnapshotTypes";
 import {
-   FilterPresenceSnapshotRequestDTO, // Para a API (espera strings ISO)
-   filterPresenceSnapshotRequestSchema, // Para validar params da API (espera strings ISO)
+   FilterPresenceSnapshotRequestDTO,
+   filterPresenceSnapshotRequestSchema,
 } from "@/backend/modules/checkin/schemas/presenceSnapshotSchemas";
 import { presenceSnapshotService } from "@/backend/modules/checkin/services/presenceSnapshotServices";
 
-// Schema Zod para o formulário (trabalha com objetos Date internamente)
 const filterFormClientSchema = z
    .object({
       startDate: z.date({
@@ -98,7 +94,6 @@ interface GymPresenceOverviewCardProps {
 
 const chartConfig: ChartConfig = {
    presenceCount: {
-      // Mantido como presenceCount para consistência interna se necessário, mas o dataKey no Area é "Pessoas"
       label: "Pessoas",
       color: "#3b82f6",
    },
@@ -123,8 +118,7 @@ export default function GymPresenceOverviewCard({
    const [isProcessingReset, setIsProcessingReset] = useState(false);
 
    const form = useForm<FilterFormClientData>({
-      // Usando o schema cliente para o form
-      resolver: zodResolver(filterFormClientSchema), // Usando o schema cliente para o form
+      resolver: zodResolver(filterFormClientSchema),
       defaultValues: {
          startDate: startOfMonth(new Date()),
          endDate: endOfMonth(new Date()),
@@ -134,11 +128,11 @@ export default function GymPresenceOverviewCard({
       watch,
       setValue,
       formState: { errors, touchedFields },
-      trigger, // Para acionar validação se necessário
+      trigger,
    } = form;
 
-   const selectedStartDate = watch("startDate"); // Estes são Date objects
-   const selectedEndDate = watch("endDate"); // Estes são Date objects
+   const selectedStartDate = watch("startDate");
+   const selectedEndDate = watch("endDate");
 
    const checkGymOpenStatus = useCallback(() => {
       const now = new Date();
@@ -170,7 +164,7 @@ export default function GymPresenceOverviewCard({
          setIsLoadingChart(true);
          try {
             const apiStartDate = startOfDay(userSelectedStartDate);
-            const apiEndDate = endOfDay(userSelectedEndDate); // Alterado para endOfDay
+            const apiEndDate = endOfDay(userSelectedEndDate);
 
             const paramsToValidate: FilterPresenceSnapshotRequestDTO = {
                startDate: apiStartDate.toISOString(),
@@ -304,7 +298,7 @@ export default function GymPresenceOverviewCard({
 
    const formattedChartData = chartData.map((item) => ({
       date: format(parseISO(item.createdAt), "dd/MM HH:mm", { locale: ptBR }),
-      Pessoas: item.presenceCount, // Usado como dataKey no AreaChart
+      Pessoas: item.presenceCount,
    }));
 
    return (

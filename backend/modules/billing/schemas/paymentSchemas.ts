@@ -6,7 +6,7 @@ export const createPaymentRequestSchema = z.object({
    subscriptionId: z
       .string({ required_error: "O ID da assinatura não pode ser nulo" })
       .uuid({ message: "O ID da assinatura deve ser um UUID válido" }),
-   method: z.string({
+   methodId: z.string({
       required_error: "O método de pagamento não pode ser nulo",
    }),
 });

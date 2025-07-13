@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
    Card,
    CardHeader,
@@ -11,17 +11,21 @@ import {
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { gymCheckInService } from "@/backend/modules/checkin/services/gymCheckInServices";
-import { Separator } from "@/components/ui/separator"; // Ajustado o caminho
-import { ErrorToast } from "@/components/toasts/Toasts"; // Ajustado o caminho
+import { Separator } from "@/components/ui/separator";
+import { ErrorToast } from "@/components/toasts/Toasts";
 import {
    format,
    startOfWeek,
    endOfWeek,
    isSameDay,
-   isBefore,
    isAfter,
+   getDay,
+   isWithinInterval,
+   setHours,
+   setMinutes,
+   setSeconds,
+   setMilliseconds,
 } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import clsx from "clsx";
 
 interface GymCheckInCardProps {
@@ -37,9 +41,30 @@ export default function GymCheckInCard({
    const [loading, setLoading] = useState(true);
    const [processing, setProcessing] = useState(false);
    const [checkedIn, setCheckedIn] = useState<boolean | null>(null);
+   const [isGymOpen, setIsGymOpen] = useState(true); // Inicia como true para evitar UI piscando
 
    const weekDays = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sab"];
    const today = new Date();
+
+   const checkGymOpenStatus = useCallback(() => {
+      const now = new Date();
+      const dayOfWeek = getDay(now); // Domingo = 0, Sábado = 6
+      const openingTime = setMilliseconds(
+         setSeconds(setMinutes(setHours(now, 6), 0), 0),
+         0
+      );
+      const closingTime = setMilliseconds(
+         setSeconds(setMinutes(setHours(now, 21), 59), 59),
+         0
+      );
+
+      // Academia abre de Segunda a Sábado (dayOfWeek de 1 a 6)
+      const open =
+         dayOfWeek !== 0 &&
+         isWithinInterval(now, { start: openingTime, end: closingTime });
+      setIsGymOpen(open);
+      return open;
+   }, []);
 
    function getWeekRange(date: Date) {
       const start = startOfWeek(date, { weekStartsOn: 1 });
@@ -110,6 +135,10 @@ export default function GymCheckInCard({
    }
 
    async function handleCheckIn() {
+      if (!isGymOpen) {
+         ErrorToast("Não é possível fazer check-in, a academia está fechada.");
+         return;
+      }
       if (!userId || !hasSubscriptionActive) {
          if (!hasSubscriptionActive) {
             ErrorToast(
@@ -151,7 +180,14 @@ export default function GymCheckInCard({
          loadPresenceWeek();
          loadCheckInStatus();
       }
-   }, [userId]);
+      // Verifica o status da academia ao montar e a cada minuto
+      checkGymOpenStatus();
+      const gymStatusIntervalId = setInterval(checkGymOpenStatus, 60 * 1000);
+
+      return () => {
+         clearInterval(gymStatusIntervalId);
+      };
+   }, [userId, checkGymOpenStatus]);
 
    const { start } = getWeekRange(today);
    const canCheckInOrOut = hasSubscriptionActive;
@@ -201,11 +237,15 @@ export default function GymCheckInCard({
 
             <Separator />
 
-            {!hasSubscriptionActive && (
+            {!hasSubscriptionActive ? (
                <p className="text-sm text-red-600">
                   Sua assinatura não está ativa. Regularize para fazer check-in.
                </p>
-            )}
+            ) : !isGymOpen && !checkedIn ? (
+               <p className="text-sm text-orange-600">
+                  A academia está fechada no momento.
+               </p>
+            ) : null}
 
             <Button
                onClick={checkedIn ? handleCheckOut : handleCheckIn}
@@ -213,7 +253,8 @@ export default function GymCheckInCard({
                   processing ||
                   checkedIn === null ||
                   !userId ||
-                  !canCheckInOrOut
+                  !canCheckInOrOut ||
+                  (!checkedIn && !isGymOpen) // Desabilita o check-in se a academia estiver fechada
                }
                className="w-full cursor-pointer"
             >
