@@ -21,23 +21,30 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LoadingSpinnerCSS } from "@/components/LoadingSpinner";
-import {
-   CreateProfileMetricRequestDTO,
-   createProfileMetricSchema,
-} from "@/backend/modules/useraccess/schemas/profileMetricSchemas";
 import { metricTypeService } from "@/backend/modules/useraccess/services/metricTypesService"; // certifique-se do path correto
 import type { MetricTypeResponseDTO } from "@/backend/modules/useraccess/types/profileMetricTypes"; // certifique-se do path correto
+import {
+   MetricDataRequestDTO,
+   metricDataRequestSchema,
+} from "@/backend/modules/useraccess/schemas/userMetricSchemas";
 
 interface MetricFormProps {
-   onSubmit: (data: CreateProfileMetricRequestDTO) => Promise<void>;
+   onSubmit: (data: MetricDataRequestDTO) => Promise<void>;
    loading: boolean;
 }
 
 export function MetricForm({ onSubmit, loading }: MetricFormProps) {
    const [metricTypes, setMetricTypes] = useState<MetricTypeResponseDTO[]>([]);
-   const form = useForm<CreateProfileMetricRequestDTO>({
-      resolver: zodResolver(createProfileMetricSchema),
-      defaultValues: { type: undefined, value: undefined },
+   const form = useForm<MetricDataRequestDTO>({
+      resolver: zodResolver(metricDataRequestSchema),
+      defaultValues: {
+         metricType: "",
+         source: "website",
+         data: {
+            // O valor agora é inicializado dentro do objeto 'data'
+            value: undefined,
+         },
+      },
    });
 
    useEffect(() => {
@@ -52,7 +59,7 @@ export function MetricForm({ onSubmit, loading }: MetricFormProps) {
       fetchMetricTypes();
    }, []);
 
-   const localSubmit = async (data: CreateProfileMetricRequestDTO) => {
+   const localSubmit = async (data: MetricDataRequestDTO) => {
       await onSubmit(data);
       form.reset();
    };
@@ -63,7 +70,7 @@ export function MetricForm({ onSubmit, loading }: MetricFormProps) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                <FormField
                   control={form.control}
-                  name="type"
+                  name="metricType" // Corrigido de 'metricType' para 'name'
                   render={({ field }) => (
                      <FormItem>
                         <FormLabel>Tipo</FormLabel>
@@ -80,7 +87,10 @@ export function MetricForm({ onSubmit, loading }: MetricFormProps) {
                               <SelectGroup>
                                  <SelectLabel>Métricas</SelectLabel>
                                  {metricTypes.map((metric) => (
-                                    <SelectItem key={metric.id} value={metric.type}>
+                                    <SelectItem
+                                       key={metric.id}
+                                       value={metric.type}
+                                    >
                                        {metric.type} ({metric.unit})
                                     </SelectItem>
                                  ))}
@@ -94,7 +104,7 @@ export function MetricForm({ onSubmit, loading }: MetricFormProps) {
 
                <FormField
                   control={form.control}
-                  name="value"
+                  name="data.value" // Corrigido para refletir o aninhamento em 'data'
                   render={({ field }) => (
                      <FormItem>
                         <FormLabel>Valor</FormLabel>

@@ -10,11 +10,3 @@ export interface ImportResultResponseDTO {
   totalRecords: number;
   errorMessages: string[];
 }
-
-
-export interface MetricDataRequestDTO {
-  metricType: string;
-  source: string;
-  data: Record<string, any>;
-  
-}

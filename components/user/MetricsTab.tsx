@@ -11,16 +11,22 @@ import { MetricForm } from "../forms/ProfileMetricForm";
 import { LastMetricsChart } from "../charts/LastMetricsChart";
 import { ErrorToast, SuccessToast } from "../toasts/Toasts";
 import { UserResponseDTO } from "@/backend/modules/useraccess/types/userTypes";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+   Select,
+   SelectContent,
+   SelectItem,
+   SelectTrigger,
+   SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { metricTypeService } from "@/backend/modules/useraccess/services/metricTypesService";
 import { userMetricService } from "@/backend/modules/useraccess/services/userMetricService";
-import { CreateProfileMetricRequestDTO } from "@/backend/modules/useraccess/schemas/profileMetricSchemas";
 import { MetricTypeResponseDTO } from "@/backend/modules/useraccess/types/profileMetricTypes";
-import { MetricDataResponseDTO } from "@/backend/modules/useraccess/types/userMetricTypes";
 
 import { Loader2, ListChecks } from "lucide-react";
+import { MetricDataResponseDTO } from "@/backend/modules/useraccess/types/userMetricTypes";
+import { MetricDataRequestDTO } from "@/backend/modules/useraccess/schemas/userMetricSchemas";
 
 interface MetricsTabProps {
    user?: UserResponseDTO | null;
@@ -36,12 +42,17 @@ export function MetricsTab({ user, isLoading }: MetricsTabProps) {
    const [importLoading, setImportLoading] = useState(false);
 
    const [importFile, setImportFile] = useState<File | null>(null);
-   const [selectedMetricType, setSelectedMetricType] = useState<string | undefined>(undefined);
+   const [selectedMetricType, setSelectedMetricType] = useState<
+      string | undefined
+   >(undefined);
 
-   const [selectedListType, setSelectedListType] = useState<string | undefined>();
-   const [listedMetrics, setListedMetrics] = useState<MetricDataResponseDTO[]>([]);
+   const [selectedListType, setSelectedListType] = useState<
+      string | undefined
+   >();
+   const [listedMetrics, setListedMetrics] = useState<MetricDataResponseDTO[]>(
+      []
+   );
    const [listingLoading, setListingLoading] = useState(false);
-
 
    const fetchMetricsByType = async (type: string) => {
       setListingLoading(true);
@@ -61,7 +72,7 @@ export function MetricsTab({ user, isLoading }: MetricsTabProps) {
          try {
             const types = await metricTypeService.getAll();
             setMetricTypes(types);
-            await fetchMetrics(user.id);
+            await fetchMetrics();
          } catch (error) {
             ErrorToast("Erro ao carregar dados iniciais das métricas.");
          }
@@ -70,10 +81,11 @@ export function MetricsTab({ user, isLoading }: MetricsTabProps) {
       loadAllData();
    }, [user]);
 
-   const fetchMetrics = async (userId: string) => {
+   const fetchMetrics = async () => {
       setLoading(true);
       try {
-         const data = await userMetricService.getLasts(userId);
+         const data = await userMetricService.getLasts();
+         console.log("Últimas métricas:", data);
          setLastMetrics(data);
       } catch (error) {
          ErrorToast("Erro ao carregar métricas...");
@@ -82,14 +94,13 @@ export function MetricsTab({ user, isLoading }: MetricsTabProps) {
       }
    };
 
-
-   const handleMetricSubmit = async (data: CreateProfileMetricRequestDTO) => {
+   const handleMetricSubmit = async (data: MetricDataRequestDTO) => {
       if (!user) return;
       setSubmitting(true);
       try {
          await userMetricService.addMetric(data);
          SuccessToast("Métrica cadastrada com sucesso!", "");
-         await fetchMetrics(user.id);
+         await fetchMetrics();
       } catch (e: any) {
          ErrorToast(e.message);
       } finally {
@@ -101,9 +112,9 @@ export function MetricsTab({ user, isLoading }: MetricsTabProps) {
       if (!user || !selectedMetricType || !importFile) return;
       try {
          setImportLoading(true);
-         await userMetricService.importMetrics(importFile, selectedMetricType, user.id);
+         await userMetricService.importMetrics(importFile, selectedMetricType);
          SuccessToast("Importação feita com sucesso!", "");
-         await fetchMetrics(user.id);
+         await fetchMetrics();
          setImportFile(null);
          setSelectedMetricType(undefined);
       } catch (e: any) {
@@ -126,11 +137,16 @@ export function MetricsTab({ user, isLoading }: MetricsTabProps) {
             <Card>
                <CardHeader>
                   <CardTitle>Registrar Nova Métrica</CardTitle>
-                  <CardDescription>Mantenha suas métricas atualizadas.</CardDescription>
+                  <CardDescription>
+                     Mantenha suas métricas atualizadas.
+                  </CardDescription>
                </CardHeader>
                <CardContent>
                   {user ? (
-                     <MetricForm onSubmit={handleMetricSubmit} loading={submitting} />
+                     <MetricForm
+                        onSubmit={handleMetricSubmit}
+                        loading={submitting}
+                     />
                   ) : (
                      <div className="space-y-4">
                         <Skeleton className="h-10 w-full" />
@@ -145,14 +161,21 @@ export function MetricsTab({ user, isLoading }: MetricsTabProps) {
                <CardHeader>
                   <CardTitle>Importar Métricas via Arquivo</CardTitle>
                   <CardDescription>
-                     Envie um arquivo <strong>CSV</strong> ou <strong>JSON</strong> com valores numéricos para um tipo de métrica específico.
+                     Envie um arquivo <strong>CSV</strong> ou{" "}
+                     <strong>JSON</strong> com valores numéricos para um tipo de
+                     métrica específico.
                   </CardDescription>
                </CardHeader>
                <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                      <div>
-                        <label className="block text-sm font-medium mb-1">Tipo de Métrica</label>
-                        <Select onValueChange={setSelectedMetricType} value={selectedMetricType ?? ""}>
+                        <label className="block text-sm font-medium mb-1">
+                           Tipo de Métrica
+                        </label>
+                        <Select
+                           onValueChange={setSelectedMetricType}
+                           value={selectedMetricType ?? ""}
+                        >
                            <SelectTrigger>
                               <SelectValue placeholder="Selecione um tipo" />
                            </SelectTrigger>
@@ -167,7 +190,9 @@ export function MetricsTab({ user, isLoading }: MetricsTabProps) {
                      </div>
 
                      <div>
-                        <label className="block text-sm font-medium mb-1">Arquivo (.csv ou .json)</label>
+                        <label className="block text-sm font-medium mb-1">
+                           Arquivo (.csv ou .json)
+                        </label>
                         <Input
                            type="file"
                            accept=".csv, application/json"
@@ -182,7 +207,12 @@ export function MetricsTab({ user, isLoading }: MetricsTabProps) {
 
                   <Button
                      onClick={handleImport}
-                     disabled={!user || !selectedMetricType || !importFile || importLoading}
+                     disabled={
+                        !user ||
+                        !selectedMetricType ||
+                        !importFile ||
+                        importLoading
+                     }
                   >
                      {importLoading ? "Importando..." : "Importar Arquivo"}
                   </Button>
@@ -196,7 +226,8 @@ export function MetricsTab({ user, isLoading }: MetricsTabProps) {
                      Listar Métricas por Tipo
                   </CardTitle>
                   <CardDescription className="text-sm text-muted-foreground">
-                     Escolha um tipo de métrica para visualizar registros anteriores.
+                     Escolha um tipo de métrica para visualizar registros
+                     anteriores.
                   </CardDescription>
                </CardHeader>
 
@@ -232,14 +263,18 @@ export function MetricsTab({ user, isLoading }: MetricsTabProps) {
                               className="p-4 border rounded-xl bg-muted/40 hover:bg-muted/30 transition-shadow"
                            >
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                                 {Object.entries(metric.data).map(([key, value]) => (
-                                    <div key={key} className="flex flex-col">
-                                       <span className="text-xs text-muted-foreground uppercase tracking-wide">
-                                          {key}
-                                       </span>
-                                       <span className="font-medium text-foreground">{value}</span>
-                                    </div>
-                                 ))}
+                                 {Object.entries(metric.data).map(
+                                    ([key, value]) => (
+                                       <div key={key} className="flex flex-col">
+                                          <span className="text-xs text-muted-foreground uppercase tracking-wide">
+                                             {key}
+                                          </span>
+                                          <span className="font-medium text-foreground">
+                                             {value}
+                                          </span>
+                                       </div>
+                                    )
+                                 )}
                               </div>
                            </div>
                         ))}
@@ -262,11 +297,16 @@ export function MetricsTab({ user, isLoading }: MetricsTabProps) {
                <Card>
                   <CardHeader>
                      <CardTitle>Últimas Métricas</CardTitle>
-                     <CardDescription>Suas últimas métricas registradas.</CardDescription>
+                     <CardDescription>
+                        Suas últimas métricas registradas.
+                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                      {lastMetrics.length > 0 ? (
-                        <LastMetricsChart data={lastMetrics} config={chartConfig} />
+                        <LastMetricsChart
+                           data={lastMetrics}
+                           config={chartConfig}
+                        />
                      ) : (
                         <Skeleton className="h-32 w-full" />
                      )}

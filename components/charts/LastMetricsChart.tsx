@@ -6,20 +6,17 @@ import {
    ChartTooltipContent,
 } from "@/components/ui/chart";
 import { ChartConfig } from "@/components/ui/chart";
-import { ProfileMetricResponseDTO } from "@/backend/modules/useraccess/types/profileMetricTypes";
-import { ProfileMetricLabels } from "@/backend/common/enums/profileMetricEnum";
-
-// TODO: corrigir profileMetric
+import { MetricDataResponseDTO } from "@/backend/modules/useraccess/types/userMetricTypes";
 
 interface LastMetricsChartProps {
-   data: ProfileMetricResponseDTO[];
+   data: MetricDataResponseDTO[];
    config: ChartConfig;
 }
 
 export function LastMetricsChart({ data, config }: LastMetricsChartProps) {
    const lastData = data.map((m) => ({
-      label: ProfileMetricLabels[m.type],
-      value: m.value,
+      label: m.metricType,
+      value: m.data.value,
    }));
 
    if (!lastData.length) return <p>Sem dados disponíveis</p>;
@@ -33,7 +30,9 @@ export function LastMetricsChart({ data, config }: LastMetricsChartProps) {
                tickLine={false}
                tickMargin={10}
                axisLine={false}
-               tickFormatter={(value) => value.split(" ")[0]}
+               tickFormatter={(value) =>
+                  typeof value === "string" ? value.split(" ")[0] : ""
+               }
             />
             <Bar dataKey="value" fill="#3b82f6" />
          </BarChart>

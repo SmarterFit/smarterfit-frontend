@@ -6,10 +6,10 @@ import {
    ChartTooltipContent,
 } from "@/components/ui/chart";
 import { ChartConfig } from "@/components/ui/chart";
-import { ProfileMetricResponseDTO } from "@/backend/modules/useraccess/types/profileMetricTypes";
+import { MetricDataResponseDTO } from "@/backend/modules/useraccess/types/userMetricTypes";
 
 interface AreaMetricChartProps {
-   data: ProfileMetricResponseDTO[];
+   data: MetricDataResponseDTO[];
    config: ChartConfig;
    color?: string;
    height?: string;
@@ -28,7 +28,8 @@ export function AreaMetricChart({
          day: "2-digit",
          month: "2-digit",
       }),
-      value: m.value,
+      // O valor agora é acessado de dentro do objeto 'data'
+      value: m.data.value,
    }));
 
    if (!chartData.length)
