@@ -29,6 +29,16 @@ export const userService = {
       });
    },
 
+  /**
+   * Busca usuários por email (retorna uma lista)
+   */
+   searchUsersByEmail(email: string): Promise<UserResponseDTO[]> {  // Mudou para array
+      return apiRequest<UserResponseDTO[]>({
+         method: "get",
+         path: `/usuarios/email/${email}`,
+      });
+   },
+
    /**
     * Atualiza o e-mail de um usuário
     */

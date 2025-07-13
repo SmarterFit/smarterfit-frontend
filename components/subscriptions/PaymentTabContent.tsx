@@ -80,6 +80,7 @@ export function PaymentsTabContent({
       resolver: zodResolver(createPaymentRequestSchema),
       defaultValues: {
          subscriptionId,
+         method: PaymentMethod.CREDIT_CARD,
          methodId: "", // O valor inicial agora é vazio
       },
    });

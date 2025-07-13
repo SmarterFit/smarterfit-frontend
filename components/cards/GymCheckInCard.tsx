@@ -40,6 +40,7 @@ export default function GymCheckInCard({
    const [presenceMap, setPresenceMap] = useState<Record<string, boolean>>({});
    const [loading, setLoading] = useState(true);
    const [processing, setProcessing] = useState(false);
+
    const [checkedIn, setCheckedIn] = useState<boolean | null>(null);
    const [isGymOpen, setIsGymOpen] = useState(true); // Inicia como true para evitar UI piscando
 

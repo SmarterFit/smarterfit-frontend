@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -25,7 +25,8 @@ import {
    CreateProfileMetricRequestDTO,
    createProfileMetricSchema,
 } from "@/backend/modules/useraccess/schemas/profileMetricSchemas";
-import { ProfileMetricLabels } from "@/backend/common/enums/profileMetricEnum";
+import { metricTypeService } from "@/backend/modules/useraccess/services/metricTypesService"; // certifique-se do path correto
+import type { MetricTypeResponseDTO } from "@/backend/modules/useraccess/types/profileMetricTypes"; // certifique-se do path correto
 
 interface MetricFormProps {
    onSubmit: (data: CreateProfileMetricRequestDTO) => Promise<void>;
@@ -33,10 +34,23 @@ interface MetricFormProps {
 }
 
 export function MetricForm({ onSubmit, loading }: MetricFormProps) {
+   const [metricTypes, setMetricTypes] = useState<MetricTypeResponseDTO[]>([]);
    const form = useForm<CreateProfileMetricRequestDTO>({
       resolver: zodResolver(createProfileMetricSchema),
       defaultValues: { type: undefined, value: undefined },
    });
+
+   useEffect(() => {
+      const fetchMetricTypes = async () => {
+         try {
+            const response = await metricTypeService.getAll();
+            setMetricTypes(response);
+         } catch (error) {
+            console.error("Erro ao carregar tipos de métrica:", error);
+         }
+      };
+      fetchMetricTypes();
+   }, []);
 
    const localSubmit = async (data: CreateProfileMetricRequestDTO) => {
       await onSubmit(data);
@@ -65,13 +79,11 @@ export function MetricForm({ onSubmit, loading }: MetricFormProps) {
                            <SelectContent>
                               <SelectGroup>
                                  <SelectLabel>Métricas</SelectLabel>
-                                 {Object.entries(ProfileMetricLabels).map(
-                                    ([key, label]) => (
-                                       <SelectItem key={key} value={key}>
-                                          {label}
-                                       </SelectItem>
-                                    )
-                                 )}
+                                 {metricTypes.map((metric) => (
+                                    <SelectItem key={metric.id} value={metric.type}>
+                                       {metric.type} ({metric.unit})
+                                    </SelectItem>
+                                 ))}
                               </SelectGroup>
                            </SelectContent>
                         </Select>
