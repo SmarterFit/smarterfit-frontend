@@ -31,6 +31,17 @@ export const challengeQuestService = {
    },
 
    /**
+    * Busca todas missões de desafio de um usuário.
+    * Corresponde ao endpoint GET /desafio/form
+    */
+   getAllChallengeQuestByProfile(): Promise<ChallengeQuestResponseDTO[]> {
+      return apiRequest<ChallengeQuestResponseDTO[]>({
+         method: "get",
+         path: `/desafio/form`,
+      });
+   },
+
+   /**
     * Atualiza uma missão de desafio existente pelo seu ID.
     * Corresponde ao endpoint PUT /desafio/form/{id}
     * @param id O ID da missão a ser atualizada.

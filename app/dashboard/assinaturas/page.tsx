@@ -21,7 +21,7 @@ export default function Assinaturas() {
          </div>
 
          <Tabs defaultValue="minhas" className="w-full">
-            <TabsList>
+            <TabsList className="w-full">
                <TabsTrigger value="minhas">Minhas Assinaturas</TabsTrigger>
                <TabsTrigger value="nova">Nova Assinatura</TabsTrigger>
             </TabsList>

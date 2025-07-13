@@ -41,4 +41,16 @@ export const challengeTrailService = {
          path: `/desafio/trilha/${id}`,
       });
    },
+
+   /**
+    * Busca uma trilha de desafio específica pelo id do desafio.
+    * Corresponde ao endpoint GET /desafio/trilha/quest/{id}
+    * @param id O ID da trilha a ser buscada.
+    */
+   findByQuestId(questId: string): Promise<ChallengeTrailResponseDTO> {
+      return apiRequest<ChallengeTrailResponseDTO>({
+         method: "get",
+         path: `/desafio/trilha/quest/${questId}`,
+      });
+   },
 };

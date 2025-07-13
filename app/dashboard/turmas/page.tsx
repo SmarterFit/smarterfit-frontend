@@ -20,7 +20,7 @@ export default function ClassGroups() {
          </div>
 
          <Tabs defaultValue="turmas" className="w-full">
-         <TabsList>
+         <TabsList className="w-full">
             <TabsTrigger value="turmas">Turmas</TabsTrigger>
             <TabsTrigger value="modalidades">Modalidades</TabsTrigger>
             <TabsTrigger value="eventos">Eventos</TabsTrigger>

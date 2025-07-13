@@ -1,6 +1,7 @@
 import { ExperienceLevel } from "@/backend/common/enums/experienceLevelEnum";
 import { ChallengeTypeResponseDTO } from "@/backend/framework/challenge/types/challengeTypes";
-import { DayOfWeek } from "react-day-picker";
+import { MetricTypeResponseDTO } from "../../useraccess/types/profileMetricTypes";
+import { DayOfWeek } from "@/backend/common/enums/dayOfWeekEnum";
 
 export interface ChallengeQuestResponseDTO {
    id: string; // UUID representado como string

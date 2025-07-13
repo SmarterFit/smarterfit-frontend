@@ -4,10 +4,11 @@ import { BarChart3 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UserResponseDTO } from "@/backend/modules/useraccess/types/userTypes";
-import { MetricsTab } from "@/components/user/MetricsTab";
-import { TrainingTab } from "@/components/user/TrainingTab";
+import { MetricsTab } from "@/components/metrics/MetricsTab";
+import { TrainingTab } from "@/components/metrics/TrainingTab";
 import { useUser } from "@/hooks/useUser";
 import { useState, useEffect } from "react";
+import { ChallengeTab } from "@/components/metrics/ChallengeTab";
 
 export default function Metrics() {
    const rawUserFromHook = useUser();
@@ -23,7 +24,7 @@ export default function Metrics() {
    }, [rawUserFromHook]);
 
    return (
-      <div className="w-full lg:max-w-4xl mx-auto flex flex-col gap-4">
+      <div className="w-full lg:max-w-6xl mx-auto flex flex-col gap-4">
          <div className="flex space-x-3 mb-6">
             <BarChart3 className="h-8 w-8 text-primary" />
             <div>
@@ -36,7 +37,7 @@ export default function Metrics() {
          </div>
 
          <Tabs defaultValue="metricas" className="w-full">
-            <TabsList>
+            <TabsList className="w-full">
                <TabsTrigger value="metricas">Minhas Métricas</TabsTrigger>
                <TabsTrigger value="treinamentos">Treinamentos</TabsTrigger>
                <TabsTrigger value="desafios">Desafios</TabsTrigger>
@@ -70,9 +71,7 @@ export default function Metrics() {
                   Participe de desafios personalizados para manter a motivação.
                </p>
                <Separator />
-               <p className="text-muted-foreground">
-                  Em breve, esta funcionalidade estará disponível.
-               </p>
+               <ChallengeTab user={user} isLoading={isLoading} />
             </TabsContent>
          </Tabs>
       </div>

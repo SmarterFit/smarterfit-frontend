@@ -34,6 +34,18 @@ export const challengeStepService = {
    },
 
    /**
+    * Faz o toggle de um passo pelo seu ID.
+    * Corresponde ao endpoint PUT /desafio/steps/toggle/{id}
+    * @param id O ID do passo a ser atualizado.
+    */
+   toggle(id: string): Promise<ChallengeStepResponseDTO> {
+      return apiRequest<ChallengeStepResponseDTO, ChallengeStepRequestDTO>({
+         method: "patch",
+         path: `/desafio/steps/toggle/${id}`,
+      });
+   },
+
+   /**
     * Deleta um passo pelo seu ID.
     * Corresponde ao endpoint DELETE /desafio/steps/{id}
     * @param id O ID do passo a ser deletado.
