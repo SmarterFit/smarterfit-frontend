@@ -17,6 +17,7 @@ import {
    Group,
    Landmark,
    Home,
+   ListChecks,
 } from "lucide-react";
 import {
    DropdownMenu,
@@ -65,6 +66,11 @@ const navItems: Array<{
       title: "Turmas",
       href: "/dashboard/turmas",
       icon: <Landmark className="mr-2 h-4 w-4" />,
+   },
+   {
+      title: "Métricas",
+      href: "/dashboard/metricas",
+      icon: <ListChecks className="mr-2 h-4 w-4" />,
    },
 ];
 

@@ -5,15 +5,12 @@ import { ProfileResponseDTO } from "@/backend/modules/useraccess/types/profileTy
 import { UserResponseDTO } from "@/backend/modules/useraccess/types/userTypes";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AddressTab } from "@/components/user/AddressTab";
-import { MetricsTab } from "@/components/user/MetricsTab";
 import { ProfileTab } from "@/components/user/ProfileTab";
 import { SecurityTab } from "@/components/user/SecurityTab";
-import { TrainingTab } from "@/components/user/TrainingTab";
 import { useUser } from "@/hooks/useUser";
-import { Train } from "lucide-react";
 import { useState, useEffect } from "react";
 
-export default function Test() {
+export default function Perfil() {
    const rawUserFromHook = useUser();
 
    const [user, setUser] = useState<UserResponseDTO | null>(null);
@@ -72,12 +69,6 @@ export default function Test() {
             <TabsTrigger value="endereco" className="w-full">
                Endereço
             </TabsTrigger>
-            <TabsTrigger value="metricas" className="w-full">
-               Métricas
-            </TabsTrigger>
-            <TabsTrigger value="treinos" className="w-full">
-               Treinos
-            </TabsTrigger>
          </TabsList>
          <TabsContent value="perfil">
             <ProfileTab
@@ -96,12 +87,6 @@ export default function Test() {
                isLoading={isLoading}
                onAddressUpdated={handleAddressUpdated}
             />
-         </TabsContent>
-         <TabsContent value="metricas">
-            <MetricsTab user={user} isLoading={isLoading} />
-         </TabsContent>
-         <TabsContent value="treinos">
-            <TrainingTab user={user} isLoading={isLoading} />
          </TabsContent>
       </Tabs>
    );
