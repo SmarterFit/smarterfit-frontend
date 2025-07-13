@@ -1,5 +1,6 @@
 import { apiRequest } from "@/backend/api";
 import { ChallengeGenericMetricRequestDTO } from "../schemas/challengeSchemas";
+import { ChallengeTrailResponseDTO } from "@/backend/modules/challenge/types/challengeTrailTypes";
 
 export const challengeService = {
    /**
