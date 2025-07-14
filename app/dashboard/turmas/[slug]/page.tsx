@@ -236,9 +236,6 @@ export default function TurmaPageClient() {
                <TabsTrigger value="aulas" className="flex items-center gap-2">
                   <Calendar className="h-4 w-4" /> Aulas
                </TabsTrigger>
-               <TabsTrigger value="notas" className="flex items-center gap-2">
-                  <FileText className="h-4 w-4" /> Notas
-               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="alunos" className="pt-4">
@@ -258,17 +255,6 @@ export default function TurmaPageClient() {
 
             <TabsContent value="aulas" className="pt-4">
                {turmaId && <SessionsTab classGroupId={turmaId} />}
-            </TabsContent>
-
-            <TabsContent value="notas" className="pt-4">
-               {turmaId && (
-                  <MetricsTab
-                     classGroupId={turmaId}
-                     isNonMember={!isMember()} // Passa a flag para a tab
-                     user={user} // Passa o ID do usuário atual
-                     isLoading={loading} // Passa o estado de loading
-                  />
-               )}
             </TabsContent>
          </Tabs>
       </div>
