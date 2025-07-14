@@ -22,8 +22,8 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { ClassGroupScheduleService } from "@/backend/modules/classgroup/service/classGroupScheduleService";
-import { DayOfWeek, DayOfWeekLabels } from "@/backend/common/enums/dayOfWeek";
 import { ErrorToast, SuccessToast } from "../../toasts/Toasts";
+import { DayOfWeek, DayOfWeekLabels } from "@/backend/common/enums/dayOfWeekEnum";
 
 const ScheduleSchema = z.object({
   dayOfWeek: z.nativeEnum(DayOfWeek, {
@@ -71,10 +71,10 @@ export function EditScheduleDialog({
 
       if (schedule) {
         await ClassGroupScheduleService.update(schedule.id, payload);
-        SuccessToast("Horário atualizado com sucesso");
+        SuccessToast("Horário atualizado com sucesso", "");
       } else {
         await ClassGroupScheduleService.create(payload);
-        SuccessToast("Horário adicionado com sucesso");
+        SuccessToast("Horário adicionado com sucesso", "");
       }
 
       onSuccess?.();
