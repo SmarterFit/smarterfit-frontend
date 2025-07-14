@@ -1,9 +1,16 @@
 import {
-  Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription,
+   Dialog,
+   DialogContent,
+   DialogTrigger,
+   DialogTitle,
+   DialogDescription,
 } from "@/components/ui/dialog";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CreateModalitySchemas } from "@/backend/modules/classgroup/schemas/modalitySchemas";
+import {
+   CreateModalitySchemas,
+   ModalityRequestDTO,
+} from "@/backend/modules/classgroup/schemas/modalitySchemas";
 import { z } from "zod";
 import { modalityService } from "@/backend/modules/classgroup/service/modalityService";
 import { Button } from "@/components/ui/button";
@@ -12,48 +19,51 @@ import { Label } from "@/components/ui/label";
 import { ErrorToast, SuccessToast } from "../../toasts/Toasts";
 
 type Props = {
-  children: React.ReactNode;
-  onCreated?: () => void;
+   children: React.ReactNode;
+   onCreated?: () => void;
 };
 
 export function ModalityDialog({ children, onCreated }: Props) {
-  const form = useForm<z.infer<typeof CreateModalitySchemas>>({
-    resolver: zodResolver(CreateModalitySchemas),
-  });
+   const form = useForm<ModalityRequestDTO>({
+      resolver: zodResolver(CreateModalitySchemas),
+   });
 
-  const onSubmit = async (data: z.infer<typeof CreateModalitySchemas>) => {
-    try {
-      await modalityService.create(data);
-      form.reset();
-      onCreated?.();
-      SuccessToast("Sucesso!", "Modalidade criada com sucesso!");
-    } catch (error) {
-        console.error("Erro ao criar modalidade:", error);
-        ErrorToast("Erro ao criar modalidade. Tente novamente.");
-    }
-  };
-  
+   const onSubmit = async (data: z.infer<typeof CreateModalitySchemas>) => {
+      try {
+         const modality = await modalityService.create(data);
+         form.reset();
+         onCreated?.();
+         SuccessToast("Sucesso!", "Modalidade criada com sucesso!");
+      } catch (error: any) {
+         ErrorToast(error.response?.data?.message);
+      }
+   };
 
-  return (
-    <Dialog>
-      <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent>
-        <DialogTitle>Criar Modalidade</DialogTitle>
-        <DialogDescription>Insira o nome da nova modalidade abaixo.</DialogDescription>
+   return (
+      <Dialog>
+         <DialogTrigger asChild>{children}</DialogTrigger>
+         <DialogContent>
+            <DialogTitle>Criar Modalidade</DialogTitle>
+            <DialogDescription>
+               Insira o nome da nova modalidade abaixo.
+            </DialogDescription>
 
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
-          <div>
-            <Label htmlFor="name">Nome da Modalidade</Label>
-            <Input id="name" {...form.register("name")} />
-            {form.formState.errors.name && (
-              <p className="text-sm text-red-500">
-                {form.formState.errors.name.message}
-              </p>
-            )}
-          </div>
-          <Button type="submit">Criar Modalidade</Button>
-        </form>
-      </DialogContent>
-    </Dialog>
-  );
+            <form
+               onSubmit={form.handleSubmit(onSubmit)}
+               className="space-y-4 mt-4"
+            >
+               <div>
+                  <Label htmlFor="name">Nome da Modalidade</Label>
+                  <Input id="name" {...form.register("name")} />
+                  {form.formState.errors.name && (
+                     <p className="text-sm text-red-500">
+                        {form.formState.errors.name.message}
+                     </p>
+                  )}
+               </div>
+               <Button type="submit">Criar Modalidade</Button>
+            </form>
+         </DialogContent>
+      </Dialog>
+   );
 }
