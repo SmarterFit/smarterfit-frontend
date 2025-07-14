@@ -37,15 +37,15 @@ export default function SectionPlans() {
          style={{ backgroundImage: "url('/imgs/plans-bg.jpg')" }}
       >
          {/* Overlay escuro */}
-         <div className="absolute inset-0 bg-black/90 z-10" />
+         <div className="absolute inset-0 bg-background/90 z-10" />
 
          <div className="container mx-auto relative z-20 p-4 py-32 min-h-screen flex flex-col justify-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-center text-white mb-8">
+            <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-8">
                Nossos Planos
             </h2>
 
             {loading && (
-               <p className="text-center text-white">Carregando planos...</p>
+               <p className="text-center text-foreground">Carregando planos...</p>
             )}
             {error && <p className="text-center text-red-500">{error}</p>}
 
@@ -57,7 +57,7 @@ export default function SectionPlans() {
                            key={plan.id}
                            className="snap-start flex-shrink-0 md:basis-1/3 "
                         >
-                           <Card className="bg-white/10 border-transparent text-white h-full justify-between">
+                           <Card className="bg-foreground/10 border-transparent text-foreground h-full justify-between">
                               <CardHeader>
                                  <CardTitle className="text-xl font-semibold">
                                     {plan.name}

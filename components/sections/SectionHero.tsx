@@ -53,15 +53,16 @@ export default function SectionHero() {
             <h1
                ref={titleRef}
                className="text-4xl md:text-6xl font-extrabold text-primary drop-shadow-lg"
+               style={{ fontFamily: "var(--font-merienda)" }}
             >
-               SmarterFit
+               LÚMINA
             </h1>
             <p
                ref={subtitleRef}
                className="mt-4 text-xl md:text-2xl text-primary/90 font-medium max-w-2xl"
             >
-               Aplique a inteligência aos seus treinos e conquiste resultados
-               reais
+               Aplique inteligência aos seus estudos e conquiste resultados
+               reais.
             </p>
 
             {/* Call to Action Buttons */}
@@ -92,13 +93,13 @@ export default function SectionHero() {
                   <CardHeader>
                      <CardTitle className="flex items-center justify-center gap-2">
                         <Activity className="h-6 w-6 text-primary" />
-                        Treinos Personalizados
+                        Estudos Personalizados
                      </CardTitle>
                   </CardHeader>
                   <CardContent>
                      <CardDescription className="text-center">
-                        Planos de treino construídos por IA para maximizar seus
-                        resultados.
+                        Planos de estudo personalizados construídos por IA para
+                        maximizar seu aprendizado.
                      </CardDescription>
                   </CardContent>
                </Card>
@@ -113,7 +114,7 @@ export default function SectionHero() {
                   <CardContent>
                      <CardDescription className="text-center">
                         Monitore seu desempenho e receba feedback imediato
-                        durante o treino.
+                        durante os estudos.
                      </CardDescription>
                   </CardContent>
                </Card>
@@ -127,8 +128,8 @@ export default function SectionHero() {
                   </CardHeader>
                   <CardContent>
                      <CardDescription className="text-center">
-                        Defina objetivos claros e acompanhe seu progresso com
-                        precisão.
+                        Defina objetivos claros e acompanhe seu progresso
+                        acadêmico com precisão.
                      </CardDescription>
                   </CardContent>
                </Card>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Merienda } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 
@@ -13,8 +13,13 @@ const geistMono = Geist_Mono({
    subsets: ["latin"],
 });
 
+const merienda = Merienda({
+  variable: "--font-merienda",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
-   title: "SmarterFit",
+   title: "LÚMINA",
    description: "A smarter fitness app",
    authors: [
       { name: "Gabriel Henrique" },
@@ -29,9 +34,9 @@ export default function RootLayout({
    children: React.ReactNode;
 }>) {
    return (
-      <html lang="pt-br" className="dark">
+      <html lang="pt-br">
          <body
-            className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
+            className={`${geistSans.variable} ${geistMono.variable} ${merienda.variable} antialiased min-h-screen flex flex-col`}
          >
             {children}
             <Toaster />

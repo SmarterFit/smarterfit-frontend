@@ -137,7 +137,7 @@ export default function GymCheckInCard({
 
    async function handleCheckIn() {
       if (!isGymOpen) {
-         ErrorToast("Não é possível fazer check-in, a academia está fechada.");
+         ErrorToast("Não é possível fazer check-in, o centro está fechado.");
          return;
       }
       if (!userId || !hasSubscriptionActive) {
@@ -244,7 +244,7 @@ export default function GymCheckInCard({
                </p>
             ) : !isGymOpen && !checkedIn ? (
                <p className="text-sm text-orange-600">
-                  A academia está fechada no momento.
+                  O centro está fechado no momento.
                </p>
             ) : null}
 

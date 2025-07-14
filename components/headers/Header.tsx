@@ -59,7 +59,10 @@ export default function Header() {
                      height={32}
                      className="rounded-md"
                   />
-                  <span className="font-bold">SmarterFit</span>
+                  <span style={{ fontFamily: "var(--font-merienda)" }}>
+                     LÚMINA
+                  </span>{" "}
+                  - Centro de Aprendizagem
                </Link>
             </div>
 
@@ -130,7 +133,7 @@ export default function Header() {
                            height={32}
                            className="rounded-md"
                         />
-                        <span className="font-bold">SmarterFit</span>
+                        <span className="font-bold">LÚMINA</span>
                      </Link>
                      <nav className="flex flex-col gap-4">
                         {navItems.map((item) => (

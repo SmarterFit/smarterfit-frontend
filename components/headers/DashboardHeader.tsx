@@ -134,7 +134,7 @@ export default function DashboardHeader() {
                </DropdownMenu>
                <div className="flex items-center space-x-1">
                   <span className="text-sm font-medium">
-                     Bem-vindo à <strong>SmarterFit</strong>,{" "}
+                     Bem-vindo à <strong>LÚMINA</strong>,{" "}
                      {user?.profile?.fullName || "Usuário"}!
                   </span>
                   <motion.span

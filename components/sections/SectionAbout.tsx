@@ -19,14 +19,15 @@ export default function SectionAbout() {
       >
          <div className="container mx-auto relative z-20 flex flex-col items-center justify-center text-center min-h-screen p-4">
             <h2 className="text-3xl md:text-4xl font-bold text-center">
-               Sobre a SmarterFit
+               Sobre a LÚMINA
             </h2>
             <p className="mt-4 max-w-3xl mx-auto text-center text-lg md:text-xl">
-               Na SmarterFit, nossa missão é unir tecnologia de ponta e ciência
-               do esporte para oferecer planos de treino personalizados que se
-               adaptam ao seu ritmo de vida. Acreditamos que cada pessoa é única
-               e merece um acompanhamento inteligente para alcançar seus
-               objetivos de forma saudável e sustentável.
+               Na LÚMINA, nossa missão é unir tecnologia de ponta e ciência da
+               educação para oferecer planos de estudo personalizados que se
+               adaptam ao seu ritmo de aprendizado. Acreditamos que cada
+               estudante é único e merece um acompanhamento inteligente para
+               alcançar seus objetivos acadêmicos de forma saudável e
+               sustentável.
             </p>
 
             {/* Cards de valores */}
@@ -50,13 +51,13 @@ export default function SectionAbout() {
                   <CardHeader>
                      <CardTitle className="flex items-center justify-center gap-2">
                         <HeartPulse className="h-5 w-5 text-primary" />
-                        Saúde em Primeiro Lugar
+                        Aprendizado em Primeiro Lugar
                      </CardTitle>
                   </CardHeader>
                   <CardContent>
                      <CardDescription>
-                        Monitoramento contínuo dos indicadores de saúde durante
-                        os treinos para garantir segurança e eficiência.
+                        Monitoramento contínuo do progresso acadêmico para
+                        garantir eficiência e qualidade nos estudos.
                      </CardDescription>
                   </CardContent>
                </Card>
@@ -70,8 +71,8 @@ export default function SectionAbout() {
                   </CardHeader>
                   <CardContent>
                      <CardDescription>
-                        Relatórios detalhados para acompanhar seu progresso e
-                        ajustar seu plano em tempo real.
+                        Relatórios detalhados para acompanhar seu desempenho
+                        acadêmico e ajustar seu plano de estudos em tempo real.
                      </CardDescription>
                   </CardContent>
                </Card>

@@ -3,9 +3,3 @@ export interface ModalityResponseDTO {
   name: string;
 }
 
-
-export interface ModalityRequestDTO {
-  name: string;
-}
-
-

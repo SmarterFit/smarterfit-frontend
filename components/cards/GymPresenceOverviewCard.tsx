@@ -306,7 +306,7 @@ export default function GymPresenceOverviewCard({
          <CardHeader>
             <CardTitle>Visão Geral da Presença</CardTitle>
             <CardDescription>
-               Acompanhe o fluxo de pessoas na academia.
+               Acompanhe o fluxo de pessoas no centro.
             </CardDescription>
          </CardHeader>
          <CardContent className="space-y-6">
@@ -459,7 +459,7 @@ export default function GymPresenceOverviewCard({
                            {currentPresence.presenceCount}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                           pessoas na academia agora.
+                           pessoas no centro agora.
                         </p>
                         {lastPresenceUpdate && (
                            <p className="text-xs text-muted-foreground">
@@ -474,7 +474,7 @@ export default function GymPresenceOverviewCard({
                   )
                ) : (
                   <p className="text-lg font-semibold text-orange-600">
-                     Academia fechada.
+                     Centro fechado.
                   </p>
                )}
             </div>

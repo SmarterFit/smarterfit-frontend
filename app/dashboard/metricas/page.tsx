@@ -38,20 +38,9 @@ export default function Metrics() {
 
          <Tabs defaultValue="metricas" className="w-full">
             <TabsList className="w-full">
-               <TabsTrigger value="metricas">Minhas Métricas</TabsTrigger>
                <TabsTrigger value="treinamentos">Treinamentos</TabsTrigger>
                <TabsTrigger value="desafios">Desafios</TabsTrigger>
             </TabsList>
-
-            <TabsContent value="metricas" className="mt-4 flex flex-col gap-4">
-               <h2 className="text-xl font-semibold">Minhas Métricas</h2>
-               <p className="text-muted-foreground">
-                  Veja o desempenho e evolução das suas métricas ao longo do
-                  tempo.
-               </p>
-               <Separator />
-               <MetricsTab user={user} isLoading={isLoading} />
-            </TabsContent>
 
             <TabsContent
                value="treinamentos"

@@ -102,7 +102,7 @@ export const WorkoutPlanForm: React.FC<WorkoutPlanFormProps> = ({
          } as any);
          setIsCreate(false);
          setShowPreview(true);
-         SuccessToast("Plano gerado!", "Plano de treino criado com IA.");
+         SuccessToast("Plano gerado!", "Plano de estudo criado com IA.");
       } catch (e: any) {
          ErrorToast(e.message);
       } finally {

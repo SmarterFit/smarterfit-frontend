@@ -1,5 +1,6 @@
-import type { ModalityRequestDTO, ModalityResponseDTO } from "@/backend/modules/classgroup/types/modalityTypes";
+import type { ModalityResponseDTO } from "@/backend/modules/classgroup/types/modalityTypes";
 import { apiRequest } from "@/backend/api";
+import { ModalityRequestDTO } from "../schemas/modalitySchemas";
 
 export const modalityService = {
    /**
@@ -47,7 +48,10 @@ export const modalityService = {
    /**
     * Atualiza uma modalidade existente
     */
-   update(id: string, payload: ModalityRequestDTO): Promise<ModalityResponseDTO> {
+   update(
+      id: string,
+      payload: ModalityRequestDTO
+   ): Promise<ModalityResponseDTO> {
       return apiRequest<ModalityResponseDTO, ModalityRequestDTO>({
          method: "put",
          path: `/modalidade/${id}`,

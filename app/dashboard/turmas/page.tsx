@@ -12,9 +12,9 @@ export default function ClassGroups() {
          <div className="flex items-center space-x-3 mb-6">
             <Dumbbell className="h-8 w-8 text-primary" />
             <div>
-               <h1 className="text-3xl font-semibold">Turmas de Treinamento</h1>
+               <h1 className="text-3xl font-semibold">Turmas de Estudo</h1>
                <p className="text-sm text-muted-foreground">
-                  Aqui você pode visualizar, cadastrar e gerenciar todas as turmas de treino ativas no sistema.
+                  Aqui você pode visualizar, cadastrar e gerenciar todas as turmas de estudos ativas no sistema.
                </p>
             </div>
          </div>
