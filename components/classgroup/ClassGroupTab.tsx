@@ -58,7 +58,7 @@ export function ClassGroupTab() {
           <Card key={turma.id} className="w-full hover:shadow-lg transition-shadow duration-300 border border-gray-200 dark:border-gray-700">
             <CardHeader className="pb-3 space-y-2">
               <div className="flex justify-between items-start gap-2">
-                <CardTitle className="text-lg font-semibold line-clamp-2 text-gray-900 dark:text-white">
+                <CardTitle className="text-lg font-semibold line-clamp-2 text-gray-900">
                   {turma.title}
                 </CardTitle>
                 <Badge 

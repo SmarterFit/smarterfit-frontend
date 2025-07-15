@@ -16,7 +16,7 @@ interface LastMetricsChartProps {
 export function LastMetricsChart({ data, config }: LastMetricsChartProps) {
    const lastData = data.map((m) => ({
       label: m.metricType,
-      value: m.data.value,
+      value: m.data.Nota,
    }));
 
    if (!lastData.length) return <p>Sem dados disponíveis</p>;
