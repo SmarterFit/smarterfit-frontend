@@ -69,8 +69,7 @@ export function AddEmployeeToClassDialog({
       }
 
       await classGroupUserService.addEmployeeToClassGroup(
-        { classGroupId, userId: user.id },
-        requesterId
+        { classGroupId },
       );
 
       SuccessToast("Sucesso", "Funcionário adicionado com sucesso!");
@@ -117,7 +116,7 @@ export function AddEmployeeToClassDialog({
                         setSearchResults([]);
                       }}
                     >
-                      {user.name ? `${user.name} (${user.email})` : user.email}
+                      {user.profile.fullName ? `${user.profile.fullName} (${user.email})` : user.email}
                     </li>
                   ))}
                 </ul>
