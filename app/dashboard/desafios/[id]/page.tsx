@@ -128,7 +128,12 @@ export default function ChallengeDetailsPage() {
             </div>
          </div>
 
-         <ChallengeTrailManager questId={quest.id} />
+         <ChallengeTrailManager
+            questId={quest.id}
+            isCreditChallenge={
+               quest.challengeType.id === "CHALLENGE_EDUCATION_CREDIT"
+            }
+         />
       </div>
    );
 }

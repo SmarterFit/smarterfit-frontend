@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-   title: "SmarterFit",
+   title: "HUBpro",
    description: "A smarter fitness app",
    authors: [
       { name: "Gabriel Henrique" },

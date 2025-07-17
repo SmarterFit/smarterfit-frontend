@@ -1,15 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-   Select,
-   SelectTrigger,
-   SelectValue,
-   SelectContent,
-   SelectGroup,
-   SelectLabel,
-   SelectItem,
-} from "@/components/ui/select";
 import {
    Form,
    FormField,
@@ -21,12 +12,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LoadingSpinnerCSS } from "@/components/LoadingSpinner";
-import { metricTypeService } from "@/backend/modules/useraccess/services/metricTypesService"; // certifique-se do path correto
-import type { MetricTypeResponseDTO } from "@/backend/modules/useraccess/types/profileMetricTypes"; // certifique-se do path correto
 import {
    MetricDataRequestDTO,
    metricDataRequestSchema,
 } from "@/backend/modules/useraccess/schemas/userMetricSchemas";
+import { useUser } from "@/hooks/useUser";
 
 interface MetricFormProps {
    onSubmit: (data: MetricDataRequestDTO) => Promise<void>;
@@ -34,30 +24,30 @@ interface MetricFormProps {
 }
 
 export function MetricForm({ onSubmit, loading }: MetricFormProps) {
-   const [metricTypes, setMetricTypes] = useState<MetricTypeResponseDTO[]>([]);
+   const user = useUser();
    const form = useForm<MetricDataRequestDTO>({
       resolver: zodResolver(metricDataRequestSchema),
+      // AJUSTE 1: Habilita a validação em tempo real para o formState.isValid
+      mode: "onChange",
       defaultValues: {
-         metricType: "",
+         metricType: "Créditos de Educação",
          source: "website",
          data: {
-            // O valor agora é inicializado dentro do objeto 'data'
-            value: undefined,
+            hours: undefined,
+            courseName: "",
+            institution: "",
+            completionDate: undefined,
          },
       },
    });
 
    useEffect(() => {
-      const fetchMetricTypes = async () => {
-         try {
-            const response = await metricTypeService.getAll();
-            setMetricTypes(response);
-         } catch (error) {
-            console.error("Erro ao carregar tipos de métrica:", error);
-         }
-      };
-      fetchMetricTypes();
-   }, []);
+      if (user?.id) {
+         // Adicionar { shouldValidate: true } garante que a validade do formulário
+         // seja recalculada assim que o ID do usuário for definido.
+         form.setValue("data.userId", user.id, { shouldValidate: true });
+      }
+   }, [user, form]); // A dependência em `form` é segura aqui.
 
    const localSubmit = async (data: MetricDataRequestDTO) => {
       await onSubmit(data);
@@ -66,37 +56,22 @@ export function MetricForm({ onSubmit, loading }: MetricFormProps) {
 
    return (
       <Form {...form}>
-         <form onSubmit={form.handleSubmit(localSubmit)} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+         <form onSubmit={form.handleSubmit(localSubmit)} className="space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+               {/* Seus FormFields estão corretos */}
                <FormField
                   control={form.control}
-                  name="metricType" // Corrigido de 'metricType' para 'name'
+                  name="data.hours"
                   render={({ field }) => (
                      <FormItem>
-                        <FormLabel>Tipo</FormLabel>
-                        <Select
-                           onValueChange={field.onChange}
-                           defaultValue={field.value}
-                        >
-                           <FormControl>
-                              <SelectTrigger className="w-full">
-                                 <SelectValue placeholder="Selecione o tipo" />
-                              </SelectTrigger>
-                           </FormControl>
-                           <SelectContent>
-                              <SelectGroup>
-                                 <SelectLabel>Métricas</SelectLabel>
-                                 {metricTypes.map((metric) => (
-                                    <SelectItem
-                                       key={metric.id}
-                                       value={metric.type}
-                                    >
-                                       {metric.type} ({metric.unit})
-                                    </SelectItem>
-                                 ))}
-                              </SelectGroup>
-                           </SelectContent>
-                        </Select>
+                        <FormLabel>Horas de Curso</FormLabel>
+                        <FormControl>
+                           <Input
+                              type="number"
+                              placeholder="Ex: 40"
+                              {...field}
+                           />
+                        </FormControl>
                         <FormMessage />
                      </FormItem>
                   )}
@@ -104,26 +79,55 @@ export function MetricForm({ onSubmit, loading }: MetricFormProps) {
 
                <FormField
                   control={form.control}
-                  name="data.value" // Corrigido para refletir o aninhamento em 'data'
+                  name="data.completionDate"
                   render={({ field }) => (
                      <FormItem>
-                        <FormLabel>Valor</FormLabel>
+                        <FormLabel>Data de Conclusão</FormLabel>
                         <FormControl>
                            <Input
-                              placeholder="Ex: 0,00"
-                              inputMode="numeric"
+                              type="date"
+                              {...field}
                               value={
-                                 field.value !== undefined
-                                    ? Number(field.value)
-                                         .toFixed(2)
-                                         .replace(".", ",")
+                                 field.value
+                                    ? typeof field.value === "string"
+                                       ? field.value
+                                       : new Date(field.value)
+                                            .toISOString()
+                                            .split("T")[0]
                                     : ""
                               }
-                              onChange={(e) => {
-                                 const raw = e.target.value.replace(/\D/g, "");
-                                 field.onChange(Number(raw) / 100);
-                              }}
                            />
+                        </FormControl>
+                        <FormMessage />
+                     </FormItem>
+                  )}
+               />
+
+               <FormField
+                  control={form.control}
+                  name="data.courseName"
+                  render={({ field }) => (
+                     <FormItem className="sm:col-span-2">
+                        <FormLabel>Nome do Curso</FormLabel>
+                        <FormControl>
+                           <Input
+                              placeholder="Ex: React - O Guia Completo"
+                              {...field}
+                           />
+                        </FormControl>
+                        <FormMessage />
+                     </FormItem>
+                  )}
+               />
+
+               <FormField
+                  control={form.control}
+                  name="data.institution"
+                  render={({ field }) => (
+                     <FormItem className="sm:col-span-2">
+                        <FormLabel>Instituição de Ensino</FormLabel>
+                        <FormControl>
+                           <Input placeholder="Ex: Udemy" {...field} />
                         </FormControl>
                         <FormMessage />
                      </FormItem>
@@ -131,8 +135,13 @@ export function MetricForm({ onSubmit, loading }: MetricFormProps) {
                />
             </div>
 
-            <Button type="submit" disabled={loading} className="w-full">
-               {loading ? <LoadingSpinnerCSS /> : "Registrar Métrica"}
+            <Button
+               type="submit"
+               // AJUSTE 2: Desativa o botão se estiver carregando OU se o formulário for inválido.
+               disabled={loading || !form.formState.isValid}
+               className="w-full"
+            >
+               {loading ? <LoadingSpinnerCSS /> : "Registrar Créditos"}
             </Button>
          </form>
       </Form>

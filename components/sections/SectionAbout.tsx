@@ -19,14 +19,15 @@ export default function SectionAbout() {
       >
          <div className="container mx-auto relative z-20 flex flex-col items-center justify-center text-center min-h-screen p-4">
             <h2 className="text-3xl md:text-4xl font-bold text-center">
-               Sobre a SmarterFit
+               Sobre a HUBpro
             </h2>
             <p className="mt-4 max-w-3xl mx-auto text-center text-lg md:text-xl">
-               Na SmarterFit, nossa missão é unir tecnologia de ponta e ciência
-               do esporte para oferecer planos de treino personalizados que se
-               adaptam ao seu ritmo de vida. Acreditamos que cada pessoa é única
-               e merece um acompanhamento inteligente para alcançar seus
-               objetivos de forma saudável e sustentável.
+               Na HUBpro, nossa missão é unir tecnologia de ponta, ciência de
+               dados e andragogia para oferecer planos de desenvolvimento
+               personalizados que se adaptam à sua rotina profissional.
+               Acreditamos que cada colaborador é único e merece um
+               acompanhamento inteligente para alcançar seus objetivos de
+               carreira de forma estratégica e sustentável.
             </p>
 
             {/* Cards de valores */}
@@ -35,13 +36,14 @@ export default function SectionAbout() {
                   <CardHeader>
                      <CardTitle className="flex items-center justify-center gap-2">
                         <Users className="h-5 w-5 text-primary" />
-                        Comunidade
+                        Comunidade Corporativa
                      </CardTitle>
                   </CardHeader>
                   <CardContent>
                      <CardDescription>
-                        Mais de 10.000 usuários ativos trocando experiências e
-                        motivação para atingir suas metas juntos.
+                        Mais de 10.000 colaboradores engajados trocando
+                        conhecimento, insights e melhores práticas para
+                        impulsionar o crescimento coletivo.
                      </CardDescription>
                   </CardContent>
                </Card>
@@ -50,13 +52,14 @@ export default function SectionAbout() {
                   <CardHeader>
                      <CardTitle className="flex items-center justify-center gap-2">
                         <HeartPulse className="h-5 w-5 text-primary" />
-                        Saúde em Primeiro Lugar
+                        Desenvolvimento Sustentável
                      </CardTitle>
                   </CardHeader>
                   <CardContent>
                      <CardDescription>
-                        Monitoramento contínuo dos indicadores de saúde durante
-                        os treinos para garantir segurança e eficiência.
+                        Acompanhamento contínuo do seu progresso para garantir
+                        um desenvolvimento profissional equilibrado, eficiente e
+                        sem sobrecarga.
                      </CardDescription>
                   </CardContent>
                </Card>
@@ -65,13 +68,14 @@ export default function SectionAbout() {
                   <CardHeader>
                      <CardTitle className="flex items-center justify-center gap-2">
                         <ChartLine className="h-5 w-5 text-primary" />
-                        Resultados Visíveis
+                        Resultados Mensuráveis
                      </CardTitle>
                   </CardHeader>
                   <CardContent>
                      <CardDescription>
-                        Relatórios detalhados para acompanhar seu progresso e
-                        ajustar seu plano em tempo real.
+                        Dashboards e relatórios detalhados para acompanhar a
+                        evolução de suas competências e ajustar sua trilha de
+                        desenvolvimento em tempo real.
                      </CardDescription>
                   </CardContent>
                </Card>

@@ -77,9 +77,9 @@ export function LoginDialog({ open, setOpen, openRegister }: LoginDialogProps) {
          </DialogTrigger>
          <DialogContent className="sm:max-w-lg">
             <DialogHeader>
-               <DialogTitle>Entrar no SmarterFit</DialogTitle>
+               <DialogTitle>Entrar no HUBpro</DialogTitle>
                <DialogDescription>
-                  Preencha os campos abaixo para entrar no SmarterFit.
+                  Preencha os campos abaixo para entrar no HUBpro.
                </DialogDescription>
             </DialogHeader>
             <Form {...form}>

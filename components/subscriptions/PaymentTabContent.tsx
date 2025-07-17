@@ -50,6 +50,7 @@ import {
 } from "../ui/select";
 import { paymentMethodService } from "@/backend/framework/billing/services/paymentMethodServices";
 import { PaymentMethodResponseDTO } from "@/backend/framework/billing/types/paymentMethodTypes";
+import { useUser } from "@/hooks/useUser"; // 1. Importe o hook useUser
 
 export function PaymentsTabContent({
    subscriptionId,
@@ -60,6 +61,7 @@ export function PaymentsTabContent({
    endedIn: string | null | undefined;
    isOwnerLogged: boolean;
 }) {
+   const user = useUser(); // 2. Obtenha o usuário logado
    const [payments, setPayments] = useState<PaymentResponseDTO[]>([]);
    const [paymentMethods, setPaymentMethods] = useState<
       PaymentMethodResponseDTO[]
@@ -80,7 +82,7 @@ export function PaymentsTabContent({
       resolver: zodResolver(createPaymentRequestSchema),
       defaultValues: {
          subscriptionId,
-         methodId: "", // O valor inicial agora é vazio
+         methodId: "",
       },
    });
 
@@ -96,7 +98,6 @@ export function PaymentsTabContent({
          setPayments(paymentsResponse);
          setPaymentMethods(methodsResponse);
 
-         // Define o valor padrão do formulário para o primeiro método disponível
          if (methodsResponse.length > 0) {
             form.setValue("methodId", methodsResponse[0].id);
          }
@@ -120,7 +121,7 @@ export function PaymentsTabContent({
    const endedDate = endedIn ? new Date(endedIn) : null;
    const now = new Date();
    const isEndedRecent = endedDate
-      ? endedDate.getTime() - now.getTime() <= 7 * 24 * 60 * 60 * 1000
+      ? now.getTime() - endedDate.getTime() <= 7 * 24 * 60 * 60 * 1000
       : true;
 
    const onSubmit = async (data: CreatePaymentRequestDTO) => {
@@ -132,7 +133,7 @@ export function PaymentsTabContent({
             "Realize o seu pagamento!"
          );
          setOpenDialog(false);
-         form.reset();
+         form.reset({ subscriptionId, methodId: paymentMethods[0]?.id || "" });
          fetchData();
       } catch (e: any) {
          ErrorToast(e.message);
@@ -141,14 +142,48 @@ export function PaymentsTabContent({
       }
    };
 
-   // Função para processar pagamento
+   // Função para processar pagamento (ATUALIZADA)
    const handleProcessPayment = async () => {
       if (!processingPaymentId) return;
 
+      const paymentToProcess = payments.find(
+         (p) => p.id === processingPaymentId
+      );
+
+      if (!paymentToProcess) {
+         ErrorToast("Erro: Pagamento não encontrado.");
+         return;
+      }
+
       setProcessingLoading(true);
       try {
-         // O payload é vazio pois ProcessorPaymentRequestDTO não tem atributos
-         await paymentService.process(processingPaymentId, {});
+         // Constrói o payload dinamicamente
+         let payload: { data: Record<string, any> } = { data: {} };
+
+         // Verifica se o método é "Pontos de Grupo"
+         if (paymentToProcess.method.name === "Pontos de Grupo") {
+            if (!user?.id) {
+               ErrorToast(
+                  "Erro: Usuário não autenticado para processar o pagamento."
+               );
+               setProcessingLoading(false);
+               return;
+            }
+
+            // Adiciona os dados necessários ao payload
+            payload = {
+               data: {
+                  userId: user.id,
+                  amount: paymentToProcess.amount,
+               },
+            };
+         }
+
+         console.log(payload);
+
+         // Envia a requisição com o payload correto
+         await paymentService.process(processingPaymentId, payload);
+
          SuccessToast(
             "Pagamento processado com sucesso.",
             "O pagamento foi processado e você já pode começar a usar o seu plano."
@@ -157,9 +192,10 @@ export function PaymentsTabContent({
          localStorage.setItem("hasActiveSubscription", "true");
          fetchData();
       } catch (e: any) {
-         ErrorToast(e.message);
+         ErrorToast(e.message || "Ocorreu um erro ao processar o pagamento.");
       } finally {
          setProcessingLoading(false);
+         setProcessingPaymentId(null);
       }
    };
 
@@ -218,16 +254,6 @@ export function PaymentsTabContent({
                               </FormItem>
                            )}
                         />
-
-                        <Button
-                           type="submit"
-                           disabled={loadingAddMember}
-                           className="w-full"
-                        >
-                           {loadingAddMember
-                              ? "Carregando..."
-                              : "Registrar Pagamento"}
-                        </Button>
                      </form>
                   </Form>
 
@@ -236,8 +262,9 @@ export function PaymentsTabContent({
                      <AlertDialogAction
                         form="create-payment-form"
                         type="submit"
+                        disabled={loadingAddMember}
                      >
-                        Criar
+                        {loadingAddMember ? "Criando..." : "Criar"}
                      </AlertDialogAction>
                   </AlertDialogFooter>
                </AlertDialogContent>
@@ -257,24 +284,36 @@ export function PaymentsTabContent({
                </TableRow>
             </TableHeader>
             <TableBody>
-               {payments.length === 0 && (
+               {payments.length === 0 && !loading && (
                   <TableRow>
-                     <TableCell colSpan={6} className="text-center">
+                     <TableCell
+                        colSpan={isOwnerLogged ? 6 : 5}
+                        className="text-center"
+                     >
                         Nenhum pagamento encontrado.
                      </TableCell>
                   </TableRow>
                )}
-
+               {loading && (
+                  <TableRow>
+                     <TableCell
+                        colSpan={isOwnerLogged ? 6 : 5}
+                        className="text-center"
+                     >
+                        Carregando pagamentos...
+                     </TableCell>
+                  </TableRow>
+               )}
                {payments.map((p) => (
                   <TableRow key={p.id}>
                      <TableCell>R$ {p.amount.toFixed(2)}</TableCell>
                      <TableCell>
                         {p.paymentDate
-                           ? new Date(p.paymentDate).toLocaleDateString()
+                           ? new Date(p.paymentDate).toLocaleDateString("pt-BR")
                            : "Não pago"}
                      </TableCell>
                      <TableCell>
-                        {new Date(p.expirationIn).toLocaleDateString()}
+                        {new Date(p.expirationIn).toLocaleDateString("pt-BR")}
                      </TableCell>
                      <TableCell>{p.method.name}</TableCell>
                      <TableCell>{PaymentStatusLabels[p.status]}</TableCell>

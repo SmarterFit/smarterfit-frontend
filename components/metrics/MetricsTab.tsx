@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
    Card,
    CardHeader,
@@ -6,125 +6,104 @@ import {
    CardDescription,
    CardContent,
 } from "@/components/ui/card";
+import {
+   Table,
+   TableHeader,
+   TableRow,
+   TableHead,
+   TableBody,
+   TableCell,
+} from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MetricForm } from "../forms/ProfileMetricForm";
-import { LastMetricsChart } from "../charts/LastMetricsChart";
+import { MetricForm } from "../forms/ProfileMetricForm"; // Mantido
 import { ErrorToast, SuccessToast } from "../toasts/Toasts";
 import { UserResponseDTO } from "@/backend/modules/useraccess/types/userTypes";
-import {
-   Select,
-   SelectContent,
-   SelectItem,
-   SelectTrigger,
-   SelectValue,
-} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { metricTypeService } from "@/backend/modules/useraccess/services/metricTypesService";
 import { userMetricService } from "@/backend/modules/useraccess/services/userMetricService";
-import { MetricTypeResponseDTO } from "@/backend/modules/useraccess/types/profileMetricTypes";
-
-import { Loader2, ListChecks } from "lucide-react";
+import { Loader2, Search } from "lucide-react";
 import { MetricDataResponseDTO } from "@/backend/modules/useraccess/types/userMetricTypes";
 import { MetricDataRequestDTO } from "@/backend/modules/useraccess/schemas/userMetricSchemas";
 
 interface MetricsTabProps {
    user?: UserResponseDTO | null;
-   isLoading?: boolean;
 }
 
-export function MetricsTab({ user, isLoading }: MetricsTabProps) {
-   const [lastMetrics, setLastMetrics] = useState<any[]>([]);
-   const [metricTypes, setMetricTypes] = useState<MetricTypeResponseDTO[]>([]);
+const METRIC_TYPE_TO_DISPLAY = "Créditos de Educação";
+const ITEMS_PER_PAGE = 5;
 
-   const [loading, setLoading] = useState(false);
-   const [submitting, setSubmitting] = useState(false);
-   const [importLoading, setImportLoading] = useState(false);
+export function MetricsTab({ user }: MetricsTabProps) {
+   // --- ESTADOS ---
+   // Estado para os dados da tabela
+   const [educationMetrics, setEducationMetrics] = useState<
+      MetricDataResponseDTO[]
+   >([]);
+   // Estados para carregamento e submissão
+   const [isLoading, setIsLoading] = useState(true);
+   const [isSubmitting, setIsSubmitting] = useState(false);
+   // Estados para busca e paginação da tabela
+   const [searchTerm, setSearchTerm] = useState("");
+   const [currentPage, setCurrentPage] = useState(1);
 
-   const [importFile, setImportFile] = useState<File | null>(null);
-   const [selectedMetricType, setSelectedMetricType] = useState<
-      string | undefined
-   >(undefined);
-
-   const [selectedListType, setSelectedListType] = useState<
-      string | undefined
-   >();
-   const [listedMetrics, setListedMetrics] = useState<MetricDataResponseDTO[]>(
-      []
-   );
-   const [listingLoading, setListingLoading] = useState(false);
-
-   const fetchMetricsByType = async (type: string) => {
-      setListingLoading(true);
+   // --- FUNÇÕES DE BUSCA ---
+   const fetchEducationMetrics = async () => {
+      if (!user) return;
+      setIsLoading(true);
       try {
-         const data = await userMetricService.getByTypeName(type);
-         setListedMetrics(data);
-      } catch (e: any) {
-         ErrorToast("Erro ao listar métricas.");
+         const data = await userMetricService.getByTypeName(
+            METRIC_TYPE_TO_DISPLAY
+         );
+         setEducationMetrics(data);
+      } catch (error) {
+         ErrorToast("Erro ao carregar os créditos de educação.");
       } finally {
-         setListingLoading(false);
+         setIsLoading(false);
       }
    };
 
+   // Carrega os dados quando o usuário estiver disponível
    useEffect(() => {
-      if (!user) return;
-      const loadAllData = async () => {
-         try {
-            const types = await metricTypeService.getAll();
-            setMetricTypes(types);
-            await fetchMetrics();
-         } catch (error) {
-            ErrorToast("Erro ao carregar dados iniciais das métricas.");
-         }
-      };
-
-      loadAllData();
+      fetchEducationMetrics();
    }, [user]);
 
-   const fetchMetrics = async () => {
-      setLoading(true);
-      try {
-         const data = await userMetricService.getLasts();
-         console.log("Últimas métricas:", data);
-         setLastMetrics(data);
-      } catch (error) {
-         ErrorToast("Erro ao carregar métricas...");
-      } finally {
-         setLoading(false);
-      }
-   };
-
+   // --- FUNÇÃO DE SUBMISSÃO ---
    const handleMetricSubmit = async (data: MetricDataRequestDTO) => {
       if (!user) return;
-      setSubmitting(true);
+      setIsSubmitting(true);
       try {
          await userMetricService.addMetric(data);
-         SuccessToast("Métrica cadastrada com sucesso!", "");
-         await fetchMetrics();
+         SuccessToast("Métrica cadastrada com sucesso!", "Sucesso!");
+         // Recarrega a tabela após o cadastro
+         await fetchEducationMetrics();
       } catch (e: any) {
-         ErrorToast(e.message);
+         ErrorToast(e.message || "Erro ao registrar métrica.");
       } finally {
-         setSubmitting(false);
+         setIsSubmitting(false);
       }
    };
 
-   const handleImport = async () => {
-      if (!user || !selectedMetricType || !importFile) return;
-      try {
-         setImportLoading(true);
-         await userMetricService.importMetrics(importFile, selectedMetricType);
-         SuccessToast("Importação feita com sucesso!", "");
-         await fetchMetrics();
-         setImportFile(null);
-         setSelectedMetricType(undefined);
-      } catch (e: any) {
-         ErrorToast(e.message || "Erro ao importar métricas");
-      } finally {
-         setImportLoading(false);
+   // --- LÓGICA DE FILTRO E PAGINAÇÃO ---
+   const filteredMetrics = useMemo(() => {
+      if (!searchTerm) {
+         return educationMetrics;
       }
-   };
+      return educationMetrics.filter((metric) =>
+         JSON.stringify(metric).toLowerCase().includes(searchTerm.toLowerCase())
+      );
+   }, [educationMetrics, searchTerm]);
 
-   const chartConfig = {};
+   const totalPages = Math.ceil(filteredMetrics.length / ITEMS_PER_PAGE);
+   const paginatedMetrics = useMemo(() => {
+      const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+      return filteredMetrics.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+   }, [filteredMetrics, currentPage]);
+
+   // Gera os cabeçalhos da tabela dinamicamente a partir dos dados
+   const tableHeaders = useMemo(() => {
+      if (educationMetrics.length === 0) return [];
+      // Pega as chaves do objeto 'data' do primeiro item e adiciona a coluna de data de criação
+      return [...Object.keys(educationMetrics[0].data), "Data de Criação"];
+   }, [educationMetrics]);
 
    return (
       <div className="space-y-8">
@@ -134,185 +113,130 @@ export function MetricsTab({ user, isLoading }: MetricsTabProps) {
                Visualize e registre suas métricas pessoais.
             </p>
 
+            {/* Card para registrar nova métrica (mantido) */}
             <Card>
                <CardHeader>
-                  <CardTitle>Registrar Nova Métrica</CardTitle>
+                  <CardTitle>Registrar Novos Créditos de Educação</CardTitle>
                   <CardDescription>
-                     Mantenha suas métricas atualizadas.
+                     Mantenha seus créditos atualizados.
                   </CardDescription>
                </CardHeader>
                <CardContent>
                   {user ? (
                      <MetricForm
                         onSubmit={handleMetricSubmit}
-                        loading={submitting}
+                        loading={isSubmitting}
                      />
                   ) : (
-                     <div className="space-y-4">
-                        <Skeleton className="h-10 w-full" />
-                        <Skeleton className="h-6 w-2/3" />
-                        <Skeleton className="h-6 w-1/3" />
-                     </div>
+                     <Skeleton className="h-48 w-full" />
                   )}
                </CardContent>
             </Card>
 
-            <Card>
-               <CardHeader>
-                  <CardTitle>Importar Métricas via Arquivo</CardTitle>
-                  <CardDescription>
-                     Envie um arquivo <strong>CSV</strong> ou{" "}
-                     <strong>JSON</strong> com valores numéricos para um tipo de
-                     métrica específico.
-                  </CardDescription>
-               </CardHeader>
-               <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                     <div>
-                        <label className="block text-sm font-medium mb-1">
-                           Tipo de Métrica
-                        </label>
-                        <Select
-                           onValueChange={setSelectedMetricType}
-                           value={selectedMetricType ?? ""}
-                        >
-                           <SelectTrigger>
-                              <SelectValue placeholder="Selecione um tipo" />
-                           </SelectTrigger>
-                           <SelectContent>
-                              {metricTypes.map((type) => (
-                                 <SelectItem key={type.id} value={type.type}>
-                                    {type.type} ({type.unit})
-                                 </SelectItem>
-                              ))}
-                           </SelectContent>
-                        </Select>
-                     </div>
-
-                     <div>
-                        <label className="block text-sm font-medium mb-1">
-                           Arquivo (.csv ou .json)
-                        </label>
-                        <Input
-                           type="file"
-                           accept=".csv, application/json"
-                           onChange={(e) => {
-                              if (e.target.files?.[0]) {
-                                 setImportFile(e.target.files[0]);
-                              }
-                           }}
-                        />
-                     </div>
-                  </div>
-
-                  <Button
-                     onClick={handleImport}
-                     disabled={
-                        !user ||
-                        !selectedMetricType ||
-                        !importFile ||
-                        importLoading
-                     }
-                  >
-                     {importLoading ? "Importando..." : "Importar Arquivo"}
-                  </Button>
-               </CardContent>
-            </Card>
-
+            {/* Card com a Tabela de Créditos de Educação */}
             <Card className="shadow-md">
                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                     <ListChecks className="w-5 h-5 text-primary" />
-                     Listar Métricas por Tipo
-                  </CardTitle>
-                  <CardDescription className="text-sm text-muted-foreground">
-                     Escolha um tipo de métrica para visualizar registros
-                     anteriores.
+                  <CardTitle>Histórico de Créditos de Educação</CardTitle>
+                  <CardDescription>
+                     Visualize todos os seus registros de créditos de educação.
                   </CardDescription>
                </CardHeader>
 
-               <CardContent className="space-y-6">
-                  <Select
-                     onValueChange={(value) => {
-                        setSelectedListType(value);
-                        fetchMetricsByType(value);
-                     }}
-                     value={selectedListType ?? ""}
-                  >
-                     <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Selecione um tipo de métrica" />
-                     </SelectTrigger>
-                     <SelectContent>
-                        {metricTypes.map((type) => (
-                           <SelectItem key={type.id} value={type.type}>
-                              {type.type} ({type.unit})
-                           </SelectItem>
-                        ))}
-                     </SelectContent>
-                  </Select>
+               <CardContent className="space-y-4">
+                  <div className="relative">
+                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                     <Input
+                        type="search"
+                        placeholder="Buscar em todos os campos..."
+                        className="pl-8 sm:w-1/3"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                     />
+                  </div>
 
-                  {listingLoading ? (
+                  {isLoading ? (
                      <div className="flex justify-center py-10">
-                        <Loader2 className="animate-spin text-muted-foreground w-6 h-6" />
+                        <Loader2 className="animate-spin text-muted-foreground w-8 h-8" />
                      </div>
-                  ) : listedMetrics.length > 0 ? (
-                     <div className="space-y-4">
-                        {listedMetrics.map((metric) => (
-                           <div
-                              key={metric.id}
-                              className="p-4 border rounded-xl bg-muted/40 hover:bg-muted/30 transition-shadow"
+                  ) : paginatedMetrics.length > 0 ? (
+                     <>
+                        <div className="border rounded-md">
+                           <Table>
+                              <TableHeader>
+                                 <TableRow>
+                                    <TableHead>Instituição</TableHead>
+                                    <TableHead>Horas</TableHead>
+                                    <TableHead>Curso</TableHead>
+                                    <TableHead>Data de Conclusão</TableHead>
+                                    <TableHead>Data de Inserção</TableHead>
+                                 </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                 {paginatedMetrics.map((metric) => (
+                                    <TableRow key={metric.id}>
+                                       <TableCell>
+                                          {metric.data.institution}
+                                       </TableCell>
+                                       <TableCell>{`${metric.data.hours} h`}</TableCell>
+
+                                       <TableCell>
+                                          {metric.data.courseName}
+                                       </TableCell>
+                                       <TableCell>
+                                          {new Date(
+                                             metric.data.completionDate
+                                          ).toLocaleDateString("pt-BR", {
+                                             timeZone: "UTC",
+                                          })}
+                                       </TableCell>
+
+                                       <TableCell>
+                                          {new Date(
+                                             metric.createdAt
+                                          ).toLocaleDateString("pt-BR")}
+                                       </TableCell>
+                                    </TableRow>
+                                 ))}
+                              </TableBody>
+                           </Table>
+                        </div>
+
+                        {/* Controles de Paginação */}
+                        <div className="flex items-center justify-end space-x-2 py-4">
+                           <span className="text-sm text-muted-foreground">
+                              Página {currentPage} de {totalPages}
+                           </span>
+                           <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                 setCurrentPage((prev) => Math.max(prev - 1, 1))
+                              }
+                              disabled={currentPage === 1}
                            >
-                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                                 {Object.entries(metric.data).map(
-                                    ([key, value]) => (
-                                       <div key={key} className="flex flex-col">
-                                          <span className="text-xs text-muted-foreground uppercase tracking-wide">
-                                             {key}
-                                          </span>
-                                          <span className="font-medium text-foreground">
-                                             {value}
-                                          </span>
-                                       </div>
-                                    )
-                                 )}
-                              </div>
-                           </div>
-                        ))}
-                     </div>
-                  ) : selectedListType ? (
-                     <p className="text-center text-muted-foreground text-sm">
-                        Nenhuma métrica registrada para este tipo.
+                              Anterior
+                           </Button>
+                           <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                 setCurrentPage((prev) =>
+                                    Math.min(prev + 1, totalPages)
+                                 )
+                              }
+                              disabled={currentPage === totalPages}
+                           >
+                              Próxima
+                           </Button>
+                        </div>
+                     </>
+                  ) : (
+                     <p className="py-10 text-center text-muted-foreground text-sm">
+                        Nenhum crédito de educação encontrado.
                      </p>
-                  ) : null}
+                  )}
                </CardContent>
             </Card>
-
-            {isLoading || loading ? (
-               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  {[...Array(3)].map((_, idx) => (
-                     <Skeleton key={idx} className="h-40 w-full" />
-                  ))}
-               </div>
-            ) : (
-               <Card>
-                  <CardHeader>
-                     <CardTitle>Últimas Métricas</CardTitle>
-                     <CardDescription>
-                        Suas últimas métricas registradas.
-                     </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                     {lastMetrics.length > 0 ? (
-                        <LastMetricsChart
-                           data={lastMetrics}
-                           config={chartConfig}
-                        />
-                     ) : (
-                        <Skeleton className="h-32 w-full" />
-                     )}
-                  </CardContent>
-               </Card>
-            )}
          </section>
       </div>
    );

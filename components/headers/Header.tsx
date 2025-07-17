@@ -55,11 +55,10 @@ export default function Header() {
                   <Image
                      src="/imgs/logo.png"
                      alt="Logo"
-                     width={32}
-                     height={32}
+                     width={96}
+                     height={48}
                      className="rounded-md"
                   />
-                  <span className="font-bold">SmarterFit</span>
                </Link>
             </div>
 
@@ -130,7 +129,7 @@ export default function Header() {
                            height={32}
                            className="rounded-md"
                         />
-                        <span className="font-bold">SmarterFit</span>
+                        <span className="font-bold">HUBpro</span>
                      </Link>
                      <nav className="flex flex-col gap-4">
                         {navItems.map((item) => (
