@@ -133,7 +133,7 @@ export function ChallengeQuestFormBase({
                         </FormControl>
                         <SelectContent>
                            {challengeTypes.map((type) => (
-                              <SelectItem key={type.id} value={type.name}>
+                              <SelectItem key={type.id} value={type.id}>
                                  {type.name}
                               </SelectItem>
                            ))}
