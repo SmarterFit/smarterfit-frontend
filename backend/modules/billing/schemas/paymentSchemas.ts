@@ -16,7 +16,9 @@ export type CreatePaymentRequestDTO = z.infer<
 >;
 
 // ProcessorPaymentRequestDTO (sem atributos)
-export const processorPaymentRequestSchema = z.object({});
+export const processorPaymentRequestSchema = z.object({
+   data: z.record(z.string(), z.any()),
+});
 
 export type ProcessorPaymentRequestDTO = z.infer<
    typeof processorPaymentRequestSchema
