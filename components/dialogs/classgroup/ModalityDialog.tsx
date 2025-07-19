@@ -9,7 +9,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
    CreateModalitySchemas,
-   ModalityRequestDTO,
 } from "@/backend/modules/classgroup/schemas/modalitySchemas";
 import { z } from "zod";
 import { modalityService } from "@/backend/modules/classgroup/service/modalityService";
@@ -17,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ErrorToast, SuccessToast } from "../../toasts/Toasts";
+import { ModalityRequestDTO } from "@/backend/modules/classgroup/types/modalityTypes";
 
 type Props = {
    children: React.ReactNode;

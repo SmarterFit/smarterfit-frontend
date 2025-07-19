@@ -17,6 +17,7 @@ import type { SubscriptionResponseDTO } from "@/backend/modules/billing/types/su
 import type { CreatedPlanResponseDTO } from "@/backend/modules/billing/types/planTypes"
 import { classGroupUserService } from "@/backend/modules/classgroup/service/classGroupUserService"
 import { Card } from "@/components/ui/card"
+import { AxiosError } from "axios"
 
 interface SelectPlanDialogProps {
   classGroupId: string
@@ -52,7 +53,7 @@ export function SelectPlanDialog({
       if (data.length > 0) {
         setSelectedSubscriptionId(data[0].id)
       }
-    } catch (error) {
+    } catch {
       ErrorToast("Falha ao carregar assinaturas disponíveis")
     } finally {
       setFetchingSubscriptions(false)
@@ -75,8 +76,12 @@ export function SelectPlanDialog({
       SuccessToast("Sucesso", "Você entrou na turma com sucesso!")
       onSuccess()
       onOpenChange(false)
-    } catch (error) {
-      ErrorToast(error.response?.data?.message || "Falha ao entrar na turma")
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        ErrorToast(error.response?.data?.message)
+      } else {
+        ErrorToast("Falha ao entrar na turma")
+      }
     } finally {
       setLoading(false)
     }

@@ -42,7 +42,7 @@ export function PlansClassTab({ classGroupId }: PlansClassTabProps) {
     setRemovingPlanId(planId);
     try {
       await classGroupPlanService.removePlanToClassGroup(classGroupId, planId);
-      SuccessToast("Plano desvinculado com sucesso");
+      SuccessToast("Sucesso!", "Plano desvinculado com sucesso");
       fetchPlans(); // Atualiza a lista
     } catch {
       ErrorToast("Erro ao remover plano");

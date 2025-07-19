@@ -11,7 +11,7 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { ErrorToast, SuccessToast } from "../../toasts/Toasts";
 import type { CreateClassGroupScheduleRequestDTO } from "@/backend/modules/classgroup/types/classGroupScheduleTypes";
-import { DayOfWeek } from "@/backend/common/enums/dayOfWeek";
+import { DayOfWeek } from "@/backend/common/enums/dayOfWeekEnum";
 import { apiRequest } from "@/backend/api";
 
 type Props = {
