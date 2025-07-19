@@ -30,6 +30,18 @@ export const importMetricRequestSchema = z.object({
 
 export type ImportMetricRequestDTO = z.infer<typeof importMetricRequestSchema>;
 
+/**
+ * Schema para MetricDataDTO.
+ * Representa o 'Map<String, Object> data'.
+ * z.record(z.string(), z.any()) é a forma de representar um mapa com chaves string e valores de qualquer tipo.
+ */
+export const metricDataSchema = z.object({
+   data: z.record(z.string(), z.any()),
+});
+
+export type MetricDataDTO = z.infer<typeof metricDataSchema>;
+
+
 export const metricDataRequestSchema = z.discriminatedUnion(
    "metricType",
    [

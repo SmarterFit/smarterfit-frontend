@@ -50,7 +50,7 @@ export default function Metrics() {
                   tempo.
                </p>
                <Separator />
-               <MetricsTab user={user} isLoading={isLoading} />
+               <MetricsTab user={user} />
             </TabsContent>
 
             <TabsContent
